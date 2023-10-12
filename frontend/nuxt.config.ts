@@ -8,7 +8,15 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     'nuxt-particles',
     'nuxt-mapbox',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    [
+      '@nuxtjs/google-fonts',
+      {
+        families: {
+          Roboto: true
+        }
+      }
+    ]
   ],
   // @ts-ignore
   pinia: {

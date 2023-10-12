@@ -126,30 +126,31 @@ const onLoad = (container: Container) => {
           Enter your identifications informations
         </p>
       </div>
-      <form @submit.prevent="router.push('/dashboard')" class="z-10">
-        <div class="grid space-y-2 mt-5 z-10">
-          <div class="grid space-y-1">
-            <UiLabel for="identifier">Identifier</UiLabel>
-            <UiInput
-              id="identifier"
-              placeholder="Enter your identifier"
-              autocomplete="off"
-            />
-          </div>
-          <div class="grid space-y-1">
-            <UiLabel for="password">Password</UiLabel>
-            <UiInput
-              id="password"
-              placeholder="Enter your password"
-              type="password"
-              autocomplete="off"
-            />
-          </div>
+      <div class="grid space-y-2 mt-5 z-10">
+        <div class="grid space-y-1">
+          <UiLabel for="identifier">Identifier</UiLabel>
+          <UiInput
+            id="identifier"
+            placeholder="Enter your identifier"
+            autocomplete="off"
+          />
         </div>
-        <UiButton class="mt-4 z-10 w-full" type="submit">
-          Connect
-        </UiButton>
-      </form>
+        <div class="grid space-y-1">
+          <UiLabel for="password">Password</UiLabel>
+          <UiInput
+            id="password"
+            placeholder="Enter your password"
+            type="password"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+      <UiButton
+        class="mt-4 z-10 w-full"
+        @click="router.push('/dashboard')"
+      >
+        Connect
+      </UiButton>
     </div>
   </div>
 </template>
