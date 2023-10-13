@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (ma-palette-ai)" project-jdk-type="Python SDK" />
+  <component name="Black">
+    <option name="sdkUUID" value="097e0d9f-5226-42cc-b586-8062749704b3" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.11.5 Docker Compose (web)" project-jdk-type="Python SDK" />
 </project>
