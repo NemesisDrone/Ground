@@ -4,6 +4,8 @@ import { ScreenShare, XCircle } from 'lucide-vue-next'
 const mapRef = useMapboxRef('map-gps')
 const route = useRoute()
 
+const loadMap = ref(false)
+
 const openInNewTab = () => {
   window.open('/fullscreen/gps', '_blank')
 }
@@ -11,10 +13,17 @@ const openInNewTab = () => {
 const closeWindow = () => {
   window.close()
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    loadMap.value = true
+  }, 1500)
+})
 </script>
 <template>
   <div class="relative h-full m-0 p-0 overflow-hidden">
     <MapboxMap
+      v-if="loadMap"
       map-id="map-gps"
       :options="{
         style: 'mapbox://styles/mapbox/satellite-streets-v12', // style URL
