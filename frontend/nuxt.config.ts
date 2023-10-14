@@ -4,6 +4,12 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
   },
+  runtimeConfig: {
+    public: {
+      SOCKETIO_URL: process.env.SOCKETIO_URL,
+      API_URL: process.env.API_URL
+    }
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     'nuxt-particles',

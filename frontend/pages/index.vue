@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { Container } from 'tsparticles-engine'
+import { useAuthStore } from '~/store/auth'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 
@@ -17,7 +19,7 @@ const options = {
     },
     move: {
       enable: true,
-      speed: 1.5
+      speed: 0.5
     },
     color: {
       value: ['#20B256']
@@ -105,17 +107,35 @@ const options = {
   retina_detect: true
 }
 
-const onLoad = (container: Container) => {
-  // Do something with the container
-  container.pause()
-  setTimeout(() => container.play(), 0)
+const authStore = useAuthStore()
+const { loading, authenticated } = storeToRefs(authStore)
+
+const user = ref({
+  identifier: '',
+  password: ''
+})
+const loginError = ref(false)
+const logIn = async () => {
+  await authStore.authenticateUser(user.value)
+  if (authenticated.value) {
+    router.push('/dashboard')
+  } else {
+    loginError.value = true
+  }
 }
+
+watch(
+  user,
+  () => {
+    loginError.value = false
+  },
+  { deep: true }
+)
 </script>
 
 <template>
   <div>
-    <NuxtParticles id="tsparticles" :options="options" @load="onLoad">
-    </NuxtParticles>
+    <NuxtParticles id="tsparticles" :options="options"> </NuxtParticles>
 
     <div
       class="mx-auto w-full flex flex-col justify-center sm:w-[350px] mt-[5rem] px-4"
@@ -125,6 +145,9 @@ const onLoad = (container: Container) => {
         <p class="text-sm text-muted-foreground z-10">
           Enter your identifications informations
         </p>
+        <p v-if="loginError" class="text-red-600 z-10">
+          Invalid credentials
+        </p>
       </div>
       <div class="grid space-y-2 mt-5 z-10">
         <div class="grid space-y-1">
@@ -133,6 +156,7 @@ const onLoad = (container: Container) => {
             id="identifier"
             placeholder="Enter your identifier"
             autocomplete="off"
+            v-model="user.identifier"
           />
         </div>
         <div class="grid space-y-1">
@@ -142,12 +166,14 @@ const onLoad = (container: Container) => {
             placeholder="Enter your password"
             type="password"
             autocomplete="off"
+            v-model="user.password"
           />
         </div>
       </div>
       <UiButton
         class="mt-4 z-10 w-full"
-        @click="router.push('/dashboard')"
+        @click="logIn"
+        :is-loading="loading"
       >
         Connect
       </UiButton>
