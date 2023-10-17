@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Label, type LabelProps } from 'radix-vue'
-import { cn } from '@/lib/utils'
+import { cn } from '~/helpers/utils'
 
 const props = defineProps<LabelProps & { class?: string }>()
 </script>
@@ -11,7 +11,7 @@ const props = defineProps<LabelProps & { class?: string }>()
     :class="
       cn(
         'block text-sm tracking-tight font-medium text-foreground text-left',
-        props.class,
+        props.class
       )
     "
   >

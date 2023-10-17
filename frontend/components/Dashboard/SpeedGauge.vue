@@ -1,18 +1,9 @@
 <script setup lang="ts">
 import { Gauge } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
+import { useSensorsStore } from '~/store/sensors'
 
-const speed = ref(27)
-let interval: NodeJS.Timeout | null = null
-
-onMounted(() => {
-  interval = setInterval(() => {
-    speed.value = Math.floor(Math.random() * (30 - 25 + 1) + 25)
-  }, 1000)
-})
-
-onUnmounted(() => {
-  if (interval) clearInterval(interval)
-})
+const { speed } = storeToRefs(useSensorsStore())
 </script>
 
 <template>

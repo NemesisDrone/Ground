@@ -1,18 +1,9 @@
 <script setup lang="ts">
 import { Mountain } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
+import { useSensorsStore } from '~/store/sensors'
 
-const altitude = ref(103)
-let interval: NodeJS.Timeout | null = null
-
-onMounted(() => {
-  interval = setInterval(() => {
-    altitude.value = Math.floor(Math.random() * (104 - 98 + 1) + 98)
-  }, 1000)
-})
-
-onUnmounted(() => {
-  if (interval) clearInterval(interval)
-})
+const { altitude } = storeToRefs(useSensorsStore())
 </script>
 
 <template>

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useCounterStore } from '~/store/counter'
 import GPSMap from '~/components/Dashboard/GPSMap.vue'
 import VideoStreaming from '~/components/Dashboard/VideoStreaming.vue'
 import SpeedGauge from '~/components/Dashboard/SpeedGauge.vue'
@@ -7,9 +6,40 @@ import Altitude from '~/components/Dashboard/Altitude.vue'
 import Battery from '~/components/Dashboard/Battery.vue'
 import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
 import Camera from '~/components/Dashboard/Camera.vue'
+import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
+import { useSensorsStore } from '~/store/sensors'
 
-const counterStore = useCounterStore()
-console.log(counterStore.count)
+let ws: WebSocketWrapper | null = null
+const sensorsStore = useSensorsStore()
+onMounted(() => {
+  /**
+   * Create a new WebSocketWrapper instance
+   * and provide it to the whole application
+   * Add callbacks to handle incoming messages
+   */
+  ws = new WebSocketWrapper(
+    useRuntimeConfig().public.WEB_SOCKET_COMMUNICATION_URL as string
+  )
+  console.log(ws, 'aa')
+
+  ws.onMessage('sensors.altitude', (event) => {
+    sensorsStore.altitude = event.data
+  })
+  ws.onMessage('sensors.battery', (event) => {
+    sensorsStore.battery = event.data
+  })
+  ws.onMessage('sensors.speed', (event) => {
+    sensorsStore.speed = event.data
+  })
+})
+
+onUnmounted(() => {
+  ws?.close()
+})
+
+const send = () => {
+  ws?.send({ message: 'Hello', test: 'aa' })
+}
 </script>
 
 <template>
@@ -32,6 +62,8 @@ console.log(counterStore.count)
           <Camera />
         </div>
       </div>
+
+      <UiButton class="mt-7" @click="send">test</UiButton>
     </div>
     <div class="w-2/5 p-2">
       <div class="w-full h-1/2 pb-1">

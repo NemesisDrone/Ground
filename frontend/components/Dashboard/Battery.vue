@@ -8,20 +8,10 @@ import {
 } from 'lucide-vue-next'
 import { getBatteryStatus } from '~/utils/sensors'
 import { BatteryStatus } from '~/types/sensors.types'
+import { storeToRefs } from 'pinia'
+import { useSensorsStore } from '~/store/sensors'
 
-const battery = ref(93)
-let interval: NodeJS.Timeout | null = null
-
-onMounted(() => {
-  interval = setInterval(() => {
-    let batteryLevel = battery.value - 1
-    battery.value = batteryLevel >= 0 ? batteryLevel : 100
-  }, 150)
-})
-
-onUnmounted(() => {
-  if (interval) clearInterval(interval)
-})
+const { battery } = storeToRefs(useSensorsStore())
 
 const batteryStatus = computed(() => {
   return getBatteryStatus(battery.value)

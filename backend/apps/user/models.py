@@ -6,10 +6,11 @@ from django.contrib.auth.models import (
 from django.db import models
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
-        if email is None:
-            raise TypeError("Users must have an email address.")
-        user = self.model(email=self.normalize_email(email))
+    def create_user(self, identifier, password=None):
+        if identifier is None:
+            raise TypeError("Users must have an identifier.")
+        user = self.model(identifier=identifier)
+
         user.set_password(password)
         user.save()
 

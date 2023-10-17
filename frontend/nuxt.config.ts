@@ -7,7 +7,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       SOCKETIO_URL: process.env.SOCKETIO_URL,
-      API_URL: process.env.API_URL
+      API_URL: process.env.API_URL,
+      WEB_SOCKET_COMMUNICATION_URL:
+        process.env.WEB_SOCKET_COMMUNICATION_URL
     }
   },
   modules: [
