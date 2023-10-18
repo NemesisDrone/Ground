@@ -43,20 +43,20 @@ onMounted(() => {
         :lnglat="[gpsPosition.lat, gpsPosition.lng]"
       />
 
-      <ScreenShare
+      <button
+        class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         v-if="route.path !== '/fullscreen/gps'"
-        class="absolute top-0 right-0 m-2 cursor-pointer"
-        color="black"
-        :size="24"
         @click="openInNewTab"
-      />
-      <XCircle
+      >
+        <ScreenShare :size="24" />
+      </button>
+      <button
+        class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         v-else
-        class="absolute top-0 right-0 m-3 cursor-pointer"
-        color="black"
-        :size="32"
         @click="closeWindow"
-      />
+      >
+        <XCircle :size="32" />
+      </button>
     </MapboxMap>
   </div>
 </template>
