@@ -1,13 +1,18 @@
 # Nemesis Ground Station
-In this repository, you can find the frontend, the backend, and the communication between the Drone and the station.
-
+Welcome to the Nemesis Ground Station repository.
+This repository contains the code for the frontend, the backend and the interfaces of the Nemesis Ground Station.
 
 ## Frontend
-The frontend is made with Vuejs 3 with Nuxt and Typescript.
-The frontend is located in the `frontend` folder.
+The frontend is built using:
+- [Vuejs 3](https://vuejs.org/)
+- [Nuxt](https://nuxtjs.org/)
+- [Typescript](https://www.typescriptlang.org/)
+- [Tailwindcss](https://tailwindcss.com/)
+- [Pinia](https://pinia.vuejs.org/)
 
+To start developping, you need to be in the `frontend` folder.
 ### Setup
-Make sure to install the dependencies:
+Make sure first to install the dependencies:
 
 ```bash
 # /frontend
@@ -15,27 +20,26 @@ yarn install
 ```
 
 ### Development 
-To start developing the frontend, run the following command:
-
+Afterwards, you can start the development server:
 ```bash
 # /frontend
 yarn dev
 ```
-
+And start coding!<br>
 [Frontend documentation](frontend/README.md)
 
 ## Backend
-The backend is made with Python using Django and running inside a Docker container.
-The backend code is located in the `backend` folder.
+The backend is built in Python with Django as a web framework and running inside a Docker container.
 
 ### Development
-To start developing the backend, run the following command:
 You need to be in the root folder of the project.
+<br>
+To start developing the backend, run the following command:
 ```bash
 docker-compose up
 ```
 
-When you add a python dependency, you need to rebuild the docker image:
+When you add a python dependency, you will need to rebuild the docker image:
 ```bash
 docker-compose up --build
 ```
