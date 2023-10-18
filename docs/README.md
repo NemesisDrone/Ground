@@ -22,7 +22,7 @@ To start developing the frontend, run the following command:
 yarn dev
 ```
 
-[Frontend documentation](frontend/index.md)
+[Frontend documentation](frontend/README.md)
 
 ## Backend
 The backend is made with Python using Django and running inside a Docker container.
@@ -39,4 +39,4 @@ When you add a python dependency, you need to rebuild the docker image:
 ```bash
 docker-compose up --build
 ```
-[Backend documentation](backend/index.md)
+[Backend documentation](backend/README.md)
