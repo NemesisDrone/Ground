@@ -4,9 +4,11 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useLogsStore } from '~/store/logs'
 import { storeToRefs } from 'pinia'
 import { LogLevels } from '~/types/logs.types'
+import { Mouse, ScrollText, ScreenShare, XCircle } from 'lucide-vue-next'
 
 const logsStore = useLogsStore()
 const { logs } = storeToRefs(logsStore)
+const route = useRoute()
 
 const dotsCount = ref(0)
 const dots = computed(() => {
@@ -21,6 +23,16 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(dotsInterval!)
 })
+
+const scrollToBottom = ref(true)
+
+const openInNewTab = () => {
+  window.open('/fullscreen/logs', '_blank')
+}
+
+const closeWindow = () => {
+  window.close()
+}
 </script>
 
 <template>
@@ -28,8 +40,29 @@ onUnmounted(() => {
     <ScrollArea
       class="h-full rounded bg-black p-3 overflow-y-auto"
       ref="scrollAreaRef"
-      :scroll-to-bottom="true"
+      :scroll-to-bottom="scrollToBottom"
     >
+      <button
+        class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
+        v-if="route.path !== '/fullscreen/logs'"
+        @click="openInNewTab"
+      >
+        <ScreenShare :size="22" />
+      </button>
+      <button
+        class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
+        v-else
+        @click="closeWindow"
+      >
+        <XCircle :size="22" />
+      </button>
+      <button
+        class="absolute top-11 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
+        @click="scrollToBottom = !scrollToBottom"
+      >
+        <ScrollText v-show="!scrollToBottom" :size="24" />
+        <Mouse v-show="scrollToBottom" :size="24" />
+      </button>
       <div v-for="(log, i) in logs" :key="i">
         <div class="flex gap-1.5">
           <div

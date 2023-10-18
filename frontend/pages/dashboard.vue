@@ -6,45 +6,15 @@ import Altitude from '~/components/Dashboard/Altitude.vue'
 import Battery from '~/components/Dashboard/Battery.vue'
 import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
 import Camera from '~/components/Dashboard/Camera.vue'
-import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
-import { useSensorsStore } from '~/store/sensors'
 import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
-import { useLogsStore } from '~/store/logs'
 
-let ws: WebSocketWrapper | null = null
-const sensorsStore = useSensorsStore()
-const logsStore = useLogsStore()
-onMounted(() => {
-  /**
-   * Create a new WebSocketWrapper instance
-   * and provide it to the whole application
-   * Add callbacks to handle incoming messages
-   */
-  ws = new WebSocketWrapper(
-    useRuntimeConfig().public.WEB_SOCKET_COMMUNICATION_URL as string
-  )
-  console.log(ws, 'aa')
-
-  ws.onMessage('sensors.altitude', (event) => {
-    sensorsStore.altitude = event.data
-  })
-  ws.onMessage('sensors.battery', (event) => {
-    sensorsStore.battery = event.data
-  })
-  ws.onMessage('sensors.speed', (event) => {
-    sensorsStore.speed = event.data
-  })
-  ws.onMessage('logs', (event) => {
-    logsStore.logs.push(event.data)
-  })
-})
-
-onUnmounted(() => {
-  ws?.close()
+definePageMeta({
+  // @ts-ignore
+  layout: 'dashboard'
 })
 
 const send = () => {
-  ws?.send({ message: 'Hello', test: 'aa' })
+  // ws?.send({ message: 'Hello', test: 'aa' })
 }
 </script>
 

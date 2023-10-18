@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { ScreenShare, XCircle } from 'lucide-vue-next'
+import { useSensorsStore } from '~/store/sensors'
+import { storeToRefs } from 'pinia'
+
+const sensorsStore = useSensorsStore()
+const { gpsPosition } = storeToRefs(sensorsStore)
 
 const mapRef = useMapboxRef('map-gps')
 const route = useRoute()
@@ -29,13 +34,13 @@ onMounted(() => {
         style: 'mapbox://styles/mapbox/satellite-streets-v12', // style URL
         // style: 'mapbox://styles/mapbox/dark-v11',
         // pitch: 60,
-        center: [-0.7563779, 48.0879123], // starting position
+        center: [gpsPosition.lat, gpsPosition.lng], // starting position
         zoom: 15.5 // starting zoom
       }"
     >
       <MapboxDefaultMarker
         marker-id="marker"
-        :lnglat="[-0.7563779, 48.0879123]"
+        :lnglat="[gpsPosition.lat, gpsPosition.lng]"
       />
 
       <ScreenShare

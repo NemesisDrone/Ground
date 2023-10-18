@@ -62,7 +62,8 @@ export const useAuthStore = defineStore('auth', {
       refresh.value = null
       this.authenticated = false
     }
-  }
+  },
+  persist: true
 })
 
 if (import.meta.hot) {

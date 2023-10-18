@@ -46,7 +46,6 @@ while True:
     sensor_data = {
         "type": "logs",
         "data": {
-        #     format time like this : time.strftime("%d/%M %H:%M:%S", time.localtime())
             "time": time.strftime("%H:%M:%S", time.localtime()),
         }
     }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GPSMap from '~/components/Dashboard/GPSMap.vue'
+import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
 definePageMeta({
   // @ts-ignore
   layout: 'dashboard'
@@ -8,7 +8,7 @@ definePageMeta({
 
 <template>
   <div class="h-[100vh]">
-    <GPSMap />
+    <LogsViewer />
   </div>
 </template>
 

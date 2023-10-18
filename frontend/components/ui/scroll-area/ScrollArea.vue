@@ -7,7 +7,6 @@ import {
 } from 'radix-vue'
 import ScrollBar from './ScrollBar.vue'
 import { cn } from '@/helpers/utils'
-import { Mouse, ScrollText } from 'lucide-vue-next'
 
 const props = withDefaults(
   defineProps<
@@ -25,7 +24,7 @@ const isScrolling = ref(false)
 onMounted(() => {
   if (props.scrollToBottom) {
     intervalScrollToBottom.value = setInterval(() => {
-      if (isScrolling.value) return
+      if (!props.scrollToBottom) return
       const scrollArea = document.querySelector(
         '.radix-scroll-area'
       ) as HTMLElement
@@ -49,14 +48,6 @@ onUnmounted(() => {
     <ScrollAreaViewport
       class="h-full w-full rounded-[inherit] radix-scroll-area"
     >
-      <button
-        v-if="scrollToBottom"
-        class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
-        @click="isScrolling = !isScrolling"
-      >
-        <ScrollText v-show="isScrolling" :size="24" />
-        <Mouse v-show="!isScrolling" :size="24" />
-      </button>
       <slot />
     </ScrollAreaViewport>
     <ScrollBar />

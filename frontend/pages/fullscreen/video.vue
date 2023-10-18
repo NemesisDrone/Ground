@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import VideoStreaming from '~/components/Dashboard/VideoStreaming.vue'
+definePageMeta({
+  // @ts-ignore
+  layout: 'dashboard'
+})
 </script>
 
 <template>
