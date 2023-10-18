@@ -1,3 +1,6 @@
+"""
+This script is only used temporarily to test the communication between the backend and the frontend.
+"""
 from channels.layers import get_channel_layer
 import asyncio
 import random
@@ -38,3 +41,33 @@ while True:
     asyncio.run(send(sensor_data))
     print(f'speed {rand}')
     time.sleep(.33)
+
+    rand = random.randint(0, 4)
+    sensor_data = {
+        "type": "logs",
+        "data": {
+        #     format time like this : time.strftime("%d/%M %H:%M:%S", time.localtime())
+            "time": time.strftime("%H:%M:%S", time.localtime()),
+        }
+    }
+    match rand:
+        case 0:
+            sensor_data["data"]["level"] = "DEBUG"
+            sensor_data["data"]["message"] = "This is a debug message"
+        case 1:
+            sensor_data["data"]["level"] = "INFO"
+            sensor_data["data"]["message"] = "That's ok, This is an info message"
+        case 2:
+            sensor_data["data"]["level"] = "WARNING"
+            sensor_data["data"]["message"] = "Achtung, this is a warning message"
+        case 3:
+            sensor_data["data"]["level"] = "ERROR"
+            sensor_data["data"]["message"] = "Ah ptn, this is an error message"
+        case 4:
+            sensor_data["data"]["level"] = "CRITICAL"
+            sensor_data["data"]["message"] = "C la d This is a critical message"
+
+    if random.randint(0, 4) == 0:
+        sensor_data["data"]["message"] = "This is a reallt big message because it has to be tested. Indeed a big message can broke an Ui"
+
+    asyncio.run(send(sensor_data))

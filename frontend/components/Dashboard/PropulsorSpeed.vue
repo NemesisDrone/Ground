@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Rabbit, CircleOff, Snail, Turtle } from 'lucide-vue-next'
 import { PropulsorSpeedStatus } from '~/types/sensors.types'
+import { getPropulsorSpeedStatus } from '~/helpers/sensors'
 
 const propulsorSpeed = ref(0)
 let interval: NodeJS.Timeout | null = null

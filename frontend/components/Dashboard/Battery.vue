@@ -6,7 +6,7 @@ import {
   Battery,
   BatteryWarning
 } from 'lucide-vue-next'
-import { getBatteryStatus } from '~/utils/sensors'
+import { getBatteryStatus } from '~/helpers/sensors'
 import { BatteryStatus } from '~/types/sensors.types'
 import { storeToRefs } from 'pinia'
 import { useSensorsStore } from '~/store/sensors'

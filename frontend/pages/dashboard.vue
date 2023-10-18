@@ -8,9 +8,12 @@ import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
 import Camera from '~/components/Dashboard/Camera.vue'
 import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
 import { useSensorsStore } from '~/store/sensors'
+import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
+import { useLogsStore } from '~/store/logs'
 
 let ws: WebSocketWrapper | null = null
 const sensorsStore = useSensorsStore()
+const logsStore = useLogsStore()
 onMounted(() => {
   /**
    * Create a new WebSocketWrapper instance
@@ -30,6 +33,9 @@ onMounted(() => {
   })
   ws.onMessage('sensors.speed', (event) => {
     sensorsStore.speed = event.data
+  })
+  ws.onMessage('logs', (event) => {
+    logsStore.logs.push(event.data)
   })
 })
 
@@ -63,7 +69,16 @@ const send = () => {
         </div>
       </div>
 
-      <UiButton class="mt-7" @click="send">test</UiButton>
+      <div class="h-3/6">
+        <UiButton class="mt-7" @click="send">test</UiButton>
+      </div>
+
+      <div class="h-2/6 w-full flex gap-4" style="max-height: 33.33vh">
+        <div class="w-1/2">
+          <LogsViewer />
+        </div>
+        <div class="w-1/2"></div>
+      </div>
     </div>
     <div class="w-2/5 p-2">
       <div class="w-full h-1/2 pb-1">
