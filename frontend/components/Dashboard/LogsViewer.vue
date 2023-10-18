@@ -7,6 +7,20 @@ import { LogLevels } from '~/types/logs.types'
 
 const logsStore = useLogsStore()
 const { logs } = storeToRefs(logsStore)
+
+const dotsCount = ref(0)
+const dots = computed(() => {
+  return '.'.repeat(dotsCount.value)
+})
+let dotsInterval: NodeJS.Timeout | null = null
+onMounted(() => {
+  dotsInterval = setInterval(() => {
+    dotsCount.value = (dotsCount.value + 1) % 4
+  }, 500)
+})
+onUnmounted(() => {
+  clearInterval(dotsInterval!)
+})
 </script>
 
 <template>
@@ -33,6 +47,7 @@ const { logs } = storeToRefs(logsStore)
           <div class="text-sm text-neutral-100">{{ log.message }}</div>
         </div>
       </div>
+      <div v-if="logs.length === 0">Waiting for logs{{ dots }}</div>
     </ScrollArea>
   </div>
 </template>
