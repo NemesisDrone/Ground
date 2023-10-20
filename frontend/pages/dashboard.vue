@@ -7,11 +7,16 @@ import Battery from '~/components/Dashboard/Battery.vue'
 import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
 import Camera from '~/components/Dashboard/Camera.vue'
 import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
+import { Power, RotateCcw } from 'lucide-vue-next'
+import { useDroneComponentsStore } from '~/store/droneComponents'
+import ComponentStatus from '~/components/Dashboard/ComponentStatus.vue'
 
 definePageMeta({
   // @ts-ignore
   layout: 'dashboard'
 })
+
+const droneComponentsStore = useDroneComponentsStore()
 
 const send = () => {
   // ws?.send({ message: 'Hello', test: 'aa' })
@@ -47,7 +52,28 @@ const send = () => {
         <div class="w-1/2">
           <LogsViewer />
         </div>
-        <div class="w-1/2"></div>
+        <div class="w-1/2 grid grid-cols-4 gap-4">
+          <ComponentStatus :component="droneComponentsStore.gps" />
+          <ComponentStatus :component="droneComponentsStore.barometer" />
+          <ComponentStatus
+            :component="droneComponentsStore.batteryReader"
+          />
+          <ComponentStatus
+            :component="droneComponentsStore.propulsionController"
+          />
+          <ComponentStatus
+            :component="droneComponentsStore.propulsionController"
+          />
+          <ComponentStatus
+            :component="droneComponentsStore.servoController"
+          />
+          <ComponentStatus
+            :component="droneComponentsStore.propulsionController"
+          />
+          <ComponentStatus
+            :component="droneComponentsStore.servoController"
+          />
+        </div>
       </div>
     </div>
     <div class="w-2/5 p-2">
