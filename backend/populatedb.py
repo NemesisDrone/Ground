@@ -9,5 +9,5 @@ user = User.objects.create_user(
     identifier="Nemesis",
     password="nemesis"
 )
-print("User Nemesis created")
+print("User Nemesis with password \"nemesis\" created")
 print("DB populated")

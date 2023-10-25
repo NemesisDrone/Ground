@@ -43,6 +43,11 @@ When you add a python dependency, you will need to rebuild the docker image:
 ```bash
 docker-compose up --build
 ```
+
+For first time setup, you will need to populate the database :
+```bash
+docker-compose exec web python populatedb.py
+```
 [Backend documentation](backend/README.md)
 
 ## Interfaces
