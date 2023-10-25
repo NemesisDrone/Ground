@@ -19,7 +19,7 @@ async def send(sensor_data):
 while True:
     rand = random.randint(95, 104)
     sensor_data = {
-        "type": "sensors.altitude",
+        "type": "sensor:altitude",
         "data": rand
     }
     asyncio.run(send(sensor_data))
@@ -27,7 +27,7 @@ while True:
     time.sleep(.33)
     rand = random.randint(0, 100)
     sensor_data = {
-        "type": "sensors.battery",
+        "type": "sensor:battery",
         "data": rand
     }
     asyncio.run(send(sensor_data))
@@ -35,7 +35,7 @@ while True:
     time.sleep(.33)
     rand = random.randint(35, 43)
     sensor_data = {
-        "type": "sensors.speed",
+        "type": "sensor:speed",
         "data": rand
     }
     asyncio.run(send(sensor_data))
@@ -44,7 +44,7 @@ while True:
 
     rand = random.randint(0, 4)
     sensor_data = {
-        "type": "logs",
+        "type": "log",
         "data": {
             "time": time.strftime("%H:%M:%S", time.localtime()),
         }

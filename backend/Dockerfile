@@ -2,8 +2,6 @@ FROM python:3.11.5-slim-bookworm
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE nemesis.settings
 
-RUN apt-get update && apt-get install -y postgresql-client
-
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 

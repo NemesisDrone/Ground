@@ -6,4 +6,8 @@ until PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USER -d $DB_DB -c 'SELECT 
 done
 
 echo "PostgreSQL is up - executing command"
+
+# Start Messages forwarder service
+python services/messages_forwarder.py &
+# Start main service
 exec "$@"

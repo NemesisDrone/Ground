@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {WebSocketWrapper} from "~/helpers/webSocketWrapper";
-import {useSensorsStore} from "~/store/sensors";
-import {useLogsStore} from "~/store/logs";
+import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
+import { useSensorsStore } from '~/store/sensors'
+import { useLogsStore } from '~/store/logs'
 
 let ws: WebSocketWrapper | null = null
 const sensorsStore = useSensorsStore()
@@ -15,18 +15,18 @@ onMounted(() => {
   ws = new WebSocketWrapper(
     useRuntimeConfig().public.WEB_SOCKET_COMMUNICATION_URL as string
   )
-  ws.onMessage('sensors.altitude', (event) => {
+  ws.onMessage('sensor:altitude', (event) => {
     sensorsStore.altitude = event.data
   })
-  ws.onMessage('sensors.battery', (event) => {
+  ws.onMessage('sensor:battery', (event) => {
     sensorsStore.battery = event.data
   })
-  ws.onMessage('sensors.speed', (event) => {
+  ws.onMessage('sensor:speed', (event) => {
     sensorsStore.speed = event.data
   })
-  ws.onMessage('logs', (event) => {
+  ws.onMessage('log', (event) => {
     logsStore.logs.push(event.data)
-    if (logsStore.logs.length > 2000) logsStore.logs.splice(0, 10)
+    if (logsStore.logs.length > 1000) logsStore.logs.splice(0, 200)
   })
 })
 

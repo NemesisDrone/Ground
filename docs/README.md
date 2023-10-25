@@ -44,3 +44,9 @@ When you add a python dependency, you will need to rebuild the docker image:
 docker-compose up --build
 ```
 [Backend documentation](backend/README.md)
+
+## Interfaces
+Create a common network between drone and ground station :
+```bash
+docker network create ground_network
+```

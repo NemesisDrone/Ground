@@ -6,6 +6,8 @@ services:
       - "6380:6380"
     container_name: redis-ground
     command: --port 6380
+    networks:
+      - ground_network
 
   database:
     image: 'postgres:latest'
@@ -16,6 +18,9 @@ services:
       - backend/.env
     volumes:
       - ./volumes/db-data/:/var/lib/postgresql/data/
+    networks:
+      - ground_network
+
 
   web:
     container_name: backend_ground
@@ -32,3 +37,31 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
+    networks:
+      - ground_network
+
+  communication_server:
+    container_name: communication_server_ground
+    build:
+      context: ./interfaces/communication
+    depends_on:
+      - redis
+      - database
+    env_file:
+      - backend/.env
+    volumes:
+      - ./interfaces/communication:/app/interfaces/communication
+    command: python /app/interfaces/communication/CommunicationServer.py 0.0.0.0
+    ports:
+      - "27015:27015"
+    networks:
+      - ground_network
+
+networks:
+    ground_network:
+        external: true
+
+volumes:
+  shared-backend-volume:
+
+
