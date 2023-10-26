@@ -16,4 +16,4 @@ USER nemesis
 EXPOSE 8000
 
 RUN chmod +x entrypoint.sh
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]
