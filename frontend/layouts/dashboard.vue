@@ -30,6 +30,9 @@ onMounted(() => {
     logsStore.logs.push(event.data)
     if (logsStore.logs.length > 1000) logsStore.logs.splice(0, 200)
   })
+  ws.onMessage('drone:connection-status', (event) => {
+    droneStore.connectionStatus = event.data
+  })
   droneStore.websocket = ws
 })
 

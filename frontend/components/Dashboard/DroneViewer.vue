@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { OrbitControls, GLTFModel, Sky } from '@tresjs/cientos'
 import { ShallowRef } from 'vue'
+import { useDroneComponentsStore } from '~/store/droneComponents'
 
+const droneComponentsStore = useDroneComponentsStore()
 // @ts-ignore
 const droneRef: ShallowRef<TresInstance | null> = shallowRef(null)
 // @ts-ignore
@@ -13,6 +15,11 @@ const sens = ref(0)
 
 onMounted(() => {
   interval = setInterval(() => {
+    if (!droneComponentsStore.connectionStatus.connected) {
+      droneRef.value.value.rotation.x = 0
+      droneRef.value.value.rotation.z = 0
+      return
+    }
     if (droneRef.value && droneRef.value.value) {
       if (sens.value === 0) {
         droneRef.value.value.rotation.x += speed.value
@@ -60,7 +67,14 @@ onUnmounted(() => {
 })
 </script>
 <template>
-  <div class="rounded-md h-full p-2 bg-neutral-900">
+  <div
+    class="rounded-md h-full p-2 bg-neutral-900"
+    :class="`${
+      droneComponentsStore.connectionStatus.connected
+        ? 'p-2'
+        : 'border-2 border-red-600'
+    }`"
+  >
     <TresCanvas clear-color="#171717" shadows alpha>
       <TresPerspectiveCamera :position="[-9, 0, 0]" />
       <OrbitControls :enableRotate="true" />

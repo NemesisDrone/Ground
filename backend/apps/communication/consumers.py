@@ -20,7 +20,8 @@ class CommunicationConsumer(AsyncWebsocketConsumer):
         This method is called when the consumer receives a message from the frontend.
         It will then send the message to redis.
         """
-        await self.redis.publish("communication", text_data)
+        print(text_data)
+        await self.redis.publish("actions", text_data)
 
     async def communication_message(self, event):
         """

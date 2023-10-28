@@ -9,6 +9,9 @@ interface State {
   propulsionController: DroneComponent
   servoController: DroneComponent
   websocket: WebSocketWrapper | null
+  connectionStatus: {
+    connected: boolean
+  }
 }
 
 export const useDroneComponentsStore = defineStore('droneComponents', {
@@ -20,24 +23,27 @@ export const useDroneComponentsStore = defineStore('droneComponents', {
       description: 'GPS'
     },
     barometer: {
-      status: ComponentsState.RUNNING,
+      status: ComponentsState.STOPPED,
       name: 'Barometer',
       description: 'Barometer'
     },
     batteryReader: {
-      status: ComponentsState.RUNNING,
+      status: ComponentsState.STOPPED,
       name: 'Battery',
       description: 'Battery reader'
     },
     propulsionController: {
-      status: ComponentsState.ERROR,
+      status: ComponentsState.STOPPED,
       name: 'Propulsion',
       description: 'Propulsion controller'
     },
     servoController: {
-      status: ComponentsState.RUNNING,
+      status: ComponentsState.STOPPED,
       name: 'Servo',
       description: 'Servo controller'
+    },
+    connectionStatus: {
+      connected: false
     }
   })
 })

@@ -5,9 +5,11 @@ import { useLogsStore } from '~/store/logs'
 import { storeToRefs } from 'pinia'
 import { LogLevels } from '~/types/logs.types'
 import { Mouse, ScrollText, ScreenShare, XCircle } from 'lucide-vue-next'
+import { useDroneComponentsStore } from '~/store/droneComponents'
 
 const logsStore = useLogsStore()
 const { logs } = storeToRefs(logsStore)
+const { connectionStatus } = storeToRefs(useDroneComponentsStore())
 const route = useRoute()
 
 const dotsCount = ref(0)
@@ -80,7 +82,12 @@ const closeWindow = () => {
           <div class="text-sm text-neutral-100">{{ log.message }}</div>
         </div>
       </div>
-      <div v-if="logs.length === 0">Waiting for logs{{ dots }}</div>
+      <div v-if="connectionStatus.connected && logs.length === 0">
+        Waiting for logs{{ dots }}
+      </div>
+      <div v-if="!connectionStatus.connected">
+        Waiting for connection{{ dots }}
+      </div>
     </ScrollArea>
   </div>
 </template>

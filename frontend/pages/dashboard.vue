@@ -5,12 +5,13 @@ import SpeedGauge from '~/components/Dashboard/SpeedGauge.vue'
 import Altitude from '~/components/Dashboard/Altitude.vue'
 import Battery from '~/components/Dashboard/Battery.vue'
 import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
-import Camera from '~/components/Dashboard/Camera.vue'
+import Camera from '~/components/Dashboard/DroneStatusConnection.vue'
 import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
 import { Power, RotateCcw } from 'lucide-vue-next'
 import { useDroneComponentsStore } from '~/store/droneComponents'
 import ComponentStatus from '~/components/Dashboard/ComponentStatus.vue'
 import DroneViewer from '~/components/Dashboard/DroneViewer.vue'
+import DroneStatusConnection from '~/components/Dashboard/DroneStatusConnection.vue'
 
 definePageMeta({
   // @ts-ignore
@@ -19,9 +20,17 @@ definePageMeta({
 
 const droneComponentsStore = useDroneComponentsStore()
 
-const send = () => {
+const stop = () => {
   droneComponentsStore.websocket?.send({
     route: 'state:stop:TestCompo',
+    data: {
+      component: 'TestCompo'
+    }
+  })
+}
+const start = () => {
+  droneComponentsStore.websocket?.send({
+    route: 'state:start:TestCompo',
     data: {
       component: 'TestCompo'
     }
@@ -46,7 +55,7 @@ const send = () => {
           <PropulsorSpeed />
         </div>
         <div class="w-full h-full">
-          <Camera />
+          <DroneStatusConnection />
         </div>
       </div>
 
@@ -55,7 +64,11 @@ const send = () => {
           <DroneViewer />
         </div>
         <div class="w-1/2">
-          <UiButton class="mt-7" @click="send">test</UiButton>
+          <UiButton class="mt-7" @click="start">Start</UiButton>
+          <UiButton class="mt-7 ml-2" @click="stop" variant="outline"
+            >Stop</UiButton
+          >
+          {{ droneComponentsStore.connectionStatus }}
         </div>
       </div>
 
@@ -65,12 +78,12 @@ const send = () => {
         </div>
         <div class="w-1/2 grid grid-cols-4 gap-4">
           <ComponentStatus :component="droneComponentsStore.gps" />
+          <ComponentStatus
+            :component="droneComponentsStore.servoController"
+          />
           <ComponentStatus :component="droneComponentsStore.barometer" />
           <ComponentStatus
             :component="droneComponentsStore.batteryReader"
-          />
-          <ComponentStatus
-            :component="droneComponentsStore.propulsionController"
           />
           <ComponentStatus
             :component="droneComponentsStore.propulsionController"
