@@ -2,8 +2,10 @@
 import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
 import { useSensorsStore } from '~/store/sensors'
 import { useLogsStore } from '~/store/logs'
+import { useDroneComponentsStore } from '~/store/droneComponents'
 
 let ws: WebSocketWrapper | null = null
+const droneStore = useDroneComponentsStore()
 const sensorsStore = useSensorsStore()
 const logsStore = useLogsStore()
 onMounted(() => {
@@ -28,6 +30,7 @@ onMounted(() => {
     logsStore.logs.push(event.data)
     if (logsStore.logs.length > 1000) logsStore.logs.splice(0, 200)
   })
+  droneStore.websocket = ws
 })
 
 onUnmounted(() => {

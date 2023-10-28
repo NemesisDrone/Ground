@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     'nuxt-particles',
     'nuxt-mapbox',
     '@pinia/nuxt',
+    '@tresjs/nuxt',
     '@pinia-plugin-persistedstate/nuxt',
     [
       '@nuxtjs/google-fonts',

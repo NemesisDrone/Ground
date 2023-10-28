@@ -10,6 +10,7 @@ import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
 import { Power, RotateCcw } from 'lucide-vue-next'
 import { useDroneComponentsStore } from '~/store/droneComponents'
 import ComponentStatus from '~/components/Dashboard/ComponentStatus.vue'
+import DroneViewer from '~/components/Dashboard/DroneViewer.vue'
 
 definePageMeta({
   // @ts-ignore
@@ -19,7 +20,12 @@ definePageMeta({
 const droneComponentsStore = useDroneComponentsStore()
 
 const send = () => {
-  // ws?.send({ message: 'Hello', test: 'aa' })
+  droneComponentsStore.websocket?.send({
+    route: 'state:stop:TestCompo',
+    data: {
+      component: 'TestCompo'
+    }
+  })
 }
 </script>
 
@@ -44,8 +50,13 @@ const send = () => {
         </div>
       </div>
 
-      <div class="h-3/6">
-        <UiButton class="mt-7" @click="send">test</UiButton>
+      <div class="h-3/6 flex w-full gap-4">
+        <div class="w-1/2 py-4">
+          <DroneViewer />
+        </div>
+        <div class="w-1/2">
+          <UiButton class="mt-7" @click="send">test</UiButton>
+        </div>
       </div>
 
       <div class="h-2/6 w-full flex gap-4" style="max-height: 33.33vh">

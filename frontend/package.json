@@ -14,6 +14,7 @@
     "@nuxtjs/google-fonts": "^3.0.2",
     "@nuxtjs/tailwindcss": "^6.8.0",
     "@pinia-plugin-persistedstate/nuxt": "^1.1.2",
+    "@types/three": "^0.157.2",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "@vue/eslint-config-typescript": "^12.0.0",
@@ -31,6 +32,11 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
+    "@tresjs/cientos": "^3.5.1",
+    "@tresjs/core": "^3.4.1",
+    "@tresjs/nuxt": "^1.2.2",
+    "@tresjs/post-processing": "^0.4.0",
+    "@tweakpane/plugin-essentials": "^0.2.0",
     "@vueuse/core": "^10.5.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -42,6 +48,8 @@
     "socket.io-client": "^4.7.2",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.157.0",
+    "tweakpane": "^4.0.1",
     "typescript": "^5.2.2"
   }
 }

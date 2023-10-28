@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ComponentsState, DroneComponent } from '~/types/components.types'
+import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
 
 interface State {
   gps: DroneComponent
@@ -7,10 +8,12 @@ interface State {
   batteryReader: DroneComponent
   propulsionController: DroneComponent
   servoController: DroneComponent
+  websocket: WebSocketWrapper | null
 }
 
 export const useDroneComponentsStore = defineStore('droneComponents', {
-  state: () => ({
+  state: (): State => ({
+    websocket: null,
     gps: {
       status: ComponentsState.STOPPED,
       name: 'GPS',
