@@ -26,10 +26,10 @@ Afterwards, you can start the development server:
 yarn dev
 ```
 And start coding!<br>
-[Frontend documentation](frontend/README.md)
+[Take a look at the frontend documentation before](frontend/README.md)
 
 ## Backend
-The backend is built in Python with Django as a web framework and running inside a Docker container.
+The backend is built in Python with Django as a web framework running inside a Docker container.
 
 ### Development
 You need to be in the root folder of the project.

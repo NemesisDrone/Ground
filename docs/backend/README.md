@@ -2,9 +2,9 @@
 
 Here is some nice documentations to read : 
 - [Django](https://docs.djangoproject.com/en/4.2/)
-- [Django Channels](https://channels.readthedocs.io/en/stable/)
-- [Django Rest Framework](https://www.django-rest-framework.org/) (not used yet)
-- [How JWT works](https://sureshdsk.dev/how-json-web-token-jwt-authentication-works/) 
+- [Django Channels](https://channels.readthedocs.io/en/stable/)(used for websocket)
+- [Django Rest Framework](https://www.django-rest-framework.org/) (not used yet, but still interesting to read)
+- [How JWT works](https://sureshdsk.dev/how-json-web-token-jwt-authentication-works/) (used for authentication)
 
 ## Apps
 Our django project is composed of 3 apps:
