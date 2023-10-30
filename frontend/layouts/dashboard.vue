@@ -2,12 +2,16 @@
 import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
 import { useSensorsStore } from '~/store/sensors'
 import { useLogsStore } from '~/store/logs'
-import { useDroneComponentsStore } from '~/store/droneComponents'
+import { useDroneComponentsStore } from '~/store/components'
+import { useGamepadController } from '~/composables/useGamePadController'
 
 let ws: WebSocketWrapper | null = null
 const droneStore = useDroneComponentsStore()
 const sensorsStore = useSensorsStore()
 const logsStore = useLogsStore()
+
+let controllerInterval: NodeJS.Timeout | null = null
+
 onMounted(() => {
   /**
    * Create a new WebSocketWrapper instance
@@ -34,10 +38,15 @@ onMounted(() => {
     droneStore.connectionStatus = event.data
   })
   droneStore.websocket = ws
+
+  const { controllerGetValueInterval } = useGamepadController()
+  controllerInterval = controllerGetValueInterval
 })
 
 onUnmounted(() => {
   ws?.close()
+
+  if (controllerInterval) clearInterval(controllerInterval)
 })
 </script>
 

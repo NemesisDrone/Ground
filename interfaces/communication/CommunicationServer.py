@@ -131,6 +131,10 @@ class CommunicationServer:
         while True:
             try:
                 client_socket, _ = self.server_socket.accept()
+                # remove all existing connections
+                # so yes it's not really a server but it's fine, i guess i could use a socket pool. Ah ? That's copilot who said "socket pool", not me. Should I use it ? Nah, I'm fine.
+                for connection in self.connections:
+                    connection.close()
                 self.connections.append(client_socket)
 
                 logging.info("CommunicationServer - New connection : %s", client_socket)

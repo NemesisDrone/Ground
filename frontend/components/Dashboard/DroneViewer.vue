@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { OrbitControls, GLTFModel, Sky } from '@tresjs/cientos'
 import { ShallowRef } from 'vue'
-import { useDroneComponentsStore } from '~/store/droneComponents'
+import { useDroneComponentsStore } from '~/store/components'
 
 const droneComponentsStore = useDroneComponentsStore()
 // @ts-ignore
@@ -15,7 +15,10 @@ const sens = ref(0)
 
 onMounted(() => {
   interval = setInterval(() => {
-    if (!droneComponentsStore.connectionStatus.connected) {
+    if (
+      !droneComponentsStore.connectionStatus.connected &&
+      droneRef.value
+    ) {
       droneRef.value.value.rotation.x = 0
       droneRef.value.value.rotation.z = 0
       return

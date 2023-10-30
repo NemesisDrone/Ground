@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Wifi, WifiOff } from 'lucide-vue-next'
-import { useDroneComponentsStore } from '~/store/droneComponents'
+import { useDroneComponentsStore } from '~/store/components'
 
 const droneComponentsStore = useDroneComponentsStore()
 </script>

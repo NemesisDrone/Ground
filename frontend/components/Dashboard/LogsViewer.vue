@@ -5,7 +5,7 @@ import { useLogsStore } from '~/store/logs'
 import { storeToRefs } from 'pinia'
 import { LogLevels } from '~/types/logs.types'
 import { Mouse, ScrollText, ScreenShare, XCircle } from 'lucide-vue-next'
-import { useDroneComponentsStore } from '~/store/droneComponents'
+import { useDroneComponentsStore } from '~/store/components'
 
 const logsStore = useLogsStore()
 const { logs } = storeToRefs(logsStore)
