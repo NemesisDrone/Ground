@@ -60,8 +60,8 @@ def handle_emission(client_socket):
                 r.set("LAST_HEARTBEAT_SENT", time.time())
                 logging.debug("Heartbeat sent")
 
-        except BrokenPipeError as e:
-            logging.error("Broken pipe error: %s", e)
+        except Exception as e:
+            logging.error("Emission error: %s", e)
             publish_drone_connection_status(False)
             break
 
