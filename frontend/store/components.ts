@@ -35,7 +35,8 @@ export const useComponentsStore = defineStore('components', {
     gps: {
       status: ComponentsState.STOPPED,
       name: 'GPS',
-      description: 'GPS'
+      description: 'GPS',
+      routeSlug: 'gps'
     },
     barometer: {
       status: ComponentsState.STOPPED,

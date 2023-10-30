@@ -20,6 +20,9 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { Separator } from '@/components/ui/separator'
+import { useComponentsStore } from '~/store/components'
+
+const componentsStore = useComponentsStore()
 
 const props = defineProps<{
   component: DroneComponent
@@ -73,6 +76,58 @@ const IconFromStatus = computed(() => {
       return MonitorCheck
   }
 })
+
+// watch for changes in websocket
+watch(
+  () => componentsStore.websocket,
+  () => {
+    if (props.component.routeSlug) {
+      componentsStore.websocket?.onMessage(
+        [
+          `state:${props.component.routeSlug}:started`,
+          `state:${props.component.routeSlug}:running`
+        ],
+        (event: any) => {
+          props.component.status = ComponentsState.RUNNING
+        }
+      )
+
+      componentsStore.websocket?.onMessage(
+        [`state:${props.component.routeSlug}:stopped`],
+        (event: any) => {
+          props.component.status = ComponentsState.STOPPED
+        }
+      )
+    }
+  }
+)
+
+const startComponent = () => {
+  componentsStore.websocket?.send({
+    route: `state:start:${props.component.routeSlug}`,
+    data: {
+      component: props.component.routeSlug
+    }
+  })
+}
+
+const stopComponent = () => {
+  componentsStore.websocket?.send({
+    route: `state:stop:${props.component.routeSlug}`,
+    data: {
+      component: props.component.routeSlug
+    }
+  })
+}
+
+const restartComponent = () => {
+  componentsStore.websocket?.send({
+    route: `state:restart:${props.component.routeSlug}`,
+    data: {
+      component: props.component.routeSlug
+    }
+  })
+}
 </script>
 
 <template>
@@ -138,7 +193,11 @@ const IconFromStatus = computed(() => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger as-child>
-                <Power :size="32" class="text-primary cursor-pointer" />
+                <Power
+                  :size="32"
+                  class="text-primary cursor-pointer"
+                  @click="startComponent"
+                />
               </TooltipTrigger>
               <TooltipContent>
                 <p>Power on component {{ props.component.description }}</p>
@@ -155,7 +214,11 @@ const IconFromStatus = computed(() => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger as-child>
-                <PowerOff :size="32" class="text-red-600 cursor-pointer" />
+                <PowerOff
+                  :size="32"
+                  class="text-red-600 cursor-pointer"
+                  @click="stopComponent"
+                />
               </TooltipTrigger>
               <TooltipContent>
                 <p>
@@ -173,6 +236,7 @@ const IconFromStatus = computed(() => {
                 <RotateCcw
                   :size="32"
                   class="text-primary cursor-pointer"
+                  @click="restartComponent"
                 />
               </TooltipTrigger>
               <TooltipContent>

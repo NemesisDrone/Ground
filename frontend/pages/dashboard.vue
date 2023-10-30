@@ -29,17 +29,17 @@ const componentsStore = useComponentsStore()
 
 const stop = () => {
   componentsStore.websocket?.send({
-    route: 'state:stop:TestCompo',
+    route: 'state:stop:gps',
     data: {
-      component: 'TestCompo'
+      component: 'gps'
     }
   })
 }
 const start = () => {
   componentsStore.websocket?.send({
-    route: 'state:start:TestCompo',
+    route: 'state:start:gps',
     data: {
-      component: 'TestCompo'
+      component: 'gps'
     }
   })
 }

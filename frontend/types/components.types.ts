@@ -9,5 +9,6 @@ export interface DroneComponent {
   name: string
   description: string
   disableActions?: boolean
+  routeSlug?: string
   [key: string]: any
 }
