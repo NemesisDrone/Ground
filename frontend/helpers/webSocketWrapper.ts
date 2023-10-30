@@ -14,11 +14,19 @@ class WebSocketWrapper {
     }
   }
 
-  public onMessage(type: string, callback: (data: any) => void) {
-    if (!this.listeners[type]) {
-      this.listeners[type] = []
+  public onMessage(
+    types: string | string[],
+    callback: (data: any) => void
+  ) {
+    if (!Array.isArray(types)) {
+      types = [types]
     }
-    this.listeners[type].push(callback)
+    types.forEach((type) => {
+      if (!this.listeners[type]) {
+        this.listeners[type] = []
+      }
+      this.listeners[type].push(callback)
+    })
   }
 
   public removeListener(type: string, callback: (data: any) => void) {
