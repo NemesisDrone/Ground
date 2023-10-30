@@ -1,20 +1,35 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ComponentsState, DroneComponent } from '~/types/components.types'
 import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
-
 interface State {
   gps: DroneComponent
   barometer: DroneComponent
   batteryReader: DroneComponent
-  propulsionController: DroneComponent
+  propulsionController: {
+    status: ComponentsState
+    name: string
+    description: string
+    speed: number
+  }
   servoController: DroneComponent
   websocket: WebSocketWrapper | null
   connectionStatus: {
     connected: boolean
   }
+  controller: {
+    status: ComponentsState
+    name: string
+    description: string
+    controllerId: number | null
+    disableActions: boolean
+    axes: {
+      pitch: number
+      roll: number
+    }
+  }
 }
 
-export const useDroneComponentsStore = defineStore('droneComponents', {
+export const useComponentsStore = defineStore('components', {
   state: (): State => ({
     websocket: null,
     gps: {
@@ -35,7 +50,8 @@ export const useDroneComponentsStore = defineStore('droneComponents', {
     propulsionController: {
       status: ComponentsState.STOPPED,
       name: 'Propulsion',
-      description: 'Propulsion controller'
+      description: 'Propulsion controller',
+      speed: 0
     },
     servoController: {
       status: ComponentsState.STOPPED,
@@ -44,12 +60,23 @@ export const useDroneComponentsStore = defineStore('droneComponents', {
     },
     connectionStatus: {
       connected: false
+    },
+    controller: {
+      status: ComponentsState.STOPPED,
+      name: 'Controller',
+      description: 'Gamepad controller',
+      disableActions: true,
+      controllerId: null,
+      axes: {
+        pitch: 0,
+        roll: 0
+      }
     }
   })
 })
 
 if (import.meta.hot) {
   import.meta.hot.accept(
-    acceptHMRUpdate(useDroneComponentsStore, import.meta.hot)
+    acceptHMRUpdate(useComponentsStore, import.meta.hot)
   )
 }

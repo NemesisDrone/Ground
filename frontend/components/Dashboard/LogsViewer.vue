@@ -5,11 +5,11 @@ import { useLogsStore } from '~/store/logs'
 import { storeToRefs } from 'pinia'
 import { LogLevels } from '~/types/logs.types'
 import { Mouse, ScrollText, ScreenShare, XCircle } from 'lucide-vue-next'
-import { useDroneComponentsStore } from '~/store/components'
+import { useComponentsStore } from '~/store/components'
 
 const logsStore = useLogsStore()
 const { logs } = storeToRefs(logsStore)
-const { connectionStatus } = storeToRefs(useDroneComponentsStore())
+const { connectionStatus } = storeToRefs(useComponentsStore())
 const route = useRoute()
 
 const dotsCount = ref(0)

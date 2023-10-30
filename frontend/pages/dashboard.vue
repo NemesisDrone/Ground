@@ -8,20 +8,27 @@ import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
 import Camera from '~/components/Dashboard/DroneStatusConnection.vue'
 import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
 import { Power, RotateCcw } from 'lucide-vue-next'
-import { useDroneComponentsStore } from '~/store/components'
+import { useComponentsStore } from '~/store/components'
 import ComponentStatus from '~/components/Dashboard/ComponentStatus.vue'
 import DroneViewer from '~/components/Dashboard/DroneViewer.vue'
 import DroneStatusConnection from '~/components/Dashboard/DroneStatusConnection.vue'
+import {
+  Gamepad2,
+  Locate,
+  Mountain,
+  PlaneTakeoff,
+  PlugZap
+} from 'lucide-vue-next'
 
 definePageMeta({
   // @ts-ignore
   layout: 'dashboard'
 })
 
-const droneComponentsStore = useDroneComponentsStore()
+const componentsStore = useComponentsStore()
 
 const stop = () => {
-  droneComponentsStore.websocket?.send({
+  componentsStore.websocket?.send({
     route: 'state:stop:TestCompo',
     data: {
       component: 'TestCompo'
@@ -29,7 +36,7 @@ const stop = () => {
   })
 }
 const start = () => {
-  droneComponentsStore.websocket?.send({
+  componentsStore.websocket?.send({
     route: 'state:start:TestCompo',
     data: {
       component: 'TestCompo'
@@ -65,10 +72,13 @@ const start = () => {
         </div>
         <div class="w-1/2">
           <UiButton class="mt-7" @click="start">Start</UiButton>
-          <UiButton class="mt-7 ml-2" @click="stop" variant="outline"
-            >Stop</UiButton
-          >
-          {{ droneComponentsStore.connectionStatus }}
+          <UiButton class="mt-7 ml-2" @click="stop" variant="outline">
+            Stop
+          </UiButton>
+          <br />
+          {{ componentsStore.connectionStatus }}
+          <br />
+          {{ componentsStore.controller.axes }}
         </div>
       </div>
 
@@ -77,25 +87,30 @@ const start = () => {
           <LogsViewer />
         </div>
         <div class="w-1/2 grid grid-cols-4 gap-4">
-          <ComponentStatus :component="droneComponentsStore.gps" />
           <ComponentStatus
-            :component="droneComponentsStore.servoController"
+            :component="componentsStore.gps"
+            :icon="Locate"
           />
-          <ComponentStatus :component="droneComponentsStore.barometer" />
+          <ComponentStatus :component="componentsStore.servoController" />
           <ComponentStatus
-            :component="droneComponentsStore.batteryReader"
-          />
-          <ComponentStatus
-            :component="droneComponentsStore.propulsionController"
+            :component="componentsStore.barometer"
+            :icon="Mountain"
           />
           <ComponentStatus
-            :component="droneComponentsStore.servoController"
+            :component="componentsStore.batteryReader"
+            :icon="PlugZap"
           />
           <ComponentStatus
-            :component="droneComponentsStore.propulsionController"
+            :component="componentsStore.propulsionController"
+            :icon="PlaneTakeoff"
+          />
+          <ComponentStatus :component="componentsStore.servoController" />
+          <ComponentStatus
+            :component="componentsStore.propulsionController"
           />
           <ComponentStatus
-            :component="droneComponentsStore.servoController"
+            :component="componentsStore.controller"
+            :icon="Gamepad2"
           />
         </div>
       </div>

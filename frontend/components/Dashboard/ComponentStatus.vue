@@ -23,6 +23,8 @@ import { Separator } from '@/components/ui/separator'
 
 const props = defineProps<{
   component: DroneComponent
+  // Sry for the any, but I don't know how to type this, that's why I'm using typescript. I promise. I know i shoud look into the LucideIcon docs and find out how to type this. But I'm lazy. And I'm not getting paid for this. So I'm not gonna do it. I'm sorry. I'm not sorry.
+  icon?: any
 }>()
 
 const isPopoverOpen = ref(false)
@@ -79,7 +81,10 @@ const IconFromStatus = computed(() => {
       <div
         :class="`border-2 rounded flex flex-col justify-center items-center cursor-pointer ${colorFromStatus}`"
       >
-        <component :is="IconFromStatus" :class="TextColorFromStatus" />
+        <component
+          :is="props.icon ? props.icon : IconFromStatus"
+          :class="TextColorFromStatus"
+        />
 
         <div
           class="text-center text-sm font-bold"
@@ -99,7 +104,12 @@ const IconFromStatus = computed(() => {
           <h4 class="font-medium leading-none">
             {{ component.description }}
           </h4>
-          <p class="text-sm text-muted-foreground">Actions</p>
+          <p
+            v-if="!props.component.disableActions"
+            class="text-sm text-muted-foreground"
+          >
+            Actions
+          </p>
         </div>
         <div class="flex flex-col justify-center items-center">
           <component :is="IconFromStatus" :class="TextColorFromStatus" />
@@ -118,7 +128,10 @@ const IconFromStatus = computed(() => {
           </div>
         </div>
       </div>
-      <div class="flex h-10 items-center space-x-4 text-sm mt-4">
+      <div
+        v-if="!props.component.disableActions"
+        class="flex h-10 items-center space-x-4 text-sm mt-4"
+      >
         <template
           v-if="props.component.status === ComponentsState.STOPPED"
         >

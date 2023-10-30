@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Wifi, WifiOff } from 'lucide-vue-next'
-import { useDroneComponentsStore } from '~/store/components'
+import { useComponentsStore } from '~/store/components'
 
-const droneComponentsStore = useDroneComponentsStore()
+const componentsStore = useComponentsStore()
 </script>
 
 <template>
@@ -10,7 +10,7 @@ const droneComponentsStore = useDroneComponentsStore()
     class="rounded bg-neutral-900 h-full flex flex-col items-center justify-center gap-0.5"
   >
     <Wifi
-      v-if="droneComponentsStore.connectionStatus.connected"
+      v-if="componentsStore.connectionStatus.connected"
       :size="32"
       class="mt-1"
     />
@@ -18,13 +18,13 @@ const droneComponentsStore = useDroneComponentsStore()
     <h3
       class="text-xl font-bold"
       :class="`${
-        droneComponentsStore.connectionStatus.connected
+        componentsStore.connectionStatus.connected
           ? 'text-primary'
           : 'text-red-600'
       }`"
     >
       {{
-        droneComponentsStore.connectionStatus.connected
+        componentsStore.connectionStatus.connected
           ? 'Connected'
           : 'Disconnected'
       }}

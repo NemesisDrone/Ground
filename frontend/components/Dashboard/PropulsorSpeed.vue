@@ -2,24 +2,27 @@
 import { Rabbit, CircleOff, Snail, Turtle } from 'lucide-vue-next'
 import { PropulsorSpeedStatus } from '~/types/sensors.types'
 import { getPropulsorSpeedStatus } from '~/helpers/sensors'
+import { storeToRefs } from 'pinia'
+import { useComponentsStore } from '~/store/components'
 
-const propulsorSpeed = ref(0)
-let interval: NodeJS.Timeout | null = null
-
-onMounted(() => {
-  interval = setInterval(() => {
-    let speed = propulsorSpeed.value + 1
-    propulsorSpeed.value = speed <= 100 ? speed : 0
-  }, 150)
-})
-
+// const propulsorSpeed = ref(0)
+const { propulsionController } = storeToRefs(useComponentsStore())
+// let interval: NodeJS.Timeout | null = null
+//
+// onMounted(() => {
+//   interval = setInterval(() => {
+//     let speed = propulsorSpeed.value + 1
+//     propulsorSpeed.value = speed <= 100 ? speed : 0
+//   }, 150)
+// })
+//
 const propulsorSpeedStatus = computed(() => {
-  return getPropulsorSpeedStatus(propulsorSpeed.value)
+  return getPropulsorSpeedStatus(propulsionController.value.speed)
 })
-
-onUnmounted(() => {
-  if (interval) clearInterval(interval)
-})
+//
+// onUnmounted(() => {
+//   if (interval) clearInterval(interval)
+// })
 </script>
 
 <template>
@@ -46,7 +49,9 @@ onUnmounted(() => {
       :size="32"
       class="mt-1 text-red-400"
     />
-    <h3 class="text-xl text-primary font-bold">{{ propulsorSpeed }} %</h3>
+    <h3 class="text-xl text-primary font-bold">
+      {{ propulsionController.speed }} %
+    </h3>
     <p class="text-sm">Propulsor speed</p>
   </div>
 </template>

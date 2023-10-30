@@ -8,4 +8,6 @@ export interface DroneComponent {
   status: ComponentsState
   name: string
   description: string
+  disableActions?: boolean
+  [key: string]: any
 }
