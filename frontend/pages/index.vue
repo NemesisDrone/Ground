@@ -118,7 +118,7 @@ const loginError = ref(false)
 const logIn = async () => {
   await authStore.authenticateUser(user.value)
   if (authenticated.value) {
-    router.push('/dashboard')
+    router.push('/dashboard/dashboard')
   } else {
     loginError.value = true
   }

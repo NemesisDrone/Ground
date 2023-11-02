@@ -4,6 +4,7 @@ import { useSensorsStore } from '~/store/sensors'
 import { useLogsStore } from '~/store/logs'
 import { useComponentsStore } from '~/store/components'
 import { useGamepadController } from '~/composables/useGamePadController'
+import { Menu, KanbanSquare, View, Settings } from 'lucide-vue-next'
 
 let ws: WebSocketWrapper | null = null
 const droneStore = useComponentsStore()
@@ -54,11 +55,58 @@ onUnmounted(() => {
   if (controllerAxesInterval) clearInterval(controllerAxesInterval)
   if (controllerButtonsInterval) clearInterval(controllerButtonsInterval)
 })
+
+const route = useRoute()
+
+const dashboardLayouts = [
+  {
+    icon: KanbanSquare,
+    title: 'Dashboard',
+    route: '/dashboard/dashboard'
+  },
+  {
+    icon: View,
+    title: 'Map & Video',
+    route: '/dashboard/map-video'
+  }
+]
 </script>
 
 <template>
-  <div>
-    <slot />
+  <div class="flex">
+    <div
+      class="w-[62px] h-[100vh] border-r-2 border-neutral-900 flex flex-col items-center justify-between"
+    >
+      <!--      <Menu :size="28" class="mt-4 cursor-pointer" />-->
+
+      <div class="flex flex-col gap-2 mt-[1.5rem]">
+        <router-link
+          v-for="dashboardLayout in dashboardLayouts"
+          class="cursor-pointer"
+          :class="{
+            'text-primary': route.path === dashboardLayout.route
+          }"
+          :title="dashboardLayout.title"
+          :to="dashboardLayout.route"
+        >
+          <component :is="dashboardLayout.icon" :size="28" />
+        </router-link>
+      </div>
+      <div class="mb-4">
+        <router-link
+          class="cursor-pointer"
+          :class="{
+            'text-primary': route.path === '/dashboard/settings'
+          }"
+          to="/dashboard/settings"
+        >
+          <Settings :size="28" />
+        </router-link>
+      </div>
+    </div>
+    <main class="w-full">
+      <slot />
+    </main>
   </div>
 </template>
 

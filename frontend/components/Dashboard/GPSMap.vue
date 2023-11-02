@@ -8,11 +8,14 @@ import {
 } from 'lucide-vue-next'
 import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
+import { v4 as uuidv4 } from 'uuid'
 
 const sensorsStore = useSensorsStore()
 const { gpsPosition } = storeToRefs(sensorsStore)
 
-const mapRef = useMapboxRef('map-gps')
+const uniqueMapId = uuidv4()
+
+const mapRef = useMapboxRef('map-gps-' + uniqueMapId)
 const markerRef = useMapboxMarkerRef('marker')
 const route = useRoute()
 
@@ -34,7 +37,6 @@ const closeWindow = () => {
 }
 
 const viewAttachedToDronePosition = ref(true)
-
 watch(gpsPosition, () => {
   if (!mapRef.value || !markerRef.value) return
 
@@ -59,7 +61,7 @@ const goToInitialZoom = () => {
   <div class="relative h-full m-0 p-0 overflow-hidden">
     <MapboxMap
       v-if="loadMap"
-      map-id="map-gps"
+      :map-id="`map-gps-${uniqueMapId}`"
       :options="{
         style: 'mapbox://styles/mapbox/satellite-streets-v12', // style URL
         // style: 'mapbox://styles/mapbox/dark-v11',

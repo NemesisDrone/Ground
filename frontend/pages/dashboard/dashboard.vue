@@ -5,9 +5,7 @@ import SpeedGauge from '~/components/Dashboard/SpeedGauge.vue'
 import Altitude from '~/components/Dashboard/Altitude.vue'
 import Battery from '~/components/Dashboard/Battery.vue'
 import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
-import Camera from '~/components/Dashboard/DroneStatusConnection.vue'
 import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
-import { Power, RotateCcw } from 'lucide-vue-next'
 import { useComponentsStore } from '~/store/components'
 import ComponentStatus from '~/components/Dashboard/ComponentStatus.vue'
 import DroneViewer from '~/components/Dashboard/DroneViewer.vue'
@@ -21,7 +19,6 @@ import {
 } from 'lucide-vue-next'
 
 definePageMeta({
-  // @ts-ignore
   layout: 'dashboard'
 })
 

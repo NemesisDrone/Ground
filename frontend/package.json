@@ -15,6 +15,7 @@
     "@nuxtjs/tailwindcss": "^6.8.0",
     "@pinia-plugin-persistedstate/nuxt": "^1.1.2",
     "@types/three": "^0.157.2",
+    "@types/uuid": "^9.0.6",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "@vue/eslint-config-typescript": "^12.0.0",
@@ -50,6 +51,7 @@
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.157.0",
     "tweakpane": "^4.0.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "uuid": "^9.0.1"
   }
 }
