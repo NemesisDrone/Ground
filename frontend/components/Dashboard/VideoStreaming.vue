@@ -15,8 +15,8 @@ const closeWindow = () => {
 <template>
   <div class="relative h-full m-0 p-0 overflow-hidden">
     <img
-      class="w-full h-full object-cover"
-      src="https://media.tenor.com/_F5jZzS4RnwAAAAC/twerk.gif"
+      class="w-full object-cover h-full"
+      src="https://media.tenor.com/UuLJ3JKB_PQAAAAd/bomb-explosion.gif"
     />
     <button
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
