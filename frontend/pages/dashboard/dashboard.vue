@@ -103,7 +103,7 @@ const start = () => {
           />
           <ComponentStatus :component="componentsStore.servoController" />
           <ComponentStatus
-            :component="componentsStore.propulsionController"
+            :component="componentsStore.laserDistanceSensor"
           />
           <ComponentStatus
             :component="componentsStore.controller"
