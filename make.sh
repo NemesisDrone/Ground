@@ -42,7 +42,7 @@ if [[ -z "$username" ]]; then
 fi
 
 if [[ -z "$password" ]]; then
-   username="nemesis_password"
+   password="nemesis_password"
 fi
 
 sed -i "s/DB_USER=.*/DB_USER=${username}/" ./backend/.env
@@ -51,7 +51,7 @@ sed -i "s/POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${password}/" ./backend/.env
 sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${password}/" ./backend/.env
 
 sudo docker network create ground_network || true
-sudo docker-compose up &
+nohup sudo docker-compose up &
 sudo docker-compose exec web python manage.py migrate
 sudo docker-compose exec web python populatedb.py
 cd frontend
