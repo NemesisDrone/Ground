@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e # Exit script if a execution fail
+set -e # Exit script if an execution fail
 
 # Install node dependcies on debian/ubuntu based system
 if ! type "yarn" > /dev/null; then
@@ -40,7 +40,7 @@ sudo docker-compose exec web python populatedb.py
 cd frontend
 yarn install
 
-# Check Docker installation...
+# Check Lolcat installation...
 if ! type "lolcat" > /dev/null; then
         echo "Lolcat is not installed..."
         sudo apt update -y
