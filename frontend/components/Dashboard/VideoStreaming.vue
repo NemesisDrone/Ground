@@ -12,24 +12,37 @@ const closeWindow = () => {
 }
 
 onMounted(() => {
-      var ws = new WebSocket('ws://localhost:7000');
-      ws.binaryType = "arraybuffer";
+      function ws_connect() {
+        var ws = new WebSocket('ws://172.20.10.2:7000'); // [TODO] See what address to use here.
+        ws.binaryType = "arraybuffer";
 
-      ws.addEventListener("error", event => {
-        console.log("WebSocket error!");
-      });
-
-      ws.addEventListener('message', event => {
-        event.data.arrayBuffer().then(res => {
-          var abv = new Uint8Array(res);
-          var blob = new Blob([abv], {type: "image/jpeg"});
-          var uc = window.URL || window.webkitURL;
-          var iu = uc.createObjectURL(blob);
-          var i = document.querySelector("#imager");
-          i.src = iu;
+        ws.addEventListener("error", event => {
+          console.error("WS ERROR: ", event.message);
+          ws.close();
+          setTimeout(function() {
+            ws_connect();
+          }, 500);
         });
-      });
+
+        ws.addEventListener("close", event => {
+          setTimeout(function() {
+            ws_connect();
+          }, 500);
+        });
+
+        ws.addEventListener('message', event => {
+          event.data.arrayBuffer().then(res => {
+            var abv = new Uint8Array(res);
+            var blob = new Blob([abv], {type: "image/jpeg"});
+            var uc = window.URL || window.webkitURL;
+            var iu = uc.createObjectURL(blob);
+            var i = document.querySelector("#imager");
+            i.src = iu;
+          });
+        });
+      };
 })
+
 </script>
 
 <template>
