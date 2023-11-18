@@ -1,11 +1,12 @@
 import { storeToRefs } from 'pinia'
-import { useAuthStore } from '~/store/auth'
+import { useUserStore } from '~/store/user'
 
 /**
  * Route named "index" is the login route
  */
 export default defineNuxtRouteMiddleware((to, from) => {
-  const { authenticated } = storeToRefs(useAuthStore())
+  const userStore = useUserStore()
+  const { authenticated } = storeToRefs(userStore)
   const access = useCookie('access')
   const refresh = useCookie('refresh')
 
@@ -16,6 +17,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     //   return navigateTo('/dashboard')
     // }
   }
+  userStore.getUserData()
 
   if ((!access.value || !refresh.value) && to?.name !== 'index') {
     abortNavigation()

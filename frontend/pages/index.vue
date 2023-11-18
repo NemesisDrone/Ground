@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Container } from 'tsparticles-engine'
-import { useAuthStore } from '~/store/auth'
+import { useUserStore } from '~/store/user'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
@@ -107,21 +107,26 @@ const options = {
   retina_detect: true
 }
 
-const authStore = useAuthStore()
-const { loading, authenticated } = storeToRefs(authStore)
+const authStore = useUserStore()
+const { authenticated } = storeToRefs(authStore)
 
 const user = ref({
   identifier: '',
   password: ''
 })
 const loginError = ref(false)
+const isLoading = ref(false)
 const logIn = async () => {
+  isLoading.value = true
+
   await authStore.authenticateUser(user.value)
   if (authenticated.value) {
     router.push('/dashboard/dashboard')
   } else {
     loginError.value = true
   }
+
+  isLoading.value = false
 }
 
 watch(
@@ -173,7 +178,7 @@ watch(
       <UiButton
         class="mt-4 z-10 w-full"
         @click="logIn"
-        :is-loading="loading"
+        :is-loading="isLoading"
       >
         Connect
       </UiButton>
