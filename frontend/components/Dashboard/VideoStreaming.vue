@@ -10,13 +10,33 @@ const openInNewTab = () => {
 const closeWindow = () => {
   window.close()
 }
+
+onMounted(() => {
+      var ws = new WebSocket('ws://localhost:7000');
+      ws.binaryType = "arraybuffer";
+
+      ws.addEventListener("error", event => {
+        console.log("WebSocket error!");
+      });
+
+      ws.addEventListener('message', event => {
+        event.data.arrayBuffer().then(res => {
+          var abv = new Uint8Array(res);
+          var blob = new Blob([abv], {type: "image/jpeg"});
+          var uc = window.URL || window.webkitURL;
+          var iu = uc.createObjectURL(blob);
+          var i = document.querySelector("#imager");
+          i.src = iu;
+        });
+      });
+})
 </script>
 
 <template>
   <div class="relative h-full m-0 p-0 overflow-hidden">
     <img
       class="w-full object-cover h-full"
-      src="https://media.tenor.com/UuLJ3JKB_PQAAAAd/bomb-explosion.gif"
+      id="imager"
     />
     <button
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
