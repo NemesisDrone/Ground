@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/user/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path("api/user/blacklist", TokenBlacklistView.as_view(), name="token_blacklist"),
     path("api/user/data", views.get_user_data, name="user_data"),
+    path("api/user/identifier", views.update_user_identifier, name="update_user_identifier"),
 ]

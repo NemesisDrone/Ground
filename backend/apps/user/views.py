@@ -15,7 +15,22 @@ class UserLoginView(TokenObtainPairView):
 def get_user_data(request: Request):
     """
     Get user data
-    :return:
     """
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def update_user_identifier(request: Request):
+    """
+    Update user identifier
+    """
+    user = request.user
+
+    print(user)
+
+    return Response({
+        "status": "success",
+    })
+
