@@ -2,12 +2,21 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis.asyncio as redis
 from django.conf import settings
+from .utils import get_user
+
 
 class CommunicationConsumer(AsyncWebsocketConsumer):
     """
     This consumer handles the communication between the frontend and the backend. And
     """
     async def connect(self):
+        user = await get_user(self.scope)
+
+        # If the user is not authenticated, close the connection.
+        if user.is_anonymous:
+            await self.close()
+            return
+
         await self.channel_layer.group_add("communication", self.channel_name)
         self.redis = await redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
         await self.accept()
