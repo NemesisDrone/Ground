@@ -30,6 +30,7 @@ class NVSState(Enum):
     Unknown: int = 7
     PendingStop: int = 8
     SrcLookupFail: int = 9
+    GstFlowError: int = 10
 
 
 class NVSServer:
@@ -41,11 +42,11 @@ class NVSServer:
         self.lastSender = None
 
         if not Gst.init_check(None): # init gstreamer
-            self.log("[NVS] GST init failed!", ll.CRITICAL)
+            self.log("GST init failed!", ll.CRITICAL)
             self.nvs_state = NVSState.GstInitFail
             return
 
-        global DECODE_PIPELNE
+        global DECODE_PIPELINE
         global RECEIVED_FORMAT
 
         self.pipeline = Gst.parse_launch(DECODE_PIPELINE)
@@ -72,14 +73,13 @@ class NVSServer:
         self.src.set_property("format", Gst.Format.TIME)
         #self.src.set_caps(Gst.Caps.from_string(RECEIVED_FORMAT))
         self.src.set_property("caps", Gst.Caps.from_string(RECEIVED_FORMAT))
-        self.src.set_property("block", True) # So we can drop frames as needed.
+        #self.src.set_property("block", True) # So we can drop frames as needed.
 
         self.nvs_state = NVSState.Initialized
 
 
     def __del__(self):
         self.stop()
-
 
     def stop(self):
         self.nvs_state = NVSState.PendingStop
@@ -91,7 +91,7 @@ class NVSServer:
         if self.pipeline:
             self.pipeline.set_state(Gst.State.NULL)
 
-        self.log("[NVS] Stopped.", ll.INFO)
+        self.log("Stopped.", ll.INFO)
         self.nvs_state = NVSState.Initialized
 
 
@@ -99,21 +99,28 @@ class NVSServer:
         if self.nvs_state != NVSState.Initialized:
             return
 
-        async with wss(self._handle_connection, "127.0.0.1", port=7000):
+        self.pipeline.set_state(Gst.State.PLAYING)
+        async with wss(self._handle_connection, "172.20.10.2", port=7000): # [TODO] See what address to use.
             self.nvs_state = NVSState.WaitingConnection
-            print("Waiting for connection.")
             await aio.Future()
-
-        self.nvs_state = NVSState.Initialized
 
 
     async def _handle_connection(self, wss):
+        self.nvs_state = NVSState.Streaming
         print("Connection acquired!")
         try:
             while self.nvs_state != NVSState.PendingStop:
-                data = await wss.rcv()
+                #try:
+                data = await wss.recv()
+                ret = Gst.FlowReturn.OK
+                buff = Gst.Buffer.new_wrapped(data)
                 # Send through APPSRC
-                self.src.emit("push-buffer", Gst.Buffer.new_wrapped(data))
+                self.src.emit("push-buffer", buff, ret)
+                buff.unref()
+
+                if ret != Gst.FlowReturn.OK:
+                    self.nvs_state = NVSState.GstFlowError
+
                 if self.lastSender != wss:
                     self.lastSender = wss
 
@@ -130,6 +137,7 @@ class NVSServer:
         """
         Handles incoming data from a GST pipeline.
         """
+        print("Pulling")
         sample = appsink.emit("pull-sample")
 
         if sample:
@@ -140,20 +148,22 @@ class NVSServer:
                     self.waiting[0].unmap(self.waiting[1])
 
                 if self.clients: # Would be useless to store frames while there is no conn.
-                    self.waiting = tuple(gst_buffer, buffer_map)
+                    self.waiting = (gst_buffer, buffer_map)
 
             finally:
-                pass
+                self._push(self.waiting)
 
         return Gst.FlowReturn.OK
 
 
     async def _push(self, stuff):
+        print("Forwarding")
         # Stream to other clients.
         for wss in self.clients:
             if wss != self.lastSender:
                 await wss.send(stuff[1].data)
                 stuff[0].unmap(stuff[1])
+
 
     def clear_waiting_data(self):
         """
@@ -165,6 +175,7 @@ class NVSServer:
 
     def get_nvs_state(self):
         return self.nvs_state
+
 
 nvss = NVSServer()
 aio.run(nvss.run())
