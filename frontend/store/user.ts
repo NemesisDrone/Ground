@@ -87,7 +87,7 @@ export const useUserStore = defineStore('user', {
         }
       })
 
-      if (data.value.access) {
+      if (data.value?.access) {
         accessCookie.value = data.value.access
 
         this.authenticated = true
