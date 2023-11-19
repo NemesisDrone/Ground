@@ -22,6 +22,7 @@ const closeWindow = () => {
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
       v-if="route.path !== '/fullscreen/video'"
       @click="openInNewTab"
+      title="Open in new tab"
     >
       <ScreenShare :size="24" />
     </button>
@@ -29,6 +30,7 @@ const closeWindow = () => {
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
       v-else
       @click="closeWindow"
+      title="Close window"
     >
       <XCircle :size="32" />
     </button>
