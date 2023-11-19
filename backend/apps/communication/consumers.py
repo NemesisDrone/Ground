@@ -9,6 +9,7 @@ class CommunicationConsumer(AsyncWebsocketConsumer):
     """
     This consumer handles the communication between the frontend and the backend. And
     """
+
     async def connect(self):
         user = await get_user(self.scope)
 
@@ -18,7 +19,9 @@ class CommunicationConsumer(AsyncWebsocketConsumer):
             return
 
         await self.channel_layer.group_add("communication", self.channel_name)
-        self.redis = await redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+        self.redis = await redis.Redis(
+            host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True
+        )
         await self.accept()
 
     async def disconnect(self, close_code):

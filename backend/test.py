@@ -16,38 +16,30 @@ async def send(sensor_data):
     }
     await channel_layer.group_send(group_name, message)
 
+
 while True:
     rand = random.randint(95, 104)
-    sensor_data = {
-        "type": "sensors:altitude",
-        "data": rand
-    }
+    sensor_data = {"type": "sensors:altitude", "data": rand}
     asyncio.run(send(sensor_data))
-    print(f'altitude {rand}')
-    time.sleep(.33)
+    print(f"altitude {rand}")
+    time.sleep(0.33)
     rand = random.randint(0, 100)
-    sensor_data = {
-        "type": "sensors:battery",
-        "data": rand
-    }
+    sensor_data = {"type": "sensors:battery", "data": rand}
     asyncio.run(send(sensor_data))
-    print(f'battery {rand}')
-    time.sleep(.33)
+    print(f"battery {rand}")
+    time.sleep(0.33)
     rand = random.randint(35, 43)
-    sensor_data = {
-        "type": "sensors:speed",
-        "data": rand
-    }
+    sensor_data = {"type": "sensors:speed", "data": rand}
     asyncio.run(send(sensor_data))
-    print(f'speed {rand}')
-    time.sleep(.33)
+    print(f"speed {rand}")
+    time.sleep(0.33)
 
     rand = random.randint(0, 4)
     sensor_data = {
         "type": "log",
         "data": {
             "time": time.strftime("%H:%M:%S", time.localtime()),
-        }
+        },
     }
     match rand:
         case 0:
@@ -67,6 +59,8 @@ while True:
             sensor_data["data"]["message"] = "C la d This is a critical message"
 
     if random.randint(0, 4) == 0:
-        sensor_data["data"]["message"] = "This is a reallt big message because it has to be tested. Indeed a big message can broke an Ui"
+        sensor_data["data"][
+            "message"
+        ] = "This is a reallt big message because it has to be tested. Indeed a big message can broke an Ui"
 
     asyncio.run(send(sensor_data))

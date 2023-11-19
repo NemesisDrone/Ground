@@ -6,11 +6,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import UserSerializer
 from ..user.models import User
 
+
 class UserLoginView(TokenObtainPairView):
     permission_classes = (permissions.AllowAny,)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
 def get_user_data(request: Request):
     """
@@ -20,7 +21,7 @@ def get_user_data(request: Request):
     return Response(serializer.data)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def update_user_identifier(request: Request):
     """
@@ -30,7 +31,8 @@ def update_user_identifier(request: Request):
 
     print(user)
 
-    return Response({
-        "status": "success",
-    })
-
+    return Response(
+        {
+            "status": "success",
+        }
+    )
