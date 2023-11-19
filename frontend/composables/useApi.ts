@@ -15,12 +15,13 @@ export const useApi: typeof useFetch = (request, opts?) => {
         options.headers.Authorization = `Bearer ${token.value}`
       }
     },
+    // @ts-ignore
     async onResponseError({ request, response, options }) {
       if (response.status === 401) {
         const userStore = useUserStore()
         if (useCookie('refresh').value) {
           await userStore.refreshTokens()
-
+          // @ts-ignore
           return useApi(request, options)
         }
       }

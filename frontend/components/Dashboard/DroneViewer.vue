@@ -1,69 +1,29 @@
 <script setup lang="ts">
 import { OrbitControls, GLTFModel, Sky } from '@tresjs/cientos'
+import { Euler, Matrix4, Vector3, MathUtils } from 'three'
 import { ShallowRef } from 'vue'
 import { useComponentsStore } from '~/store/components'
+import { useSensorsStore } from '~/store/sensors'
 
 const componentsStore = useComponentsStore()
+const sensorStore = useSensorsStore()
 // @ts-ignore
 const droneRef: ShallowRef<TresInstance | null> = shallowRef(null)
-// @ts-ignore
-const verticalGrids: ShallowRef<TresInstance | null> = shallowRef(null)
 
-let interval: NodeJS.Timeout | null = null
-const speed = ref(0.005)
-const sens = ref(0)
+const droneModelAnimation = () => {
+  if (droneRef.value && droneRef.value.value) {
+    droneRef.value.value.rotation.x = MathUtils.degToRad(
+      sensorStore.full.roll
+    )
+    droneRef.value.value.rotation.z = MathUtils.degToRad(
+      sensorStore.full.pitch
+    )
+  }
+  requestAnimationFrame(droneModelAnimation)
+}
 
 onMounted(() => {
-  interval = setInterval(() => {
-    if (!componentsStore.connectionStatus.connected && droneRef.value) {
-      droneRef.value.value.rotation.x = 0
-      droneRef.value.value.rotation.z = 0
-      return
-    }
-    if (droneRef.value && droneRef.value.value) {
-      if (sens.value === 0) {
-        droneRef.value.value.rotation.x += speed.value
-
-        if (droneRef.value.value.rotation.x > 0.5) {
-          sens.value = 1
-        }
-      } else if (sens.value === 1) {
-        droneRef.value.value.rotation.x -= speed.value
-
-        if (droneRef.value.value.rotation.x < -0.5) {
-          sens.value = 2
-        }
-      } else if (sens.value === 2) {
-        droneRef.value.value.rotation.x += speed.value
-
-        if (droneRef.value.value.rotation.x >= 0) {
-          sens.value = 3
-        }
-      } else if (sens.value === 3) {
-        droneRef.value.value.rotation.z += speed.value
-
-        if (droneRef.value.value.rotation.z > 0.5) {
-          sens.value = 4
-        }
-      } else if (sens.value === 4) {
-        droneRef.value.value.rotation.z -= speed.value
-
-        if (droneRef.value.value.rotation.z < -0.5) {
-          sens.value = 5
-        }
-      } else if (sens.value === 5) {
-        droneRef.value.value.rotation.z += speed.value
-
-        if (droneRef.value.value.rotation.z >= 0) {
-          sens.value = 0
-        }
-      }
-    }
-  }, 10)
-})
-
-onUnmounted(() => {
-  clearInterval(interval!)
+  droneModelAnimation()
 })
 </script>
 <template>

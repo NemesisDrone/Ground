@@ -34,6 +34,9 @@ onMounted(() => {
   ws.onMessage('sensors:gps', (event) => {
     sensorsStore.gpsPosition = event.data
   })
+  ws.onMessage('sensors:full', (event) => {
+    sensorsStore.full = event.data
+  })
   ws.onMessage('log', (event) => {
     logsStore.logs.push(event.data)
     if (logsStore.logs.length > 1000) logsStore.logs.splice(0, 200)
