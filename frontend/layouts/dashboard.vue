@@ -22,16 +22,16 @@ onMounted(() => {
   ws = new WebSocketWrapper(
     useRuntimeConfig().public.WEB_SOCKET_COMMUNICATION_URL as string
   )
-  ws.onMessage('sensor:altitude', (event) => {
+  ws.onMessage('sensors:altitude', (event) => {
     sensorsStore.altitude = event.data
   })
-  ws.onMessage('sensor:battery', (event) => {
+  ws.onMessage('sensors:battery', (event) => {
     sensorsStore.battery = event.data
   })
-  ws.onMessage('sensor:speed', (event) => {
+  ws.onMessage('sensors:speed', (event) => {
     sensorsStore.speed = event.data
   })
-  ws.onMessage('sensor:gps', (event) => {
+  ws.onMessage('sensors:gps', (event) => {
     sensorsStore.gpsPosition = event.data
   })
   ws.onMessage('log', (event) => {
