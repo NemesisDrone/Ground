@@ -34,24 +34,26 @@ The backend is built in Python with Django as a web framework running inside a D
 ### Development
 You need to be in the root folder of the project.
 <br>
+
+Create a common network between drone and ground station :
+```bash
+docker network create ground_network
+```
+
 To start developing the backend, run the following command:
 ```bash
 docker-compose up
+```
+
+For first time setup, you will need to migrate and populate the database :
+In another shell :
+```bash
+docker-compose exec web python manage.py migrate
+docker-compose exec web python populatedb.py
 ```
 
 When you add a python dependency, you will need to rebuild the docker image:
 ```bash
 docker-compose up --build
 ```
-
-For first time setup, you will need to populate the database :
-```bash
-docker-compose exec web python populatedb.py
-```
 [Backend documentation](backend/README.md)
-
-## Interfaces
-Create a common network between drone and ground station :
-```bash
-docker network create ground_network
-```

@@ -26,6 +26,7 @@ const loadMap = ref(false)
 onMounted(() => {
   setTimeout(() => {
     loadMap.value = true
+    // Set default center to esiea position
   }, 1500)
 })
 
@@ -49,6 +50,10 @@ watch(gpsPosition, () => {
     gpsPosition.value.lat,
     gpsPosition.value.lng
   ])
+})
+
+watch(mapRef, () => {
+  mapRef.value?.setCenter([gpsPosition.value.lat, gpsPosition.value.lng])
 })
 
 const goToInitialZoom = () => {

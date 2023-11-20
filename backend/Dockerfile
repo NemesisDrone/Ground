@@ -5,6 +5,8 @@ ENV DJANGO_SETTINGS_MODULE nemesis.settings
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
+RUN apt-get update && apt-get install -y postgresql-client
+
 RUN mkdir /app
 COPY . /app
 WORKDIR /app

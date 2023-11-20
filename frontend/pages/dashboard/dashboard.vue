@@ -17,13 +17,14 @@ import {
   PlaneTakeoff,
   PlugZap
 } from 'lucide-vue-next'
+import { useSensorsStore } from '~/store/sensors'
 
 definePageMeta({
   layout: 'dashboard'
 })
 
 const componentsStore = useComponentsStore()
-
+const sensorsStore = useSensorsStore()
 const stop = () => {
   componentsStore.websocket?.send({
     route: 'state:stop:gps',
@@ -76,6 +77,7 @@ const start = () => {
           {{ componentsStore.connectionStatus }}
           <br />
           {{ componentsStore.controller.axes }}
+          {{ sensorsStore.full }}
         </div>
       </div>
 
@@ -103,7 +105,7 @@ const start = () => {
           />
           <ComponentStatus :component="componentsStore.servoController" />
           <ComponentStatus
-            :component="componentsStore.propulsionController"
+            :component="componentsStore.laserDistanceSensor"
           />
           <ComponentStatus
             :component="componentsStore.controller"

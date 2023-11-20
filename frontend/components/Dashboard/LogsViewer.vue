@@ -4,14 +4,27 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useLogsStore } from '~/store/logs'
 import { storeToRefs } from 'pinia'
 import { LogLevels } from '~/types/logs.types'
-import { Mouse, ScrollText, ScreenShare, XCircle } from 'lucide-vue-next'
+import {
+  Mouse,
+  ScrollText,
+  ScreenShare,
+  XCircle,
+  ChevronRightSquare
+} from 'lucide-vue-next'
 import { useComponentsStore } from '~/store/components'
+import {
+  getLogLevelFromNumber,
+  getNumberFromLogLevel
+} from '~/helpers/sensors'
 
 const logsStore = useLogsStore()
-const { logs } = storeToRefs(logsStore)
 const { connectionStatus } = storeToRefs(useComponentsStore())
 const route = useRoute()
 
+/**
+ * Next lines are used to display animated dots while waiting for logs
+ *
+ */
 const dotsCount = ref(0)
 const dots = computed(() => {
   return '.'.repeat(dotsCount.value)
@@ -27,6 +40,25 @@ onUnmounted(() => {
 })
 
 const scrollToBottom = ref(true)
+
+/**
+ * Next lines are used to filter logs by log level
+ *
+ */
+const logLevel = ref(LogLevels.INFO)
+
+const logs = computed(() => {
+  const numberLogLevel = getNumberFromLogLevel(logLevel.value)
+  return logsStore.logs.filter((log) => {
+    return getNumberFromLogLevel(log.level) >= numberLogLevel
+  })
+})
+
+const incrementLogLevel = () => {
+  logLevel.value = getLogLevelFromNumber(
+    (getNumberFromLogLevel(logLevel.value) % 4) + 1
+  )
+}
 
 const openInNewTab = () => {
   window.open('/fullscreen/logs', '_blank')
@@ -48,22 +80,39 @@ const closeWindow = () => {
         class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         v-if="route.path !== '/fullscreen/logs'"
         @click="openInNewTab"
+        title="Open in new tab"
       >
-        <ScreenShare :size="22" />
+        <ScreenShare :size="24" />
       </button>
       <button
         class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         v-else
         @click="closeWindow"
+        title="Close window"
       >
-        <XCircle :size="22" />
+        <XCircle :size="24" />
       </button>
       <button
         class="absolute top-11 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         @click="scrollToBottom = !scrollToBottom"
+        title="Enable/Disable scroll to bottom"
       >
         <ScrollText v-show="!scrollToBottom" :size="24" />
         <Mouse v-show="scrollToBottom" :size="24" />
+      </button>
+      <button
+        class="absolute top-[5.5rem] right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5"
+        :class="{
+          'text-gray-500': logLevel === LogLevels.DEBUG,
+          'text-blue-500': logLevel === LogLevels.INFO,
+          'text-orange-500': logLevel === LogLevels.WARNING,
+          'text-red-500': logLevel === LogLevels.ERROR,
+          'text-red-900': logLevel === LogLevels.CRITICAL
+        }"
+        @click="incrementLogLevel"
+        title="Change log level"
+      >
+        <ChevronRightSquare :size="24" />
       </button>
       <div v-for="(log, i) in logs" :key="i">
         <div class="flex gap-1.5">

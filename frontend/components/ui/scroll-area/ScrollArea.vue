@@ -29,7 +29,6 @@ onMounted(() => {
         '.radix-scroll-area'
       ) as HTMLElement
       if (!scrollArea) {
-        clearInterval(intervalScrollToBottom.value)
         return
       }
       scrollArea.scrollTop = scrollArea.scrollHeight

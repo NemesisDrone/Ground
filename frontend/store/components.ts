@@ -16,6 +16,7 @@ interface State {
   connectionStatus: {
     connected: boolean
   }
+  laserDistanceSensor: DroneComponent
   controller: {
     status: ComponentsState
     name: string
@@ -58,6 +59,12 @@ export const useComponentsStore = defineStore('components', {
       status: ComponentsState.STOPPED,
       name: 'Servo',
       description: 'Servo controller'
+    },
+    laserDistanceSensor: {
+      status: ComponentsState.STOPPED,
+      name: 'Laser',
+      description: 'Laser distance sensor',
+      routeSlug: 'laser-distance'
     },
     connectionStatus: {
       connected: false
