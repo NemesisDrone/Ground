@@ -13,8 +13,8 @@ const closeWindow = () => {
 
 onMounted(() => {
       function ws_connect() {
-        var ws = new WebSocket('ws://172.20.10.2:7000'); // [TODO] See what address to use here.
-        ws.binaryType = "arraybuffer";
+        var ws = new WebSocket('ws://10.0.3.1:7000'); // [TODO] See what address to use here.
+        //ws.binaryType = "arraybuffer";
 
         ws.addEventListener("error", event => {
           console.error("WS ERROR: ", event.message);
@@ -25,9 +25,8 @@ onMounted(() => {
         });
 
         ws.addEventListener("close", event => {
-          setTimeout(function() {
-            ws_connect();
-          }, 500);
+          ws.close();
+          setTimeout(ws_connect, 500);
         });
 
         ws.addEventListener('message', event => {
@@ -40,7 +39,18 @@ onMounted(() => {
             i.src = iu;
           });
         });
+
+        ws.addEventListener('message', event => {
+          var abv = new Uint8Array(event.data);
+          var blob = new Blob([abv], {type: "image/jpeg"});
+          var uc = window.URL || window.webkitURL;
+          var iu = uc.createObjectURL(blob);
+          var i = document.querySelector("#imager");
+          i.src = iu;
+        });
       };
+
+      ws_connect();
 })
 
 </script>
