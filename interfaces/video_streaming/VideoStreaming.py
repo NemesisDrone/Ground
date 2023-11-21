@@ -1,49 +1,66 @@
 #!/usr/bin/python3
 
 import gi
+
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject as gobject, Gst
 
-import dataclasses
-from enum import Enum
+import threading
 import asyncio as aio
 from websockets.server import serve as wss
 from websockets import exceptions as wssexcept
+from websockets.server import WebSocketServerProtocol as wssp
 
 
-DECODE_PIPELINE = "appsrc name=src ! openh264dec ! jpegenc ! appsink name=sink sync=false drop=True emit-signals=True"
-RECEIVED_FORMAT = "video/x-h264,profile=baseline,stream-format=byte-stream"
+# [TODO] See if it's worth switching back to H264.
+# Don't forget to look at the legacy code for H264 in case of switch back.
+# All the previous code that was used for H264 has the [LEGACY] tag.
+
+# [LEGACY] H264 Works
+#RECEIVED_FORMAT = "video/x-h264,profile=baseline,stream-format=byte-stream"
+#DECODE_PIPELINE = "appsrc name=src ! openh264dec ! jpegenc ! appsink name=sink sync=false drop=True emit-signals=True"
+DECODE_PIPELINE = "appsrc name=src ! appsink name=sink emit-signals=True"
 
 
-@dataclasses.dataclass
-class NVSState(Enum):
+async def functionWrap(func):
+    await func()
+
+
+class NVSState(int):
     """
     @brief Class representing the different states of NVSComponent.
     """
     GstInitFail: int = 0
     PipelineCreationFail: int = 1
     SinkLookupFail: int = 2
-    Initialized: int = 3
-    WaitingConnection: int = 4
-    Streaming: int = 5
-    Cleaning: int = 6
-    Unknown: int = 7
-    PendingStop: int = 8
-    SrcLookupFail: int = 9
-    GstFlowError: int = 10
+    SrcLookupFail: int = 3
+    GstFlowError: int = 4
+    GstBufferFail = 5
+    Initialized: int = 6
+    WaitingConnection: int = 7
+    Streaming: int = 8
+    Cleaning: int = 9
+    Unknown: int = 10
+    PendingStop: int = 11
 
 
 class NVSServer:
-    def __init__(self):
-        self.clients = []
-        self.nvs_state = NVSState.Unknown
-        self.waiting = None
-        self.server = None
-        self.lastSender = None
+    def __init__(self) -> None:
+        self.clients: list = []
+        self.pendingBuffers: list = []
+        self.nvs_state: int = NVSState.Unknown
+        self.waiting: tuple = None
+        self.lastSender: wssp = None
+        self.push_waiting: bytes = None
+        self.enable_src_push = False
+        self.cthread: threading.Thread = None
+        self.cloop: aio.AbstractEventLoop = None
 
+        """
+        [LEGACY] H264 Works
         if not Gst.init_check(None): # init gstreamer
             self.log("GST init failed!", ll.CRITICAL)
-            self.nvs_state = NVSState.GstInitFail
+            self.set_nvs_state(NVSState.GstInitFail)
             return
 
         global DECODE_PIPELINE
@@ -51,17 +68,17 @@ class NVSServer:
 
         self.pipeline = Gst.parse_launch(DECODE_PIPELINE)
         if not self.pipeline:
-            self.nvs_state = NVSState.PipelineCreationFail
+            self.set_nvs_state(NVSState.PipelineCreationFail)
             return
 
         self.sink = self.pipeline.get_by_name("sink")
         if not self.sink:
-            self.nvs_state = NVSState.SinkLookupFail
+            self.set_nvs_state(NVSState.SinkLookupFail)
             return
 
         self.src = self.pipeline.get_by_name("src")
         if not self.src:
-            self.nvs_state = NVSState.SrcLookupFail
+            self.set_nvs_state(NVSState.SrcLookupFail)
             return
 
         # Notify us when it receives a frame
@@ -71,73 +88,139 @@ class NVSServer:
 
         # Setup our appsrc.
         self.src.set_property("format", Gst.Format.TIME)
-        #self.src.set_caps(Gst.Caps.from_string(RECEIVED_FORMAT))
-        self.src.set_property("caps", Gst.Caps.from_string(RECEIVED_FORMAT))
+        #self.src.set_property("caps", Gst.Caps.from_string(RECEIVED_FORMAT))
         #self.src.set_property("block", True) # So we can drop frames as needed.
+        self.src.connect("need-data", self._on_data_needed)
+        self.src.connect("enough-data", self._on_enough_data)"""
 
-        self.nvs_state = NVSState.Initialized
+        self.set_nvs_state(NVSState.Initialized)
 
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.stop()
 
-    def stop(self):
-        self.nvs_state = NVSState.PendingStop
-        for wss in self.clients:
-            wss.close()
 
+    def set_nvs_state(self, val) -> None:
+        if int(val) < int(NVSState.Initialized):
+            print("Warning, state:" + str(val))
+        self.nvs_state = val
+
+
+    def stop(self) -> None:
+        self.set_nvs_state(NVSState.PendingStop)
+        for sock in self.clients:
+            sock.close()
+
+        """
+        [LEGACY] H264 Works
         self.clear_waiting_data()
 
         if self.pipeline:
-            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline.set_state(Gst.State.NULL)"""
 
-        self.log("Stopped.", ll.INFO)
-        self.nvs_state = NVSState.Initialized
+        self.set_nvs_state(NVSState.Initialized)
 
 
-    async def run(self):
+    async def run(self) -> None:
+        def loop_setter(loop):
+            aio.set_event_loop(loop)
+            loop.run_forever()
+
         if self.nvs_state != NVSState.Initialized:
             return
 
+        """
+        [LEGACY] H264 Works
         self.pipeline.set_state(Gst.State.PLAYING)
-        async with wss(self._handle_connection, "172.20.10.2", port=7000): # [TODO] See what address to use.
-            self.nvs_state = NVSState.WaitingConnection
-            await aio.Future()
+
+        self.loop = aio.new_event_loop()
+        aio.set_event_loop(self.loop)
+        self.thread = threading.Thread(target=loop_setter, args=(self.loop,))
+        self.thread.start()
+
+        aio.run_coroutine_threadsafe(functionWrap(self._data_push_loop), self.loop)"""
+
+        await self._connection_loop()
 
 
-    async def _handle_connection(self, wss):
-        self.nvs_state = NVSState.Streaming
-        print("Connection acquired!")
+    async def _connection_loop(self) -> None:
+        if self.nvs_state != NVSState.Initialized:
+            return
+
+        while self.nvs_state != NVSState.PendingStop:
+            try:
+                async with wss(self._handle_connection, "10.0.3.1", port=7000):  # [TODO] See what address to use.
+                    self.set_nvs_state(NVSState.WaitingConnection)
+                    await aio.Future()
+            except Exception:
+                pass
+
+
+    async def _handle_connection(self, sock: wssp) -> None:
+        self.set_nvs_state(NVSState.Streaming)
+        self.clients.append(sock)
         try:
             while self.nvs_state != NVSState.PendingStop:
-                #try:
-                data = await wss.recv()
-                ret = Gst.FlowReturn.OK
-                buff = Gst.Buffer.new_wrapped(data)
-                # Send through APPSRC
-                self.src.emit("push-buffer", buff, ret)
-                buff.unref()
+                try:
+                    data = await sock.recv()
 
-                if ret != Gst.FlowReturn.OK:
-                    self.nvs_state = NVSState.GstFlowError
+                    # Send through APPSRC
+                    #self.push_waiting = data
 
-                if self.lastSender != wss:
-                    self.lastSender = wss
+                    if self.lastSender != sock:
+                        self.lastSender = sock
 
-            await wss.close()
+                    for socket in self.clients:
+                        if socket != self.lastSender:
+                            await socket.send(data)
 
-        except wssexcept.ConnectionClosedOK:
+                finally:
+                    pass
+
+            await sock.close()
+
+        except wssexcept.ConnectionClosed:
             pass
 
-        if wss in self.clients:
-            self.clients.remove(wss)
+        if sock in self.clients:
+            self.clients.remove(sock)
 
 
-    def _on_output_available(self, appsink):
-        """
+    #
+    #  The followings methods are legacy from H264 works. Leave it here in case we switch back from JPEG to H264 streaming.
+    # [LEGACY] H264 Works
+    #
+
+
+    """def _on_data_needed(self, appsrc, u_size) -> None:
+        self.enable_src_push = True
+
+
+    def _on_enough_data(self):
+        self.enable_src_push = False
+
+
+    def _data_push_loop(self) -> None:
+        while self.nvs_state != NVSState.PendingStop:
+            if self.enable_src_push:
+                if self.push_waiting:
+                    ret = Gst.FlowReturn.OK
+                    inner = bytearray(self.push_waiting)
+                    buff = Gst.Buffer.new_wrapped_data(inner)
+                    # Send through APPSRC
+                    self.src.emit("push-buffer", buff, ret)
+                    buff.unref()
+                    self.push_waiting = None
+
+                    print("Pushed data.")
+
+                    if ret != Gst.FlowReturn.OK:
+                        self.set_nvs_state(NVSState.GstFlowError)
+
+    def _on_output_available(self, appsink) -> None:
+        ""
         Handles incoming data from a GST pipeline.
-        """
-        print("Pulling")
+        ""
         sample = appsink.emit("pull-sample")
 
         if sample:
@@ -156,24 +239,24 @@ class NVSServer:
         return Gst.FlowReturn.OK
 
 
-    async def _push(self, stuff):
+    async def _push(self, stuff: tuple) -> None:
         print("Forwarding")
         # Stream to other clients.
-        for wss in self.clients:
-            if wss != self.lastSender:
-                await wss.send(stuff[1].data)
+        for sock in self.clients:
+            if sock != self.lastSender:
+                await sock.send(stuff[1].data)
                 stuff[0].unmap(stuff[1])
 
 
-    def clear_waiting_data(self):
-        """
+    def clear_waiting_data(self) -> None:
+        ""
         Clears all the data put in the pending list for sending.
-        """
+        ""
         f, self.waiting = self.waiting, None
-        f[0].unmap(f[1])
+        f[0].unmap(f[1])"""
 
 
-    def get_nvs_state(self):
+    def get_nvs_state(self) -> int:
         return self.nvs_state
 
 
