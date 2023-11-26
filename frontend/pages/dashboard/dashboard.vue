@@ -41,6 +41,34 @@ const start = () => {
     }
   })
 }
+
+const demoSpeed = (value: number) => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:speed',
+    data: value
+  })
+}
+
+const demoCalibrate = () => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:calibrate',
+    data: null
+  })
+}
+
+const demoArm = () => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:arm',
+    data: null
+  })
+}
+
+const demoDisarm = () => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:disarm',
+    data: null
+  })
+}
 </script>
 
 <template>
@@ -69,9 +97,31 @@ const start = () => {
           <DroneViewer />
         </div>
         <div class="w-1/2">
-          <UiButton class="mt-7" @click="start">Start</UiButton>
-          <UiButton class="mt-7 ml-2" @click="stop" variant="outline">
-            Stop
+          <UiButton class="mt-7" @click="demoSpeed(0)">0</UiButton>
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(800)"
+            >800</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1100)"
+            >1100</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1500)"
+            >1500</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1800)"
+            >1800</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(2100)"
+            >2100</UiButton
+          >
+          <UiButton class="ml-2 mt-2" @click="demoSpeed(2500)">
+            2500
+          </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoCalibrate">
+            Calibrate
+          </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoArm"> Arm </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoDisarm">
+            Disarm
           </UiButton>
           <br />
           {{ componentsStore.connectionStatus }}
