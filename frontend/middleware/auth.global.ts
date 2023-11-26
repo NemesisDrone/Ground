@@ -14,7 +14,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     authenticated.value = true
 
     // if (to?.name === 'index') {
-    //   return navigateTo('/dashboard')
+    //   return navigateTo('/operations/dashboard')
     // }
   }
   userStore.getUserData()

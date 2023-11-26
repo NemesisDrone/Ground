@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import GPSMap from '~/components/Dashboard/GPSMap.vue'
+import GPSMap from '~/components/Operations/GPSMap.vue'
 definePageMeta({
   // @ts-ignore
-  layout: 'dashboard'
+  layout: 'operations'
 })
 </script>
 

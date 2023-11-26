@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Dashboard/GPSMap.vue'
-import VideoStreaming from '~/components/Dashboard/VideoStreaming.vue'
-import SpeedGauge from '~/components/Dashboard/SpeedGauge.vue'
-import Altitude from '~/components/Dashboard/Altitude.vue'
-import Battery from '~/components/Dashboard/Battery.vue'
-import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
-import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
+import GPSMap from '~/components/Operations/GPSMap.vue'
+import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
+import SpeedGauge from '~/components/Operations/SpeedGauge.vue'
+import Altitude from '~/components/Operations/Altitude.vue'
+import Battery from '~/components/Operations/Battery.vue'
+import PropulsorSpeed from '~/components/Operations/PropulsorSpeed.vue'
+import LogsViewer from '~/components/Operations/LogsViewer.vue'
 import { useComponentsStore } from '~/store/components'
-import ComponentStatus from '~/components/Dashboard/ComponentStatus.vue'
-import DroneViewer from '~/components/Dashboard/DroneViewer.vue'
-import DroneStatusConnection from '~/components/Dashboard/DroneStatusConnection.vue'
+import ComponentStatus from '~/components/Operations/ComponentStatus.vue'
+import DroneViewer from '~/components/Operations/DroneViewer.vue'
+import DroneStatusConnection from '~/components/Operations/DroneStatusConnection.vue'
 import {
   Gamepad2,
   Locate,
@@ -20,7 +20,7 @@ import {
 import { useSensorsStore } from '~/store/sensors'
 
 definePageMeta({
-  layout: 'dashboard'
+  layout: 'operations'
 })
 
 const componentsStore = useComponentsStore()

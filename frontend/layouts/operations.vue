@@ -4,7 +4,13 @@ import { useSensorsStore } from '~/store/sensors'
 import { useLogsStore } from '~/store/logs'
 import { useComponentsStore } from '~/store/components'
 import { useGamepadController } from '~/composables/useGamePadController'
-import { Menu, KanbanSquare, View, Settings } from 'lucide-vue-next'
+import {
+  Menu,
+  KanbanSquare,
+  View,
+  Settings,
+  Camera
+} from 'lucide-vue-next'
 
 let ws: WebSocketWrapper | null = null
 const droneStore = useComponentsStore()
@@ -65,12 +71,17 @@ const dashboardLayouts = [
   {
     icon: KanbanSquare,
     title: 'Dashboard',
-    route: '/dashboard/dashboard'
+    route: '/operations/dashboard'
   },
   {
     icon: View,
     title: 'Map & Video',
-    route: '/dashboard/map-video'
+    route: '/operations/map-video'
+  },
+  {
+    icon: Camera,
+    title: 'Monitoring',
+    route: '/operations/monitoring'
   }
 ]
 </script>
@@ -80,8 +91,6 @@ const dashboardLayouts = [
     <div
       class="w-[62px] h-[100vh] border-r-2 border-neutral-900 flex flex-col items-center justify-between"
     >
-      <!--      <Menu :size="28" class="mt-4 cursor-pointer" />-->
-
       <div class="flex flex-col gap-2 mt-[1.5rem]">
         <router-link
           v-for="dashboardLayout in dashboardLayouts"
@@ -99,9 +108,9 @@ const dashboardLayouts = [
         <router-link
           class="cursor-pointer"
           :class="{
-            'text-primary': route.path === '/dashboard/settings'
+            'text-primary': route.path === '/operations/settings'
           }"
-          to="/dashboard/settings"
+          to="/operations/settings"
         >
           <Settings :size="28" />
         </router-link>

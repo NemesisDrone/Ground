@@ -121,7 +121,7 @@ const logIn = async () => {
 
   await authStore.authenticateUser(user.value)
   if (authenticated.value) {
-    router.push('/dashboard/dashboard')
+    router.push('/operations/dashboard')
   } else {
     loginError.value = true
   }
