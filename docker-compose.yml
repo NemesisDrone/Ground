@@ -61,7 +61,4 @@ networks:
     ground_network:
         external: true
 
-volumes:
-  shared-backend-volume:
-
 
