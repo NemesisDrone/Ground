@@ -5,6 +5,9 @@ import ImageViewer from '~/components/ui/image-viewer/ImageViewer.vue'
 definePageMeta({
   layout: 'operations'
 })
+useHead({
+  title: 'Monitoring'
+})
 </script>
 <template>
   <div class="w-full h-full min-h-[100vh]">

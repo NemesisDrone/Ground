@@ -4,6 +4,9 @@ import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
 definePageMeta({
   layout: 'operations'
 })
+useHead({
+  title: 'Map & Video'
+})
 </script>
 <template>
   <div class="w-full h-full flex min-h-[100vh]">

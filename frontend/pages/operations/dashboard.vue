@@ -22,6 +22,9 @@ import { useSensorsStore } from '~/store/sensors'
 definePageMeta({
   layout: 'operations'
 })
+useHead({
+  title: 'Dashboard'
+})
 
 const componentsStore = useComponentsStore()
 const sensorsStore = useSensorsStore()
