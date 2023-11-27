@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ScreenShare, Image } from 'lucide-vue-next'
+import { ScreenShare, Image, Fullscreen } from 'lucide-vue-next'
 
 const props = defineProps({
   src: {
@@ -11,6 +11,10 @@ const props = defineProps({
     default: false
   },
   allowOpenInNewTab: {
+    type: Boolean,
+    default: false
+  },
+  allowZoom: {
     type: Boolean,
     default: false
   }
@@ -31,13 +35,43 @@ const imageViewerStyleComputed = computed(() => {
     'object-cover': imageViewerStyle.value === 'cover'
   }
 })
+
+const image = ref<HTMLElement | null>(null)
+const scale = ref(1)
+const originX = ref(0)
+const originY = ref(0)
+const onWheelEvent = (event) => {
+  event.preventDefault()
+  if (image.value && props.allowZoom) {
+    scale.value += event.deltaY * -0.01
+    scale.value = Math.min(Math.max(0.125, scale.value), 4)
+    originX.value = event.clientX - image.value.offsetLeft
+    originY.value = event.clientY - image.value.offsetTop
+  }
+}
+
+const imageStyleComputed = computed(() => {
+  return {
+    transform: `scale(${scale.value})`,
+    transformOrigin: `${originX.value}px ${originY.value}px`
+  }
+})
+
+const setDefaultImageStyle = () => {
+  scale.value = 1
+}
 </script>
 
 <template>
-  <div class="rounded-md bg-neutral-900 h-full p-2 relative">
+  <div
+    class="rounded-md bg-neutral-900 h-full p-2 relative overflow-hidden"
+    @wheel="onWheelEvent"
+  >
     <img
       :src="src"
+      ref="image"
       class="h-full w-full"
+      :style="imageStyleComputed"
       alt=""
       :class="imageViewerStyleComputed"
     />
@@ -55,6 +89,14 @@ const imageViewerStyleComputed = computed(() => {
       @click="changeImageViewerStyle"
     >
       <Image :size="24" />
+    </button>
+    <button
+      v-if="allowZoom"
+      class="absolute top-10 left-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 ml-2.5 text-primary"
+      title="Return to default image zoom"
+      @click="setDefaultImageStyle"
+    >
+      <Fullscreen :size="24" />
     </button>
   </div>
 </template>

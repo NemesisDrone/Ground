@@ -17,6 +17,7 @@ useHead({
           src="/images/demo/img1.jpg"
           class="mt-4 ml-4"
           :allow-style-change="true"
+          :allow-zoom="true"
         />
       </div>
       <div class="w-1/2 h-full">
