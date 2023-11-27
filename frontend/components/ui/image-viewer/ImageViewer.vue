@@ -37,14 +37,22 @@ const imageViewerStyleComputed = computed(() => {
 })
 
 const image = ref<HTMLElement | null>(null)
+const imageContainer = ref<HTMLElement | null>(null)
 const scale = ref(1)
 const originX = ref(0)
 const originY = ref(0)
-const onWheelEvent = (event) => {
+
+const onWheelEvent = (event: WheelEvent) => {
   event.preventDefault()
-  if (image.value && props.allowZoom) {
-    scale.value += event.deltaY * -0.01
-    scale.value = Math.min(Math.max(0.125, scale.value), 4)
+  if (image.value && props.allowZoom && imageContainer.value) {
+    const mouseX =
+      event.clientX - imageContainer.value.getBoundingClientRect().left
+    const mouseY =
+      event.clientY - imageContainer.value.getBoundingClientRect().top
+
+    const localScale = scale.value - event.deltaY * 0.001
+    scale.value = Math.min(Math.max(1, localScale), 4)
+
     originX.value = event.clientX - image.value.offsetLeft
     originY.value = event.clientY - image.value.offsetTop
   }
@@ -60,12 +68,105 @@ const imageStyleComputed = computed(() => {
 const setDefaultImageStyle = () => {
   scale.value = 1
 }
+
+const selectionBox = ref<HTMLElement | null>(null)
+const isSelecting = ref(false)
+const selection = reactive({
+  startX: 0,
+  startY: 0,
+  endX: 0,
+  endY: 0,
+  left: 0,
+  top: 0,
+  width: 0,
+  height: 0
+})
+const startSelection = (event: MouseEvent) => {
+  if (event.buttons != 1 || imageContainer.value == null) return
+  isSelecting.value = true
+
+  selection.startX =
+    event.clientX - imageContainer.value.getBoundingClientRect().left
+  selection.startY =
+    event.clientY - imageContainer.value.getBoundingClientRect().top
+  selection.width = 0
+  selection.height = 0
+  selection.endX = 0
+  selection.endY = 0
+}
+
+const updateSelection = (event: MouseEvent) => {
+  if (
+    !isSelecting.value ||
+    event.buttons != 1 ||
+    imageContainer.value == null
+  )
+    return
+
+  selection.endX =
+    event.clientX - imageContainer.value?.getBoundingClientRect().left
+  selection.endY =
+    event.clientY - imageContainer.value?.getBoundingClientRect().top
+
+  const x = Math.min(selection.startX, selection.endX)
+  const y = Math.min(selection.startY, selection.endY)
+  const width = Math.abs(selection.endX - selection.startX)
+  const height = Math.abs(selection.endY - selection.startY)
+
+  selection.left = x
+  selection.top = y
+  selection.width = width
+  selection.height = height
+}
+
+const endSelection = (event: MouseEvent) => {
+  if (
+    !image.value ||
+    event.buttons != 0 ||
+    !isSelecting.value ||
+    !imageContainer.value
+  )
+    return
+  isSelecting.value = false
+
+  const scaleWidth =
+    imageContainer.value.clientWidth /
+    Math.abs(selection.endX - selection.startX)
+  const scaleHeight =
+    imageContainer.value.clientHeight /
+    Math.abs(selection.endY - selection.startY)
+
+  scale.value = Math.max(scaleWidth, scaleHeight)
+  const x = selection.startX
+  const y = selection.endY
+
+  originX.value = x
+  originY.value = y
+
+  selection.left = 0
+  selection.top = 0
+  selection.width = 0
+  selection.height = 0
+}
+
+const selectionBoxStyleComputed = computed(() => {
+  return {
+    left: `${selection.left}px`,
+    top: `${selection.top}px`,
+    width: `${selection.width}px`,
+    height: `${selection.height}px`
+  }
+})
 </script>
 
 <template>
   <div
-    class="rounded-md bg-neutral-900 h-full p-2 relative overflow-hidden"
+    class="rounded-md bg-neutral-900 h-full p-2 relative overflow-hidden select-text"
+    ref="imageContainer"
     @wheel="onWheelEvent"
+    @mousedown="startSelection"
+    @mouseup="endSelection"
+    @mousemove="updateSelection"
   >
     <img
       :src="src"
@@ -74,6 +175,12 @@ const setDefaultImageStyle = () => {
       :style="imageStyleComputed"
       alt=""
       :class="imageViewerStyleComputed"
+      draggable="false"
+    />
+    <div
+      class="selection-box"
+      ref="selectionBox"
+      :style="selectionBoxStyleComputed"
     />
     <button
       v-if="allowOpenInNewTab"
@@ -101,4 +208,11 @@ const setDefaultImageStyle = () => {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.selection-box {
+  border: 2px dashed #131110;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+</style>
