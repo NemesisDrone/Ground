@@ -13,12 +13,12 @@ const closeWindow = () => {
 
 onMounted(() => {
       function ws_connect() {
-        var ws = new WebSocket('ws://10.0.3.1:7000'); // [TODO] See what address to use here.
-        //ws.binaryType = "arraybuffer";
+        let ws = new WebSocket('ws://10.0.3.1:7000'); // [TODO] See what address to use here.
 
         ws.addEventListener("error", event => {
           console.error("WS ERROR: ", event.message);
           ws.close();
+          ws = null;
           setTimeout(function() {
             ws_connect();
           }, 500);
@@ -26,27 +26,14 @@ onMounted(() => {
 
         ws.addEventListener("close", event => {
           ws.close();
+          ws = null;
           setTimeout(ws_connect, 500);
         });
 
         ws.addEventListener('message', event => {
           event.data.arrayBuffer().then(res => {
-            var abv = new Uint8Array(res);
-            var blob = new Blob([abv], {type: "image/jpeg"});
-            var uc = window.URL || window.webkitURL;
-            var iu = uc.createObjectURL(blob);
-            var i = document.querySelector("#imager");
-            i.src = iu;
+            document.querySelector("#imager").src = (window.URL || window.webkitURL).createObjectURL(new Blob([new Uint8Array(res)], {type: "image/jpeg"}));
           });
-        });
-
-        ws.addEventListener('message', event => {
-          var abv = new Uint8Array(event.data);
-          var blob = new Blob([abv], {type: "image/jpeg"});
-          var uc = window.URL || window.webkitURL;
-          var iu = uc.createObjectURL(blob);
-          var i = document.querySelector("#imager");
-          i.src = iu;
         });
       };
 
