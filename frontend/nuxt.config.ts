@@ -28,11 +28,9 @@ export default defineNuxtConfig({
       }
     ]
   ],
-  // @ts-ignore
   pinia: {
     autoImports: ['defineStore', ['defineStore', 'definePiniaStore']]
   },
-  // @ts-ignore
   mapbox: {
     accessToken:
       'pk.eyJ1IjoieHBpZXJyZSIsImEiOiJjbG05anh5NW8wa3pkM3BvNTd6NTZ1Z2czIn0.8BcNWxnR7ru-MIyy6Y8-Tg'

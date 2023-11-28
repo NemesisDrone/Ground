@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import LogsViewer from '~/components/Operations/LogsViewer.vue'
 definePageMeta({
-  // @ts-ignore
   layout: 'operations'
 })
 </script>
