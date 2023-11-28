@@ -80,7 +80,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="h-1/2 w-full flex gap-4 pt-4">
-      <scroll-area :scroll-to-bottom="false" class="w-2/3 h-full">
+      <scroll-area class="w-2/3 h-full">
         <div
           class="h-full grid grid-cols-4 gap-2 rounded-md bg-neutral-900 p-2"
         >
