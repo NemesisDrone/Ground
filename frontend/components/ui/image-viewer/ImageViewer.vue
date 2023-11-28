@@ -75,6 +75,13 @@ const imageStyleComputed = computed(() => {
 const setDefaultImageStyle = () => {
   scale.value = 1
 }
+
+watch(
+  () => props.src,
+  () => {
+    setDefaultImageStyle()
+  }
+)
 </script>
 
 <template>
