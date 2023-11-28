@@ -72,6 +72,29 @@ const imageStyleComputed = computed(() => {
   }
 })
 
+const hasImageToMove = ref(false)
+const onMouseDown = (event: MouseEvent) => {
+  if (event.button !== 0) return
+  hasImageToMove.value = true
+}
+
+const onMouseMove = (event: MouseEvent) => {
+  if (event.button !== 0) return
+  if (hasImageToMove.value && image.value && imageContainer.value) {
+    const mouseX =
+      event.clientX - imageContainer.value.getBoundingClientRect().left
+    const mouseY =
+      event.clientY - imageContainer.value.getBoundingClientRect().top
+    originX.value = mouseX
+    originY.value = mouseY
+  }
+}
+
+const onMouseUp = (event: MouseEvent) => {
+  if (event.button !== 0) return
+  hasImageToMove.value = false
+}
+
 const setDefaultImageStyle = () => {
   scale.value = 1
 }
@@ -98,6 +121,9 @@ watch(
       alt=""
       :class="imageViewerStyleComputed"
       draggable="false"
+      @mousedown="onMouseDown"
+      @mouseup="onMouseUp"
+      @mousemove="onMouseMove"
     />
     <button
       v-if="allowOpenInNewTab"
