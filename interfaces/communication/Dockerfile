@@ -6,8 +6,8 @@ RUN pip install -r requirements.txt
 
 
 
-RUN mkdir /app && mkdir /app/interfaces && mkdir /app/interfaces/communication
-COPY . /app/interfaces/coamunication
+RUN mkdir -p /app/interfaces/communication
+COPY . /app/interfaces/communication
 WORKDIR /app/interfaces/communication
 
 RUN useradd -ms /bin/bash nemesis_com
