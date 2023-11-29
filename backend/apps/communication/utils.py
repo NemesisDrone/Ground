@@ -17,9 +17,12 @@ def get_user(scope) -> User:
 
     try:
         user = User.objects.get(id=AccessToken(access)["user_id"])
-    # TODO: Handle refresh token
-    # except rest_framework_simplejwt.exceptions.TokenError:
-    #     #     Refresh token
+    # Handle jwt token auto refreshing
+    except rest_framework_simplejwt.exceptions.TokenError:
+        try:
+            return User.objects.get(id=RefreshToken(refresh)["user_id"])
+        except rest_framework_simplejwt.exceptions.TokenError:
+            user = AnonymousUser()
 
     except ObjectDoesNotExist:
         user = AnonymousUser()

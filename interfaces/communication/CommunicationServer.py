@@ -48,7 +48,7 @@ def handle_emission(client_socket):
             if message:
                 message = message["data"]
                 logging.debug("from redis: %s", message)
-                data = str(json.dumps(message))
+                data = json.dumps(message)
                 client_socket.send(len(data).to_bytes(4, byteorder='big'))
                 client_socket.send(data.encode())
 

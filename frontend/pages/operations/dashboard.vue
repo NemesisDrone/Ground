@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Dashboard/GPSMap.vue'
-import VideoStreaming from '~/components/Dashboard/VideoStreaming.vue'
-import SpeedGauge from '~/components/Dashboard/SpeedGauge.vue'
-import Altitude from '~/components/Dashboard/Altitude.vue'
-import Battery from '~/components/Dashboard/Battery.vue'
-import PropulsorSpeed from '~/components/Dashboard/PropulsorSpeed.vue'
-import LogsViewer from '~/components/Dashboard/LogsViewer.vue'
+import GPSMap from '~/components/Operations/GPSMap.vue'
+import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
+import SpeedGauge from '~/components/Operations/SpeedGauge.vue'
+import Altitude from '~/components/Operations/Altitude.vue'
+import Battery from '~/components/Operations/Battery.vue'
+import PropulsorSpeed from '~/components/Operations/PropulsorSpeed.vue'
+import LogsViewer from '~/components/Operations/LogsViewer.vue'
 import { useComponentsStore } from '~/store/components'
-import ComponentStatus from '~/components/Dashboard/ComponentStatus.vue'
-import DroneViewer from '~/components/Dashboard/DroneViewer.vue'
-import DroneStatusConnection from '~/components/Dashboard/DroneStatusConnection.vue'
+import ComponentStatus from '~/components/Operations/ComponentStatus.vue'
+import DroneViewer from '~/components/Operations/DroneViewer.vue'
+import DroneStatusConnection from '~/components/Operations/DroneStatusConnection.vue'
 import {
   Gamepad2,
   Locate,
@@ -20,7 +20,10 @@ import {
 import { useSensorsStore } from '~/store/sensors'
 
 definePageMeta({
-  layout: 'dashboard'
+  layout: 'operations'
+})
+useHead({
+  title: 'Dashboard'
 })
 
 const componentsStore = useComponentsStore()
@@ -39,6 +42,34 @@ const start = () => {
     data: {
       component: 'gps'
     }
+  })
+}
+
+const demoSpeed = (value: number) => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:speed',
+    data: value
+  })
+}
+
+const demoCalibrate = () => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:calibrate',
+    data: null
+  })
+}
+
+const demoArm = () => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:arm',
+    data: null
+  })
+}
+
+const demoDisarm = () => {
+  componentsStore.websocket?.send({
+    route: 'propulsion:disarm',
+    data: null
   })
 }
 </script>
@@ -69,9 +100,31 @@ const start = () => {
           <DroneViewer />
         </div>
         <div class="w-1/2">
-          <UiButton class="mt-7" @click="start">Start</UiButton>
-          <UiButton class="mt-7 ml-2" @click="stop" variant="outline">
-            Stop
+          <UiButton class="mt-7" @click="demoSpeed(0)">0</UiButton>
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(800)"
+            >800</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1100)"
+            >1100</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1500)"
+            >1500</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1800)"
+            >1800</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(2100)"
+            >2100</UiButton
+          >
+          <UiButton class="ml-2 mt-2" @click="demoSpeed(2500)">
+            2500
+          </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoCalibrate">
+            Calibrate
+          </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoArm"> Arm </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoDisarm">
+            Disarm
           </UiButton>
           <br />
           {{ componentsStore.connectionStatus }}

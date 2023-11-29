@@ -9,7 +9,7 @@ Here is some nice documentations to read :
 ## Apps
 Our django project is composed of 3 apps:
 - `core` which contains utilities, models and function that are reused in the other apps.
-- `user` which contains the user model and the authentication system.
+- `user` which contains the user model and the authentication system as well as the user profile.
 - `communication` which contains the communication using websocket with the frontend/interfaces to the drone.
 
 ## Docker

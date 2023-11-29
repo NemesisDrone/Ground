@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import VideoStreaming from '~/components/Dashboard/VideoStreaming.vue'
+import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
 definePageMeta({
-  // @ts-ignore
-  layout: 'dashboard'
+  layout: 'operations'
 })
 </script>
 

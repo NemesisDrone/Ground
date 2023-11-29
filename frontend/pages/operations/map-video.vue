@@ -1,8 +1,11 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Dashboard/GPSMap.vue'
-import VideoStreaming from '~/components/Dashboard/VideoStreaming.vue'
+import GPSMap from '~/components/Operations/GPSMap.vue'
+import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
 definePageMeta({
-  layout: 'dashboard'
+  layout: 'operations'
+})
+useHead({
+  title: 'Map & Video'
 })
 </script>
 <template>
