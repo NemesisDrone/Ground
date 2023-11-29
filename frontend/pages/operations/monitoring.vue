@@ -71,6 +71,7 @@ onMounted(() => {
           :src="selectedImage ? selectedImage.src : ''"
           :allow-style-change="true"
           :allow-zoom="true"
+          :allow-open-in-new-tab="true"
         />
       </div>
       <div class="w-1/2 h-full">

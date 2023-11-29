@@ -105,6 +105,10 @@ watch(
     setDefaultImageStyle()
   }
 )
+
+const openInNewTab = () => {
+  window.open(`/fullscreen/${btoa(props.src)}/viewer`, '_blank')
+}
 </script>
 
 <template>
@@ -129,6 +133,7 @@ watch(
       v-if="allowOpenInNewTab"
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
       title="Open in a new tab"
+      @click="openInNewTab"
     >
       <ScreenShare :size="24" />
     </button>
