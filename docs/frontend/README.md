@@ -14,7 +14,7 @@ To add a custom operation layout, you need to create a new page in `pages/dashbo
 import GPSMap from '~/components/Operations/GPSMap.vue'
 import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
 definePageMeta({
-  layout: 'operations'
+  layout: 'sidebar'
 })
 </script>
 <template>

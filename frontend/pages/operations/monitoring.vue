@@ -5,7 +5,7 @@ import ImageViewer from '~/components/ui/image-viewer/ImageViewer.vue'
 import ScrollArea from '~/components/ui/scroll-area/ScrollArea.vue'
 import { CameraOff } from 'lucide-vue-next'
 definePageMeta({
-  layout: 'operations'
+  layout: 'sidebar'
 })
 useHead({
   title: 'Monitoring'

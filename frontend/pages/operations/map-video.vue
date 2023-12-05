@@ -2,7 +2,7 @@
 import GPSMap from '~/components/Operations/GPSMap.vue'
 import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
 definePageMeta({
-  layout: 'operations'
+  layout: 'sidebar'
 })
 useHead({
   title: 'Map & Video'
