@@ -8,7 +8,12 @@ class WebSocketWrapper {
   private listeners: Record<string, ((data: any) => void)[]> = {}
 
   constructor(url: string) {
+    const access = useCookie('access').value
+    const refresh = useCookie('refresh').value
+    // not good but nevermind
+    url = url + '?access=' + access + '&refresh=' + refresh
     this.socket = new WebSocket(url)
+
     this.socket.onmessage = (event) => {
       this.handleMessage(JSON.parse(event.data))
     }
