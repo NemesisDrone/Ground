@@ -1,12 +1,16 @@
 import { useUserStore } from '~/store/user'
+import { NitroFetchOptions, NitroFetchRequest } from 'nitropack'
 
-export const useApi: typeof useFetch = (request, opts?) => {
+export const useApi = async <T>(
+  request: NitroFetchRequest,
+  opts?: NitroFetchOptions<string>
+): Promise<T> => {
   const config = useRuntimeConfig()
 
-  return useFetch(request, {
+  return $fetch(request, {
     baseURL: config.public.API_URL,
     ...opts,
-    async onRequest({ request, options }) {
+    onRequest({ options }) {
       const token = useCookie('access')
       if (token.value) {
         if (!options.headers) options.headers = {}
@@ -15,16 +19,10 @@ export const useApi: typeof useFetch = (request, opts?) => {
           ...options.headers,
           Authorization: `Bearer ${token.value}`
         }
-        // options.headers.Authorization = `Bearer ${token.value}`
       }
     },
-    // @ts-ignore
-    async onResponseError({ request, response, options }) {
+    async onResponseError({ response, options }) {
       if (response.status === 401) {
-        // if (request.path === '/api/user/refresh') {
-        //   useRouter().push('/')
-        //   return
-        // }
         const userStore = useUserStore()
         if (useCookie('refresh').value) {
           await userStore.refreshTokens()
