@@ -89,7 +89,7 @@ const dashboardLayouts = [
 <template>
   <div class="flex">
     <div
-      class="w-[62px] h-[100vh] border-r-2 border-neutral-900 flex flex-col items-center justify-between"
+      class="w-[62px] h-[100vh] border-r-2 border-neutral-900 flex flex-col items-center justify-between fixed"
     >
       <div class="flex flex-col gap-2 mt-[1.5rem]">
         <router-link
@@ -116,7 +116,7 @@ const dashboardLayouts = [
         </router-link>
       </div>
     </div>
-    <main class="w-full">
+    <main class="w-full ml-[62px]">
       <slot />
     </main>
   </div>

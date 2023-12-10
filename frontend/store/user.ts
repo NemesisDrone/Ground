@@ -13,21 +13,17 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     async getUserData() {
-      const { data } = await useApi<UserData>('/api/user/data')
-
-      if (data.value) {
-        this.user = data.value
+      const data = await useApi<UserData>('/api/user/data')
+      if (data) {
+        this.user = data
       }
     },
 
     async authenticateUser({ identifier, password }: UserLoginPayload) {
-      const { data } = await useApi<
-        {
-          access: string
-          refresh: string
-        },
-        any
-      >('/api/user/token', {
+      const data = await useApi<{
+        access: string
+        refresh: string
+      }>('/api/user/token', {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -36,12 +32,12 @@ export const useUserStore = defineStore('user', {
         }
       })
 
-      if (data.value?.access && data.value?.refresh) {
+      if (data.access && data.refresh) {
         const access = useCookie('access')
-        access.value = data.value.access
+        access.value = data.access
 
         const refresh = useCookie('refresh')
-        refresh.value = data.value.refresh
+        refresh.value = data.refresh
 
         this.authenticated = true
       } else {
@@ -57,7 +53,7 @@ export const useUserStore = defineStore('user', {
     async logOut() {
       const token = useCookie('token')
       const refresh = useCookie('refresh')
-      const { data } = await useApi('/api/user/blacklist', {
+      await useApi('/api/user/blacklist', {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -74,24 +70,27 @@ export const useUserStore = defineStore('user', {
       const refresh = useCookie('refresh')
       const accessCookie = useCookie('access')
 
-      const { data } = await useApi<
-        {
+      try {
+        const data = await useApi<{
           access: string
-        },
-        any
-      >('/api/user/refresh', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          refresh: refresh.value
+        }>('/api/user/refresh', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          body: {
+            refresh: refresh.value
+          }
+        })
+
+        if (data.access) {
+          accessCookie.value = data.access
+
+          this.authenticated = true
+        } else {
+          this.authenticated = false
+          accessCookie.value = null
+          refresh.value = null
         }
-      })
-
-      if (data.value?.access) {
-        accessCookie.value = data.value.access
-
-        this.authenticated = true
-      } else {
+      } catch (e) {
         this.authenticated = false
         accessCookie.value = null
         refresh.value = null

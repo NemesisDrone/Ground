@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.user",
     "apps.communication",
+    "apps.drone",
 ]
 
 MIDDLEWARE = [
@@ -142,7 +143,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    # ofetch lib is really fucking bad, interceptors are not real interceptos so i can't ...
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
     "SLIDING_TOKEN_LIFETIME": timedelta(days=30),
     "SLIDING_TOKEN_REFRESH_AT_LOGIN": True,
