@@ -4,6 +4,9 @@ definePageMeta({
   layout: 'sidebar',
   keepalive: false
 })
+useHead({
+  title: 'Settings'
+})
 
 const isLoading = ref(false)
 const droneSettingsStore = useDroneSettingsStore()

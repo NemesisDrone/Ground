@@ -11,6 +11,7 @@ import {
   Settings,
   Camera
 } from 'lucide-vue-next'
+import { useDroneSettingsStore } from '~/store/droneSettings'
 
 let ws: WebSocketWrapper | null = null
 const droneStore = useComponentsStore()
