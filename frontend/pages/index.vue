@@ -154,34 +154,36 @@ watch(
           Invalid credentials
         </p>
       </div>
-      <div class="grid space-y-2 mt-5 z-10">
-        <div class="grid space-y-1">
-          <UiLabel for="identifier">Identifier</UiLabel>
-          <UiInput
-            id="identifier"
-            placeholder="Enter your identifier"
-            autocomplete="off"
-            v-model="user.identifier"
-          />
+      <form class="z-10">
+        <div class="grid space-y-2 mt-5 z-10">
+          <div class="grid space-y-1">
+            <UiLabel for="identifier">Identifier</UiLabel>
+            <UiInput
+              id="identifier"
+              placeholder="Enter your identifier"
+              autocomplete="off"
+              v-model="user.identifier"
+            />
+          </div>
+          <div class="grid space-y-1">
+            <UiLabel for="password">Password</UiLabel>
+            <UiInput
+              id="password"
+              placeholder="Enter your password"
+              type="password"
+              autocomplete="off"
+              v-model="user.password"
+            />
+          </div>
         </div>
-        <div class="grid space-y-1">
-          <UiLabel for="password">Password</UiLabel>
-          <UiInput
-            id="password"
-            placeholder="Enter your password"
-            type="password"
-            autocomplete="off"
-            v-model="user.password"
-          />
-        </div>
-      </div>
-      <UiButton
-        class="mt-4 z-10 w-full"
-        @click="logIn"
-        :is-loading="isLoading"
-      >
-        Connect
-      </UiButton>
+        <UiButton
+          class="mt-4 z-10 w-full"
+          @click="logIn"
+          :is-loading="isLoading"
+        >
+          Connect
+        </UiButton>
+      </form>
     </div>
   </div>
 </template>
