@@ -22,7 +22,10 @@ export const useApi = async <T>(
       }
     },
     async onResponseError({ response, options }) {
-      if (response.status === 401) {
+      if (
+        response.status === 401 &&
+        !response.url.includes('/api/user/token')
+      ) {
         const userStore = useUserStore()
         if (useCookie('refresh').value) {
           await userStore.refreshTokens()
