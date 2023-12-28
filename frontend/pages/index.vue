@@ -2,8 +2,10 @@
 import type { Container } from 'tsparticles-engine'
 import { useUserStore } from '~/store/user'
 import { storeToRefs } from 'pinia'
+import { useToast } from '~/components/ui/toast'
 
 const router = useRouter()
+const route = useRoute()
 
 const options = {
   fullScreen: {
@@ -136,6 +138,13 @@ watch(
   },
   { deep: true }
 )
+
+onMounted(() => {
+  if (route.query.hasOwnProperty('disconnected')) {
+    useToast().toast({ description: 'You have been disconnected' })
+    router.replace({ query: {} })
+  }
+})
 </script>
 
 <template>
