@@ -141,7 +141,7 @@ watch(
 
 onMounted(() => {
   if (route.query.hasOwnProperty('disconnected')) {
-    useToast().toast({ description: 'You have been disconnected' })
+    useToast().toast({ title: 'You have been disconnected' })
     router.replace({ query: {} })
   }
 })
