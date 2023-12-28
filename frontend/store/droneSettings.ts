@@ -29,7 +29,7 @@ export const useDroneSettingsStore = defineStore('droneSettings', {
     },
 
     async getSettings() {
-      const data = await useApi<{
+      const { data } = await useHttp().get<{
         id: number
         canals: Canal[]
       }>('/api/drone/settings/')
@@ -38,14 +38,11 @@ export const useDroneSettingsStore = defineStore('droneSettings', {
     },
 
     async updateSettings({ canals }: { canals: Canal[] }) {
-      const data = await useApi<{
+      const { data } = await useHttp().post<{
         id: number
         canals: Canal[]
       }>('/api/drone/settings/update/', {
-        method: 'POST',
-        body: {
-          canals
-        }
+        canals
       })
 
       this.canals = data.canals

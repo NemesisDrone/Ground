@@ -13,23 +13,19 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     async getUserData() {
-      const data = await useApi<UserData>('/api/user/data')
+      const { data } = await useHttp().get<UserData>('/api/user/data')
       if (data) {
         this.user = data
       }
     },
 
     async authenticateUser({ identifier, password }: UserLoginPayload) {
-      const data = await useApi<{
+      const { data } = await useHttp().post<{
         access: string
         refresh: string
       }>('/api/user/token', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          identifier,
-          password
-        }
+        identifier,
+        password
       })
 
       if (data.access && data.refresh) {
@@ -53,13 +49,10 @@ export const useUserStore = defineStore('user', {
     async logOut() {
       const token = useCookie('token')
       const refresh = useCookie('refresh')
-      await useApi('/api/user/blacklist', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          refresh
-        }
-      })
+      // await useHttp().post('/api/user/blacklist', {
+      //   refresh: refresh.value,
+      //   token: token.value
+      // })
 
       token.value = null
       refresh.value = null
@@ -71,14 +64,10 @@ export const useUserStore = defineStore('user', {
       const accessCookie = useCookie('access')
 
       try {
-        const data = await useApi<{
+        const { data } = await useHttp().post<{
           access: string
         }>('/api/user/refresh', {
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          body: {
-            refresh: refresh.value
-          }
+          refresh: refresh.value
         })
 
         if (data.access) {

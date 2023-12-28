@@ -144,9 +144,13 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     # ofetch lib is really fucking bad, interceptors are not real interceptos so i can't ...
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
-    "SLIDING_TOKEN_LIFETIME": timedelta(days=30),
+    # "ACCESS_TOKEN_LIFETIME": timedelta(seconds=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    # "REFRESH_TOKEN_LIFETIME": timedelta(seconds=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(seconds=10),
+    # "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timedelta(seconds=10),
     "SLIDING_TOKEN_REFRESH_AT_LOGIN": True,
 }
 
