@@ -139,7 +139,7 @@ watch(
 </script>
 
 <template>
-  <div>
+  <div class="w-full">
     <NuxtParticles id="tsparticles" :options="options"> </NuxtParticles>
 
     <div
