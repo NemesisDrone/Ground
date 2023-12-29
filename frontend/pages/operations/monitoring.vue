@@ -1,12 +1,17 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Operations/GPSMap.vue'
 import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
 import ImageViewer from '~/components/ui/image-viewer/ImageViewer.vue'
 import ScrollArea from '~/components/ui/scroll-area/ScrollArea.vue'
-import { CameraOff } from 'lucide-vue-next'
+import { CameraOff, MousePointerSquare, XCircle } from 'lucide-vue-next'
 import { useMonitoringStore } from '~/store/monitoring'
 import { DroneImage } from '~/types/images.types'
 import Overlay from '~/components/ui/overlay/Overlay.vue'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger
+} from '@/components/ui/context-menu'
 definePageMeta({
   layout: 'sidebar'
 })
@@ -68,11 +73,25 @@ onMounted(async () => {
               }"
               @click="selectImage(img)"
             >
-              <img
-                :src="img.url"
-                alt=""
-                class="h-full w-full rounded-[0.12rem]"
-              />
+              <ContextMenu>
+                <ContextMenuTrigger>
+                  <img
+                    :src="img.url"
+                    alt=""
+                    class="h-full w-full rounded-[0.12rem]"
+                  />
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem @click="selectImage(img)">
+                    <MousePointerSquare :size="22" class="mr-2" />
+                    Select
+                  </ContextMenuItem>
+                  <ContextMenuItem class="text-red-500">
+                    <XCircle :size="22" class="mr-2" />
+                    Delete
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             </div>
             <div
               v-if="monitoringStore.images.length < 8"
