@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ScreenShare, Image, Fullscreen } from 'lucide-vue-next'
+import { ScreenShare, Image, Fullscreen, CameraOff } from 'lucide-vue-next'
 
 const props = defineProps({
   src: {
@@ -118,6 +118,7 @@ const openInNewTab = () => {
     @wheel="onWheelEvent"
   >
     <img
+      v-if="src"
       :src="src"
       ref="image"
       class="h-full w-full"
@@ -129,6 +130,9 @@ const openInNewTab = () => {
       @mouseup="onMouseUp"
       @mousemove="onMouseMove"
     />
+    <div v-else class="h-full w-full flex items-center justify-center">
+      <CameraOff :size="72" color="#27272A" />
+    </div>
     <button
       v-if="allowOpenInNewTab"
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
