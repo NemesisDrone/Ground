@@ -118,7 +118,9 @@ const dashboardLayouts = [
       </div>
     </div>
     <main class="w-full ml-[62px]">
-      <slot />
+      <div>
+        <slot />
+      </div>
     </main>
   </div>
 </template>
