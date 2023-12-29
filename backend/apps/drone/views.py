@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .serializers import DroneSettingsSerializer
+from .serializers import DroneSettingsSerializer, DroneImageSerializer
 
-from .models import DroneSettings
+from .models import DroneSettings, DroneImage
 
 
 @api_view(["GET"])
@@ -32,3 +32,12 @@ def update_drone_settings(request: Request):
     serializer.save()
 
     return Response(serializer.data)
+
+
+class DroneImagesViewSet(viewsets.ModelViewSet):
+    """
+    This viewset is used to list all the drone images, and to create new ones or delete them.
+    """
+    queryset = DroneImage.objects.all().order_by('-created_at')
+    serializer_class = DroneImageSerializer
+    permission_classes = [permissions.IsAuthenticated]
