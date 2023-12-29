@@ -1,17 +1,8 @@
 <script lang="ts" setup>
 import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
-import ImageViewer from '~/components/ui/image-viewer/ImageViewer.vue'
-import ScrollArea from '~/components/ui/scroll-area/ScrollArea.vue'
 import { CameraOff, MousePointerSquare, XCircle } from 'lucide-vue-next'
 import { useMonitoringStore } from '~/store/monitoring'
 import { DroneImage } from '~/types/images.types'
-import Overlay from '~/components/ui/overlay/Overlay.vue'
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger
-} from '@/components/ui/context-menu'
 definePageMeta({
   layout: 'sidebar'
 })
@@ -23,6 +14,7 @@ const monitoringStore = useMonitoringStore()
 
 const selectedImage = ref<DroneImage | null>(null)
 const isImagesLoading = ref(false)
+const isImageDeletionLoading = ref(false)
 
 const selectImage = (image: DroneImage) => {
   selectedImage.value = image
@@ -37,19 +29,34 @@ onMounted(async () => {
     selectedImage.value = monitoringStore.images[0]
   }
 })
+
+const deleteImage = async (image: DroneImage) => {
+  isImageDeletionLoading.value = true
+
+  await monitoringStore.deleteImage(image)
+  if (selectedImage.value?.id === image.id) {
+    if (monitoringStore.images.length > 0) {
+      selectedImage.value = monitoringStore.images[0]
+    } else {
+      selectedImage.value = null
+    }
+  }
+
+  isImageDeletionLoading.value = false
+}
 </script>
 <template>
   <div class="w-full h-[100vh] p-4">
     <div class="h-1/2 w-full flex gap-4">
       <div class="w-1/2 h-full">
-        <Overlay :show="isImagesLoading">
-          <ImageViewer
+        <UiOverlay :show="isImagesLoading">
+          <UiImageViewer
             :src="selectedImage ? selectedImage.url : ''"
             :allow-style-change="true"
             :allow-zoom="true"
             :allow-open-in-new-tab="true"
           />
-        </Overlay>
+        </UiOverlay>
       </div>
       <div class="w-1/2 h-full">
         <div class="rounded-md bg-neutral-900 h-full p-2">
@@ -58,8 +65,8 @@ onMounted(async () => {
       </div>
     </div>
     <div class="h-1/2 w-full flex gap-4 pt-4">
-      <scroll-area class="w-2/3 h-full" :scroll-to-bottom="false">
-        <Overlay :show="isImagesLoading">
+      <UiScrollArea class="w-2/3 h-full" :scroll-to-bottom="false">
+        <UiOverlay :show="isImagesLoading">
           <div
             class="h-full grid grid-cols-4 gap-2 rounded-md bg-neutral-900 p-2"
           >
@@ -73,25 +80,49 @@ onMounted(async () => {
               }"
               @click="selectImage(img)"
             >
-              <ContextMenu>
-                <ContextMenuTrigger>
-                  <img
-                    :src="img.url"
-                    alt=""
-                    class="h-full w-full rounded-[0.12rem]"
-                  />
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                  <ContextMenuItem @click="selectImage(img)">
-                    <MousePointerSquare :size="22" class="mr-2" />
-                    Select
-                  </ContextMenuItem>
-                  <ContextMenuItem class="text-red-500">
-                    <XCircle :size="22" class="mr-2" />
-                    Delete
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
+              <UiDialog>
+                <UiContextMenu>
+                  <UiContextMenuTrigger>
+                    <img
+                      :src="img.url"
+                      alt=""
+                      class="h-full w-full rounded-[0.12rem]"
+                    />
+                  </UiContextMenuTrigger>
+                  <UiContextMenuContent>
+                    <UiContextMenuItem
+                      @click="selectImage(img)"
+                      :disabled="selectedImage?.id === img.id"
+                    >
+                      <MousePointerSquare :size="22" class="mr-2" />
+                      Select
+                    </UiContextMenuItem>
+                    <UiDialogTrigger asChild>
+                      <UiContextMenuItem class="text-red-500">
+                        <XCircle :size="22" class="mr-2" />
+                        Delete
+                      </UiContextMenuItem>
+                    </UiDialogTrigger>
+                  </UiContextMenuContent>
+                </UiContextMenu>
+                <UiDialogContent>
+                  <UiDialogHeader>
+                    <UiDialogTitle>Delete picture?</UiDialogTitle>
+                    <UiDialogDescription>
+                      The picture will be deleted permanently.
+                    </UiDialogDescription>
+                  </UiDialogHeader>
+                  <UiDialogFooter>
+                    <UiButton
+                      variant="destructive"
+                      @click="deleteImage(img)"
+                      :is-loading="isImageDeletionLoading"
+                    >
+                      Confirm
+                    </UiButton>
+                  </UiDialogFooter>
+                </UiDialogContent>
+              </UiDialog>
             </div>
             <div
               v-if="monitoringStore.images.length < 8"
@@ -105,8 +136,8 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-        </Overlay>
-      </scroll-area>
+        </UiOverlay>
+      </UiScrollArea>
       <div class="w-1/3 h-full"></div>
     </div>
   </div>

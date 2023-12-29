@@ -28,6 +28,13 @@ export const useMonitoringStore = defineStore('monitoring', {
       )
 
       this.images = data
+    },
+
+    async deleteImage(deletedImage: DroneImage) {
+      await useHttp().delete(`/api/drone/images/${deletedImage.id}/`)
+      this.images = this.images.filter(
+        (image) => image.id !== deletedImage.id
+      )
     }
   }
 })
