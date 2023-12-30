@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ScreenShare, Fullscreen, CameraOff } from 'lucide-vue-next'
+import { ScreenShare, Fullscreen, CameraOff, Image } from 'lucide-vue-next'
 
 const props = defineProps({
   src: {

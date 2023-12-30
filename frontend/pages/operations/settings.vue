@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useDroneSettingsStore } from '~/store/droneSettings'
 import { useToast } from '~/components/ui/toast'
+import { LogOut } from 'lucide-vue-next'
+import { useUserStore } from '~/store/user'
+
 definePageMeta({
   layout: 'sidebar',
   keepalive: false
@@ -34,6 +37,16 @@ const updateSettings = async () => {
 
   isLoading.value = false
 }
+
+const isLogOutLoading = ref(false)
+const logOut = async () => {
+  isLogOutLoading.value = true
+
+  await useUserStore().logOut()
+  useRouter().push('/?disconnected')
+
+  isLogOutLoading.value = false
+}
 </script>
 
 <template>
@@ -61,6 +74,33 @@ const updateSettings = async () => {
             Save Drone Settings
           </UiButton>
         </div>
+      </div>
+      <div class="mt-3">
+        <UiDialog>
+          <UiDialogTrigger>
+            <UiButton variant="destructive">
+              <LogOut :size="18" class="mr-2" />
+              Log out
+            </UiButton>
+          </UiDialogTrigger>
+          <UiDialogContent>
+            <UiDialogHeader>
+              <UiDialogTitle>Log out?</UiDialogTitle>
+              <UiDialogDescription>
+                You will be logged out. You can log in again.
+              </UiDialogDescription>
+            </UiDialogHeader>
+            <UiDialogFooter>
+              <UiButton
+                variant="destructive"
+                @click="logOut"
+                :is-loading="isLogOutLoading"
+              >
+                Confirm
+              </UiButton>
+            </UiDialogFooter>
+          </UiDialogContent>
+        </UiDialog>
       </div>
     </div>
   </div>
