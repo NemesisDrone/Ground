@@ -9,7 +9,9 @@ interface UserLoginPayload {
 export const useUserStore = defineStore('user', {
   state: () => ({
     authenticated: false,
-    user: null as null | UserData
+    user: null as null | UserData,
+    accessToken: null as null | string,
+    refreshToken: null as null | string
   }),
   actions: {
     async getUserData() {
@@ -29,60 +31,49 @@ export const useUserStore = defineStore('user', {
       })
 
       if (data.access && data.refresh) {
-        const access = useCookie('access')
-        access.value = data.access
-
-        const refresh = useCookie('refresh')
-        refresh.value = data.refresh
+        this.accessToken = data.access
+        this.refreshToken = data.refresh
 
         this.authenticated = true
       } else {
         this.authenticated = false
-        const access = useCookie('access')
-        access.value = null
-
-        const refresh = useCookie('refresh')
-        refresh.value = null
+        this.accessToken = null
+        this.refreshToken = null
       }
     },
 
     async logOut() {
-      const token = useCookie('token')
-      const refresh = useCookie('refresh')
       // await useHttp().post('/api/user/blacklist', {
       //   refresh: refresh.value,
       //   token: token.value
       // })
 
-      token.value = null
-      refresh.value = null
+      this.accessToken = null
+      this.refreshToken = null
       this.authenticated = false
     },
 
-    async refreshTokens() {
-      const refresh = useCookie('refresh')
-      const accessCookie = useCookie('access')
-
+    async refreshExpiredToken() {
       try {
         const { data } = await useHttp().post<{
           access: string
         }>('/api/user/refresh', {
-          refresh: refresh.value
+          refresh: this.refreshToken
         })
 
         if (data.access) {
-          accessCookie.value = data.access
+          this.accessToken = data.access
 
           this.authenticated = true
         } else {
           this.authenticated = false
-          accessCookie.value = null
-          refresh.value = null
+          this.accessToken = null
+          this.refreshToken = null
         }
       } catch (e) {
         this.authenticated = false
-        accessCookie.value = null
-        refresh.value = null
+        this.accessToken = null
+        this.refreshToken = null
       }
     }
   },

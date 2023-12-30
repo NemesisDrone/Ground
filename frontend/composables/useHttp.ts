@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios'
 
 export const useHttp = () => {
   const config = useRuntimeConfig()
+  const userStore = useUserStore()
   const http = axios.create({
     baseURL: config.public.API_URL,
     headers: {
@@ -11,9 +12,8 @@ export const useHttp = () => {
   })
 
   http.interceptors.request.use((config) => {
-    const token = useCookie('access')
-    if (config && config.headers && token.value) {
-      config.headers['Authorization'] = `Bearer ${token.value}`
+    if (config && config.headers && userStore.accessToken) {
+      config.headers['Authorization'] = `Bearer ${userStore.accessToken}`
     }
 
     return config
@@ -26,18 +26,18 @@ export const useHttp = () => {
     async (error) => {
       if (error instanceof AxiosError) {
         const originalRequest = error.config
-        console.log(useCookie('refresh').value, error.response?.status)
+
         if (
           error.response?.status === 401 &&
-          // @ts-ignore
-          originalRequest.url !== '/api/user/refresh' &&
-          // @ts-ignore
-          originalRequest.url !== '/api/user/blacklist' &&
-          useCookie('refresh').value
+          // TODO: refacto this shit
+          originalRequest?.url !== '/api/user/refresh' &&
+          originalRequest?.url !== '/api/user/blacklist' &&
+          originalRequest?.url !== '/api/user/token' &&
+          userStore.refreshToken
         ) {
-          await useUserStore().refreshTokens()
+          await userStore.refreshExpiredToken()
 
-          if (useCookie('access').value) {
+          if (userStore.accessToken) {
             // @ts-ignore
             return http(originalRequest)
           } else {
@@ -46,8 +46,7 @@ export const useHttp = () => {
               document.location.href = '/?disconnected'
             }
           }
-          // @ts-ignore
-        } else if (originalRequest.url === '/api/user/refresh') {
+        } else if (originalRequest?.url === '/api/user/refresh') {
           if (document.location.pathname !== '/?disconnected') {
             await useUserStore().logOut()
             document.location.href = '/?disconnected'

@@ -109,8 +109,8 @@ const options = {
   retina_detect: true
 }
 
-const authStore = useUserStore()
-const { authenticated } = storeToRefs(authStore)
+const userStore = useUserStore()
+const { authenticated } = storeToRefs(userStore)
 
 const user = ref({
   identifier: '',
@@ -121,10 +121,14 @@ const isLoading = ref(false)
 const logIn = async () => {
   isLoading.value = true
 
-  await authStore.authenticateUser(user.value)
-  if (authenticated.value) {
-    router.push('/operations/dashboard')
-  } else {
+  try {
+    await userStore.authenticateUser(user.value)
+    if (authenticated.value) {
+      router.push('/operations/dashboard')
+    } else {
+      loginError.value = true
+    }
+  } catch (e) {
     loginError.value = true
   }
 
