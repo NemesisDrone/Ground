@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
-import { CameraOff, MousePointerSquare, XCircle } from 'lucide-vue-next'
+import {
+  CameraOff,
+  MousePointerSquare,
+  XCircle,
+  Download
+} from 'lucide-vue-next'
 import { useMonitoringStore } from '~/store/monitoring'
 import { DroneImage } from '~/types/images.types'
 definePageMeta({
@@ -43,6 +48,14 @@ const deleteImage = async (image: DroneImage) => {
   }
 
   isImageDeletionLoading.value = false
+}
+
+const downloadImage = async (image: DroneImage) => {
+  const link = document.createElement('a')
+  link.href = image.url
+  link.target = '_blank'
+  link.download = image.url.split('/').pop() || ''
+  link.click()
 }
 </script>
 <template>
@@ -96,6 +109,10 @@ const deleteImage = async (image: DroneImage) => {
                     >
                       <MousePointerSquare :size="22" class="mr-2" />
                       Select
+                    </UiContextMenuItem>
+                    <UiContextMenuItem @click="downloadImage(img)">
+                      <Download :size="22" class="mr-2" />
+                      Download
                     </UiContextMenuItem>
                     <UiDialogTrigger asChild>
                       <UiContextMenuItem class="text-red-500">
