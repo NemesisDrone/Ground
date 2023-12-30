@@ -4,7 +4,8 @@ import {
   XCircle,
   LocateFixed,
   LocateOff,
-  ScanSearch
+  ScanSearch,
+  Box
 } from 'lucide-vue-next'
 import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
@@ -52,8 +53,67 @@ watch(gpsPosition, () => {
   ])
 })
 
+const add3dBuildings = () => {
+  const layers = mapRef.value?.getStyle().layers
+  // @ts-ignore
+  const labelLayerId = layers.find(
+    // @ts-ignore
+    (layer) => layer.type === 'symbol' && layer.layout['text-field']
+  ).id
+
+  mapRef.value?.addLayer(
+    {
+      id: 'add-3d-buildings',
+      source: 'composite',
+      'source-layer': 'building',
+      filter: ['==', 'extrude', 'true'],
+      type: 'fill-extrusion',
+      minzoom: 15,
+      paint: {
+        'fill-extrusion-color': '#aaa',
+
+        'fill-extrusion-height': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          15,
+          0,
+          15.05,
+          ['get', 'height']
+        ],
+        'fill-extrusion-base': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          15,
+          0,
+          15.05,
+          ['get', 'min_height']
+        ],
+        'fill-extrusion-opacity': 0.6
+      }
+    },
+    labelLayerId
+  )
+}
+
+const use3dBuildings = ref(true)
+const toggle3dBuildings = () => {
+  if (!mapRef.value) return
+  use3dBuildings.value = !use3dBuildings.value
+
+  if (use3dBuildings.value) {
+    add3dBuildings()
+  } else {
+    mapRef.value?.removeLayer('add-3d-buildings')
+  }
+}
+
 watch(mapRef, () => {
   mapRef.value?.setCenter([gpsPosition.value.lat, gpsPosition.value.lng])
+  mapRef.value?.on('style.load', () => {
+    if (use3dBuildings.value) add3dBuildings()
+  })
 })
 
 const goToInitialZoom = () => {
@@ -70,7 +130,7 @@ const goToInitialZoom = () => {
       >
         <div class="flex flex-col items-center">
           <div
-            class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"
+            class="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-primary"
           ></div>
         </div>
       </div>
@@ -81,9 +141,10 @@ const goToInitialZoom = () => {
       :options="{
         style: 'mapbox://styles/mapbox/satellite-streets-v12', // style URL
         // style: 'mapbox://styles/mapbox/dark-v11',
-        // pitch: 60,
+        pitch: 45,
         // center: [gpsPosition.lat, gpsPosition.lng], // starting position
-        zoom: 15.5 // starting zoom
+        zoom: 15.5, // starting zoom,
+        antialias: true
       }"
     >
       <MapboxDefaultMarker
@@ -121,6 +182,13 @@ const goToInitialZoom = () => {
         title="Go to initial zoom"
       >
         <ScanSearch :size="24" />
+      </button>
+      <button
+        class="absolute top-[7.5rem] right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
+        @click="toggle3dBuildings"
+        title="Toggle 3D buildings"
+      >
+        <Box :size="24" />
       </button>
     </MapboxMap>
   </div>
