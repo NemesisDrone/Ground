@@ -7,6 +7,10 @@ import { useToast } from '~/components/ui/toast'
 const router = useRouter()
 const route = useRoute()
 
+useHead({
+  title: 'Nemesis - Authentication'
+})
+
 const options = {
   fullScreen: {
     zIndex: 0
