@@ -20,7 +20,8 @@ import {
 import { useSensorsStore } from '~/store/sensors'
 
 definePageMeta({
-  layout: 'sidebar'
+  layout: 'sidebar',
+  keepalive: false
 })
 useHead({
   title: 'Dashboard'
