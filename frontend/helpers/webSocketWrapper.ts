@@ -1,3 +1,5 @@
+import { useUserStore } from '~/store/user'
+
 /**
  * A wrapper around the WebSocket class that allows for adding and removing listeners
  * for specific message types.
@@ -8,10 +10,14 @@ class WebSocketWrapper {
   private listeners: Record<string, ((data: any) => void)[]> = {}
 
   constructor(url: string) {
-    const access = useCookie('access').value
-    const refresh = useCookie('refresh').value
+    const userStore = useUserStore()
     // not good but nevermind
-    url = url + '?access=' + access + '&refresh=' + refresh
+    url =
+      url +
+      '?access=' +
+      userStore.accessToken +
+      '&refresh=' +
+      userStore.refreshToken
     this.socket = new WebSocket(url)
 
     this.socket.onmessage = (event) => {
