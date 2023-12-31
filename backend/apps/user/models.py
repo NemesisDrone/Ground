@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
+
 class UserManager(BaseUserManager):
     def create_user(self, identifier, password=None):
         if identifier is None:
@@ -29,4 +30,3 @@ class User(AbstractBaseUser, BaseModel):
 
     def __str__(self):
         return self.identifier
-

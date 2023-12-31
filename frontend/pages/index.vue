@@ -1,9 +1,15 @@
 <script lang="ts" setup>
 import type { Container } from 'tsparticles-engine'
-import { useAuthStore } from '~/store/auth'
+import { useUserStore } from '~/store/user'
 import { storeToRefs } from 'pinia'
+import { useToast } from '~/components/ui/toast'
 
 const router = useRouter()
+const route = useRoute()
+
+useHead({
+  title: 'Nemesis - Authentication'
+})
 
 const options = {
   fullScreen: {
@@ -107,21 +113,30 @@ const options = {
   retina_detect: true
 }
 
-const authStore = useAuthStore()
-const { loading, authenticated } = storeToRefs(authStore)
+const userStore = useUserStore()
+const { authenticated } = storeToRefs(userStore)
 
 const user = ref({
   identifier: '',
   password: ''
 })
 const loginError = ref(false)
+const isLoading = ref(false)
 const logIn = async () => {
-  await authStore.authenticateUser(user.value)
-  if (authenticated.value) {
-    router.push('/dashboard/dashboard')
-  } else {
+  isLoading.value = true
+
+  try {
+    await userStore.authenticateUser(user.value)
+    if (authenticated.value) {
+      router.push('/operations/dashboard')
+    } else {
+      loginError.value = true
+    }
+  } catch (e) {
     loginError.value = true
   }
+
+  isLoading.value = false
 }
 
 watch(
@@ -131,10 +146,17 @@ watch(
   },
   { deep: true }
 )
+
+onMounted(() => {
+  if (route.query.hasOwnProperty('disconnected')) {
+    useToast().toast({ title: 'You have been disconnected' })
+    router.replace({ query: {} })
+  }
+})
 </script>
 
 <template>
-  <div>
+  <div class="w-full">
     <NuxtParticles id="tsparticles" :options="options"> </NuxtParticles>
 
     <div
@@ -149,34 +171,36 @@ watch(
           Invalid credentials
         </p>
       </div>
-      <div class="grid space-y-2 mt-5 z-10">
-        <div class="grid space-y-1">
-          <UiLabel for="identifier">Identifier</UiLabel>
-          <UiInput
-            id="identifier"
-            placeholder="Enter your identifier"
-            autocomplete="off"
-            v-model="user.identifier"
-          />
+      <form class="z-10">
+        <div class="grid space-y-2 mt-5 z-10">
+          <div class="grid space-y-1">
+            <UiLabel for="identifier">Identifier</UiLabel>
+            <UiInput
+              id="identifier"
+              placeholder="Enter your identifier"
+              autocomplete="off"
+              v-model="user.identifier"
+            />
+          </div>
+          <div class="grid space-y-1">
+            <UiLabel for="password">Password</UiLabel>
+            <UiInput
+              id="password"
+              placeholder="Enter your password"
+              type="password"
+              autocomplete="off"
+              v-model="user.password"
+            />
+          </div>
         </div>
-        <div class="grid space-y-1">
-          <UiLabel for="password">Password</UiLabel>
-          <UiInput
-            id="password"
-            placeholder="Enter your password"
-            type="password"
-            autocomplete="off"
-            v-model="user.password"
-          />
-        </div>
-      </div>
-      <UiButton
-        class="mt-4 z-10 w-full"
-        @click="logIn"
-        :is-loading="loading"
-      >
-        Connect
-      </UiButton>
+        <UiButton
+          class="mt-4 z-10 w-full"
+          @click="logIn"
+          :is-loading="isLoading"
+        >
+          Connect
+        </UiButton>
+      </form>
     </div>
   </div>
 </template>

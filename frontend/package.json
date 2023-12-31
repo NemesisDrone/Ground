@@ -39,6 +39,7 @@
     "@tresjs/post-processing": "^0.4.0",
     "@tweakpane/plugin-essentials": "^0.2.0",
     "@vueuse/core": "^10.5.0",
+    "axios": "^1.6.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "lucide-vue-next": "^0.284.0",

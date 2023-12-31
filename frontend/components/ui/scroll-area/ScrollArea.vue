@@ -8,6 +8,7 @@ import {
 import ScrollBar from './ScrollBar.vue'
 import { cn } from '@/helpers/utils'
 
+const random = ref(Math.random().toString(36).substr(2, 9))
 const props = withDefaults(
   defineProps<
     ScrollAreaRootProps & { class?: string; scrollToBottom: boolean }
@@ -19,17 +20,15 @@ const props = withDefaults(
   }
 )
 const intervalScrollToBottom = ref<NodeJS.Timeout | null>(null)
-const isScrolling = ref(false)
 
 onMounted(() => {
   if (props.scrollToBottom) {
     intervalScrollToBottom.value = setInterval(() => {
       if (!props.scrollToBottom) return
       const scrollArea = document.querySelector(
-        '.radix-scroll-area'
+        '#scroll-area-' + random.value
       ) as HTMLElement
       if (!scrollArea) {
-        clearInterval(intervalScrollToBottom.value)
         return
       }
       scrollArea.scrollTop = scrollArea.scrollHeight
@@ -51,6 +50,7 @@ onUnmounted(() => {
   >
     <ScrollAreaViewport
       class="h-full w-full rounded-[inherit] radix-scroll-area"
+      :id="`scroll-area-${random}`"
     >
       <slot />
     </ScrollAreaViewport>
