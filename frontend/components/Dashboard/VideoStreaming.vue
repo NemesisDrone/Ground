@@ -13,12 +13,12 @@ const closeWindow = () => {
 
 onMounted(() => {
       function ws_connect() {
-        var ws = new WebSocket('ws://10.0.3.1:7000'); // [TODO] See what address to use here.
-        //ws.binaryType = "arraybuffer";
+        let ws = new WebSocket('ws://100.87.214.117:7000'); // [TODO] See what address to use here.
 
         ws.addEventListener("error", event => {
           console.error("WS ERROR: ", event.message);
           ws.close();
+          ws = null;
           setTimeout(function() {
             ws_connect();
           }, 500);
@@ -26,27 +26,14 @@ onMounted(() => {
 
         ws.addEventListener("close", event => {
           ws.close();
+          ws = null;
           setTimeout(ws_connect, 500);
         });
 
         ws.addEventListener('message', event => {
           event.data.arrayBuffer().then(res => {
-            var abv = new Uint8Array(res);
-            var blob = new Blob([abv], {type: "image/jpeg"});
-            var uc = window.URL || window.webkitURL;
-            var iu = uc.createObjectURL(blob);
-            var i = document.querySelector("#imager");
-            i.src = iu;
+            document.querySelector("#imager").src = (window.URL || window.webkitURL).createObjectURL(new Blob([new Uint8Array(res)], {type: "image/jpeg"}));
           });
-        });
-
-        ws.addEventListener('message', event => {
-          var abv = new Uint8Array(event.data);
-          var blob = new Blob([abv], {type: "image/jpeg"});
-          var uc = window.URL || window.webkitURL;
-          var iu = uc.createObjectURL(blob);
-          var i = document.querySelector("#imager");
-          i.src = iu;
         });
       };
 
@@ -57,10 +44,13 @@ onMounted(() => {
 
 <template>
   <div class="relative h-full m-0 p-0 overflow-hidden">
-    <img
-      class="w-full object-cover h-full"
-      id="imager"
-    />
+    <div class="nvs-container">
+        <img
+            class="w-full object-cover h-full"
+            id="imager"
+        />
+        <p class="nvs-message">Stream unavailable.</p>
+    </div>
     <button
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
       v-if="route.path !== '/fullscreen/video'"
