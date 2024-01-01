@@ -52,7 +52,7 @@ export const getMapBox3DDroneModelLayer = (
         sensorStore.gpsPosition.lat,
         sensorStore.gpsPosition.lng
       ]
-      const modelAltitude = 10
+      const modelAltitude = sensorStore.altitude
       const modelRotate = [
         MathUtils.degToRad(sensorStore.full.roll) + Math.PI / 2,
         0,

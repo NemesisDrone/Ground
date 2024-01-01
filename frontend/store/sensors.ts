@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 
 export const useSensorsStore = defineStore('sensors', {
   state: () => ({
-    altitude: 0,
+    altitude: 20,
     gpsPosition: {
       lat: -0.7563779,
       lng: 48.0879123

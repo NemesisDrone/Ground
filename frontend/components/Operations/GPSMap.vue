@@ -11,9 +11,7 @@ import {
 import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
-import mapboxgl from 'mapbox-gl'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { getMapBox3DDroneModelLayer } from '~/helpers/mapBoxLayers'
 
 const sensorsStore = useSensorsStore()
@@ -22,7 +20,6 @@ const { gpsPosition } = storeToRefs(sensorsStore)
 const uniqueMapId = uuidv4()
 
 const mapRef = useMapboxRef('map-gps-' + uniqueMapId)
-const markerRef = useMapboxMarkerRef('marker')
 const route = useRoute()
 
 /**
@@ -45,17 +42,14 @@ const closeWindow = () => {
 
 const viewAttachedToDronePosition = ref(true)
 watch(gpsPosition, () => {
-  if (!mapRef.value || !markerRef.value) return
+  if (!mapRef.value) return
 
+  console.log(viewAttachedToDronePosition.value)
   if (viewAttachedToDronePosition.value) {
     mapRef.value?.panTo([gpsPosition.value.lat, gpsPosition.value.lng], {
       duration: 1000
     })
   }
-  markerRef.value?.setLngLat([
-    gpsPosition.value.lat,
-    gpsPosition.value.lng
-  ])
 })
 
 const add3dBuildings = () => {
@@ -130,9 +124,9 @@ const toggleMapView = () => {
 let scene: THREE.Scene | null = null
 let camera: THREE.Camera | null = null
 
-setInterval(() => {
-  sensorsStore.gpsPosition.lat += 0.00001
-}, 500)
+// setInterval(() => {
+//   sensorsStore.gpsPosition.lat += 0.00001
+// }, 500)
 
 watch(mapRef, () => {
   if (!mapRef.value) return
@@ -181,11 +175,6 @@ const goToInitialZoom = () => {
         attributionControl: false
       }"
     >
-      <!--      <MapboxDefaultMarker-->
-      <!--        marker-id="marker"-->
-      <!--        :lnglat="[gpsPosition.lat, gpsPosition.lng]"-->
-      <!--      />-->
-
       <button
         class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         v-if="route.path !== '/fullscreen/gps'"
