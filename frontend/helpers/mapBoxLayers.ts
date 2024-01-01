@@ -3,6 +3,7 @@ import { useSensorsStore } from '~/store/sensors'
 import * as THREE from 'three'
 // @ts-ignore
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { MathUtils } from 'three'
 
 export const getMapBox3DDroneModelLayer = (
   camera: THREE.Camera | null,
@@ -52,7 +53,11 @@ export const getMapBox3DDroneModelLayer = (
         sensorStore.gpsPosition.lng
       ]
       const modelAltitude = 10
-      const modelRotate = [Math.PI / 2, 0, 0]
+      const modelRotate = [
+        MathUtils.degToRad(sensorStore.full.roll) + Math.PI / 2,
+        0,
+        MathUtils.degToRad(sensorStore.full.pitch)
+      ]
 
       const modelAsMercatorCoordinate =
         mapboxgl.MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
