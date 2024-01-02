@@ -61,6 +61,14 @@ export const getMapBox3DDroneModelLayer = (
 
       const modelAsMercatorCoordinate =
         mapboxgl.MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
+
+      /*
+      The factor variable is used to scale the size of the drone based on the zoom level.
+       */
+      const factor = Math.pow(2, 22 - map.getZoom()) / 11
+      const scale =
+        modelAsMercatorCoordinate.meterInMercatorCoordinateUnits() * factor
+
       const modelTransform = {
         translateX: modelAsMercatorCoordinate.x,
         translateY: modelAsMercatorCoordinate.y,
@@ -70,8 +78,7 @@ export const getMapBox3DDroneModelLayer = (
         rotateZ: modelRotate[2],
         /* Since the 3D model is in real world meters, a scale transform needs to be applied
          */
-        scale:
-          modelAsMercatorCoordinate.meterInMercatorCoordinateUnits() * 6
+        scale
       }
 
       const rotationX = new THREE.Matrix4().makeRotationAxis(
