@@ -44,13 +44,21 @@ const viewAttachedToDronePosition = ref(true)
 watch(gpsPosition, () => {
   if (!mapRef.value) return
 
-  console.log(viewAttachedToDronePosition.value)
   if (viewAttachedToDronePosition.value) {
     mapRef.value?.panTo([gpsPosition.value.lat, gpsPosition.value.lng], {
       duration: 1000
     })
   }
 })
+
+const toggleAttachedView = () => {
+  viewAttachedToDronePosition.value = !viewAttachedToDronePosition.value
+  if (viewAttachedToDronePosition.value) {
+    mapRef.value?.panTo([gpsPosition.value.lat, gpsPosition.value.lng], {
+      duration: 1000
+    })
+  }
+}
 
 const add3dBuildings = () => {
   const layers = mapRef.value?.getStyle().layers
@@ -144,7 +152,6 @@ watch(mapRef, () => {
 
 const goToInitialZoom = () => {
   if (!mapRef.value) return
-  console.log('goToInitialZoom')
   mapRef.value?.setPitch(45)
   mapRef.value?.setBearing(0)
   mapRef.value?.zoomTo(15.75)
@@ -193,7 +200,7 @@ const goToInitialZoom = () => {
       </button>
       <button
         class="absolute top-10 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
-        @click="viewAttachedToDronePosition = !viewAttachedToDronePosition"
+        @click="toggleAttachedView"
         :title="viewAttachedToDronePosition ? 'Detach' : 'Attach'"
       >
         <LocateOff v-if="viewAttachedToDronePosition" :size="24" />
