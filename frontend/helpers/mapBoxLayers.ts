@@ -69,6 +69,14 @@ export const getMapBox3DDroneModelLayer = (
       const scale =
         modelAsMercatorCoordinate.meterInMercatorCoordinateUnits() * factor
 
+      /*
+      When map zoom is less than 6, 3d model need to disappear.
+      Otherwise drone is bugged.
+      */
+      if (map.getZoom() < 6) {
+        return
+      }
+
       const modelTransform = {
         translateX: modelAsMercatorCoordinate.x,
         translateY: modelAsMercatorCoordinate.y,
