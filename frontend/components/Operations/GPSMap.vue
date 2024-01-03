@@ -51,10 +51,30 @@ watch(gpsPosition, () => {
   if (!mapRef.value) return
 
   if (viewAttachedToDronePosition.value) {
-    mapRef.value?.panTo([gpsPosition.value.lat, gpsPosition.value.lng], {
-      duration: 1000
-    })
+    // Move the map to the drone position only if the drone position is not too far from the current position
+    const distance = Math.abs(
+      mapRef.value
+        ?.getCenter()
+        .distanceTo(
+          new mapboxgl.LngLat(gpsPosition.value.lat, gpsPosition.value.lng)
+        )
+    )
+
+    // Calcul of the max distance from the center of the map depending on the zoom
+    const maxDistanceFromCenter =
+      Math.pow(2, 22 - mapRef.value?.getZoom()) / 1.2
+
+    if (distance > maxDistanceFromCenter) {
+      mapRef.value?.panTo([gpsPosition.value.lat, gpsPosition.value.lng], {
+        duration: 1000
+      })
+    }
   }
+
+  mapRef.value
+    ?.getSource('droneDirection')
+    // @ts-ignore Why does this function doesn't exist but exist ?
+    .setData(getMapBoxDroneDirectionSourceData(mapRef.value))
 })
 
 const toggleAttachedView = () => {
@@ -167,6 +187,7 @@ watch(mapRef, () => {
   })
 
   mapRef.value?.on('move', () => {
+    if (!mapRef.value) return
     mapRef.value
       ?.getSource('droneDirection')
       // @ts-ignore Why does this function doesn't exist but exist ?
