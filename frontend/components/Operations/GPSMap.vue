@@ -12,7 +12,10 @@ import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import * as THREE from 'three'
-import { getMapBox3DDroneModelLayer } from '~/helpers/mapBoxLayers'
+import {
+  getMapBox3DDroneModelLayer,
+  getMapBoxDroneDirectionLineLayer
+} from '~/helpers/mapBoxLayers'
 
 const sensorsStore = useSensorsStore()
 const { gpsPosition } = storeToRefs(sensorsStore)
@@ -43,7 +46,7 @@ const closeWindow = () => {
 const viewAttachedToDronePosition = ref(true)
 watch(gpsPosition, () => {
   if (!mapRef.value) return
-
+  console.log(gpsPosition.value)
   if (viewAttachedToDronePosition.value) {
     mapRef.value?.panTo([gpsPosition.value.lat, gpsPosition.value.lng], {
       duration: 1000
@@ -143,10 +146,85 @@ watch(mapRef, () => {
     if (use3dBuildings.value) add3dBuildings()
   })
 
-  const layer = getMapBox3DDroneModelLayer(camera, scene, mapRef.value)
+  const layerDrone = getMapBox3DDroneModelLayer(
+    camera,
+    scene,
+    mapRef.value
+  )
 
   mapRef.value?.on('style.load', () => {
-    mapRef.value?.addLayer(layer, 'waterway-label')
+    const distance =
+      0.00015 * (Math.pow(2, 22 - (mapRef.value?.getZoom() || 0)) / 8)
+    const yaw = sensorsStore.full.yaw
+    const lat = gpsPosition.value.lat
+    const lng = gpsPosition.value.lng
+
+    const newLng = lng + distance * Math.cos(yaw)
+    const newLat = lat + distance * Math.sin(yaw)
+
+    mapRef.value?.addSource('droneDirection', {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            // Position of the drone
+            [gpsPosition.value.lat, gpsPosition.value.lng],
+            // Position of the direction last point of the drone
+            [newLat, newLng]
+          ]
+        }
+      }
+    })
+    mapRef.value?.addLayer(
+      {
+        id: 'droneDirection',
+        type: 'line',
+        source: 'droneDirection',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#FF0000',
+          'line-width': 6
+        }
+      },
+      'waterway-label'
+    )
+    mapRef.value?.addLayer(layerDrone, 'waterway-label')
+  })
+
+  mapRef.value?.on('move', () => {
+    // Update line size with zoom
+    const zoom = mapRef.value?.getZoom()
+    if (zoom) {
+      // Update the line distance with the drone position
+      // coordinate of the second point depending on yaw.
+      const distance = 0.00015 * (Math.pow(2, 22 - zoom) / 8)
+      const yaw = sensorsStore.full.yaw
+      const lat = gpsPosition.value.lat
+      const lng = gpsPosition.value.lng
+
+      const newLng = lng + distance * Math.cos(yaw)
+      const newLat = lat + distance * Math.sin(yaw)
+
+      mapRef.value?.getSource('droneDirection').setData({
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            // Position of the drone
+            [gpsPosition.value.lat, gpsPosition.value.lng],
+            // Position of the direction last point of the drone
+            [newLat, newLng]
+          ]
+        }
+      })
+    }
   })
 })
 

@@ -133,3 +133,36 @@ export const getMapBox3DDroneModelLayer = (
 
   return layer
 }
+
+export const getMapBoxDroneDirectionLineLayer = (): mapboxgl.LineLayer => {
+  const sensorStore = useSensorsStore()
+
+  const layer: mapboxgl.LineLayer = {
+    id: 'drone-direction',
+    type: 'line',
+    source: {
+      type: 'geojson',
+      // @ts-ignore
+      data: {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          // @ts-ignore
+          coordinates: [
+            [sensorStore.gpsPosition.lng, sensorStore.gpsPosition.lat],
+            [
+              sensorStore.gpsPosition.lng + 0.0001,
+              sensorStore.gpsPosition.lat + 0.0001
+            ]
+          ]
+        }
+      }
+    },
+    paint: {
+      'line-color': '#FF0000',
+      'line-width': 2
+    }
+  }
+
+  return layer
+}
