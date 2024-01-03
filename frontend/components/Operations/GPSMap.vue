@@ -14,9 +14,11 @@ import { v4 as uuidv4 } from 'uuid'
 import * as THREE from 'three'
 import {
   getMapBox3DDroneModelLayer,
-  getMapBoxDroneDirectionLineLayer
+  getMapBoxDroneDirectionLineLayer,
+  getMapBoxDroneDirectionSourceData
 } from '~/helpers/mapBoxLayers'
 import { MathUtils } from 'three'
+import mapboxgl from 'mapbox-gl'
 
 const sensorsStore = useSensorsStore()
 const { gpsPosition } = storeToRefs(sensorsStore)
@@ -47,7 +49,7 @@ const closeWindow = () => {
 const viewAttachedToDronePosition = ref(true)
 watch(gpsPosition, () => {
   if (!mapRef.value) return
-  console.log(gpsPosition.value)
+
   if (viewAttachedToDronePosition.value) {
     mapRef.value?.panTo([gpsPosition.value.lat, gpsPosition.value.lng], {
       duration: 1000
@@ -138,90 +140,37 @@ let camera: THREE.Camera | null = null
 
 watch(mapRef, () => {
   if (!mapRef.value) return
+  // Center the map on the drone position, or default position
   mapRef.value.setCenter([gpsPosition.value.lat, gpsPosition.value.lng])
+
+  // Add drone model, custom layers... , buildings
   mapRef.value.on('style.load', () => {
     if (use3dBuildings.value) add3dBuildings()
-  })
 
-  const layerDrone = getMapBox3DDroneModelLayer(
-    camera,
-    scene,
-    mapRef.value
-  )
-
-  mapRef.value?.on('style.load', () => {
-    const distance =
-      0.00015 * (Math.pow(2, 22 - (mapRef.value?.getZoom() || 0)) / 8)
-    const yaw = MathUtils.degToRad(sensorsStore.full.yaw)
-    const lat = gpsPosition.value.lat
-    const lng = gpsPosition.value.lng
-
-    const newLng = lng + distance * Math.cos(yaw)
-    const newLat = lat + distance * Math.sin(yaw)
+    const layerDrone = getMapBox3DDroneModelLayer(
+      camera,
+      scene,
+      mapRef.value as mapboxgl.Map
+    )
 
     mapRef.value?.addSource('droneDirection', {
       type: 'geojson',
-      data: {
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: [
-            // Position of the drone
-            [gpsPosition.value.lat, gpsPosition.value.lng],
-            // Position of the direction last point of the drone
-            [newLat, newLng]
-          ]
-        }
-      }
+      data: getMapBoxDroneDirectionSourceData(mapRef.value) as any
     })
+
     mapRef.value?.addLayer(
-      {
-        id: 'droneDirection',
-        type: 'line',
-        source: 'droneDirection',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        paint: {
-          'line-color': '#FF0000',
-          'line-width': 6
-        }
-      },
+      getMapBoxDroneDirectionLineLayer(),
       'waterway-label'
     )
+
     mapRef.value?.addLayer(layerDrone, 'waterway-label')
   })
 
   mapRef.value?.on('move', () => {
-    // Update line size with zoom
-    const zoom = mapRef.value?.getZoom()
-    if (zoom) {
-      // Update the line distance with the drone position
-      // coordinate of the second point depending on yaw.
-      const distance = 0.00015 * (Math.pow(2, 22 - zoom) / 8)
-      const yaw = MathUtils.degToRad(sensorsStore.full.yaw)
-      const lat = gpsPosition.value.lat
-      const lng = gpsPosition.value.lng
-
-      const newLng = lng + distance * Math.cos(yaw)
-      const newLat = lat + distance * Math.sin(yaw)
-
-      mapRef.value?.getSource('droneDirection').setData({
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: [
-            // Position of the drone
-            [gpsPosition.value.lat, gpsPosition.value.lng],
-            // Position of the direction last point of the drone
-            [newLat, newLng]
-          ]
-        }
-      })
-    }
+    mapRef.value
+      ?.getSource('droneDirection')
+      // @ts-ignore Why does this function doesn't exist but exist ?
+      .setData(getMapBoxDroneDirectionSourceData(mapRef.value))
   })
 })
 

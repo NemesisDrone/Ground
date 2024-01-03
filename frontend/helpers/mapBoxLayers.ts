@@ -1,10 +1,13 @@
-import mapboxgl, { CustomLayerInterface } from 'mapbox-gl'
+import mapboxgl from 'mapbox-gl'
 import { useSensorsStore } from '~/store/sensors'
 import * as THREE from 'three'
+import { MathUtils } from 'three'
 // @ts-ignore
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { MathUtils } from 'three'
 
+/*
+Get the mapbox layer for the drone model
+ */
 export const getMapBox3DDroneModelLayer = (
   camera: THREE.Camera | null,
   scene: THREE.Scene | null,
@@ -134,35 +137,45 @@ export const getMapBox3DDroneModelLayer = (
   return layer
 }
 
-export const getMapBoxDroneDirectionLineLayer = (): mapboxgl.LineLayer => {
-  const sensorStore = useSensorsStore()
+/**
+ * Get the mapbox source for the drone direction
+ */
+export const getMapBoxDroneDirectionSourceData = (map: mapboxgl.Map) => {
+  const sensorsStore = useSensorsStore()
+  const distance = 0.00015 * (Math.pow(2, 22 - (map.getZoom() || 0)) / 8)
+  const yaw = MathUtils.degToRad(sensorsStore.full.yaw)
+  const lat = sensorsStore.gpsPosition.lat
+  const lng = sensorsStore.gpsPosition.lng
 
-  const layer: mapboxgl.LineLayer = {
-    id: 'drone-direction',
+  const newLng = lng + distance * Math.cos(yaw)
+  const newLat = lat + distance * Math.sin(yaw)
+
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'LineString',
+      coordinates: [
+        // Position of the drone
+        [lat, lng],
+        // Position of the direction last point of the drone
+        [newLat, newLng]
+      ]
+    }
+  }
+}
+export const getMapBoxDroneDirectionLineLayer = (): mapboxgl.LineLayer => {
+  return {
+    id: 'droneDirection',
     type: 'line',
-    source: {
-      type: 'geojson',
-      // @ts-ignore
-      data: {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          // @ts-ignore
-          coordinates: [
-            [sensorStore.gpsPosition.lng, sensorStore.gpsPosition.lat],
-            [
-              sensorStore.gpsPosition.lng + 0.0001,
-              sensorStore.gpsPosition.lat + 0.0001
-            ]
-          ]
-        }
-      }
+    source: 'droneDirection',
+    layout: {
+      'line-join': 'round',
+      'line-cap': 'round'
     },
     paint: {
       'line-color': '#FF0000',
-      'line-width': 2
+      'line-width': 6
     }
   }
-
-  return layer
 }
