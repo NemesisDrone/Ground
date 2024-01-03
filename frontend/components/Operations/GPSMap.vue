@@ -71,10 +71,12 @@ watch(gpsPosition, () => {
     }
   }
 
-  mapRef.value
-    ?.getSource('droneDirection')
-    // @ts-ignore Why does this function doesn't exist but exist ?
-    .setData(getMapBoxDroneDirectionSourceData(mapRef.value))
+  if (mapRef.value?.getSource('droneDirection')) {
+    mapRef.value
+      ?.getSource('droneDirection')
+      // @ts-ignore Why does this function doesn't exist but exist ?
+      .setData(getMapBoxDroneDirectionSourceData(mapRef.value))
+  }
 })
 
 const toggleAttachedView = () => {
