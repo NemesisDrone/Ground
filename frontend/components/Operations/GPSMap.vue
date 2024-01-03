@@ -16,6 +16,7 @@ import {
   getMapBox3DDroneModelLayer,
   getMapBoxDroneDirectionLineLayer
 } from '~/helpers/mapBoxLayers'
+import { MathUtils } from 'three'
 
 const sensorsStore = useSensorsStore()
 const { gpsPosition } = storeToRefs(sensorsStore)
@@ -135,10 +136,6 @@ const toggleMapView = () => {
 let scene: THREE.Scene | null = null
 let camera: THREE.Camera | null = null
 
-// setInterval(() => {
-//   sensorsStore.gpsPosition.lat += 0.00001
-// }, 500)
-
 watch(mapRef, () => {
   if (!mapRef.value) return
   mapRef.value.setCenter([gpsPosition.value.lat, gpsPosition.value.lng])
@@ -155,7 +152,7 @@ watch(mapRef, () => {
   mapRef.value?.on('style.load', () => {
     const distance =
       0.00015 * (Math.pow(2, 22 - (mapRef.value?.getZoom() || 0)) / 8)
-    const yaw = sensorsStore.full.yaw
+    const yaw = MathUtils.degToRad(sensorsStore.full.yaw)
     const lat = gpsPosition.value.lat
     const lng = gpsPosition.value.lng
 
@@ -204,7 +201,7 @@ watch(mapRef, () => {
       // Update the line distance with the drone position
       // coordinate of the second point depending on yaw.
       const distance = 0.00015 * (Math.pow(2, 22 - zoom) / 8)
-      const yaw = sensorsStore.full.yaw
+      const yaw = MathUtils.degToRad(sensorsStore.full.yaw)
       const lat = gpsPosition.value.lat
       const lng = gpsPosition.value.lng
 
