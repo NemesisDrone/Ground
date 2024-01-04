@@ -57,6 +57,18 @@ services:
     networks:
       - ground_network
 
+  nvs_serve:
+    container_name: nvs_server
+    build:
+      context: ./interfaces/video_streaming
+    depends_on:
+      - redis
+    ports:
+      - "7000:7000"
+    networks:
+      - ground_network
+    command: ["python3", "VideoStreaming.py"]
+
 networks:
     ground_network:
         external: true

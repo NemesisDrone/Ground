@@ -147,9 +147,11 @@ class NVSServer:
         if self.nvs_state != NVSState.Initialized:
             return
 
+        print("NVS Server up and running.")
+
         while self.nvs_state != NVSState.PendingStop:
             try:
-                async with wss(self._handle_connection, "10.0.3.1", port=7000):  # [TODO] See what address to use.
+                async with wss(self._handle_connection, "100.87.214.117", port=7000):  # [TODO] See what address to use.
                     self.set_nvs_state(NVSState.WaitingConnection)
                     await aio.Future()
             except Exception:
@@ -157,6 +159,7 @@ class NVSServer:
 
 
     async def _handle_connection(self, sock: wssp) -> None:
+        print("Client connected to NVS Server.")
         self.set_nvs_state(NVSState.Streaming)
         self.clients.append(sock)
         try:
