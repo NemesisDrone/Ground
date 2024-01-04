@@ -7,12 +7,12 @@ from gi.repository import GObject as gobject, Gst
 
 import threading
 import asyncio as aio
-from websockets.server import serve as wss
 from websockets import exceptions as wssexcept
+from websockets.server import serve as wss
 from websockets.server import WebSocketServerProtocol as wssp
 
-
-DECODE_PIPELINE = "appsrc name=src ! appsink name=sink emit-signals=True"
+from io import BytesIO as bio
+import exif
 
 
 async def functionWrap(func):
@@ -57,12 +57,20 @@ class NVSServer:
 
 
     def set_nvs_state(self, val) -> None:
+        """
+        Setter for the object's internal state. Also implements guards to log unproper behaviours.
+        :param val: Integer corresponding to a NVSState.
+        """
         if int(val) < int(NVSState.Initialized):
             print("Warning, state:" + str(val))
         self.nvs_state = val
 
 
     def stop(self) -> None:
+        """
+        Stops the running loops & connections.
+        This will stop the possibility to try to connect to the address too.
+        """
         self.set_nvs_state(NVSState.PendingStop)
         for sock in self.clients:
             sock.close()
@@ -71,10 +79,9 @@ class NVSServer:
 
 
     async def run(self) -> None:
-        def loop_setter(loop):
-            aio.set_event_loop(loop)
-            loop.run_forever()
-
+        """
+        Starts event loop to enable WS connections.
+        """
         if self.nvs_state != NVSState.Initialized:
             return
 
@@ -82,6 +89,9 @@ class NVSServer:
 
 
     async def _connection_loop(self) -> None:
+        """
+        Function generating a loop, waiting for new clients to connect and handles it.
+        """
         if self.nvs_state != NVSState.Initialized:
             return
 
@@ -97,16 +107,17 @@ class NVSServer:
 
 
     async def _handle_connection(self, sock: wssp) -> None:
+        """
+        Handles the connection established with a client.
+        :param sock: Websocket for the client that just connected.
+        """
         print("Client connected to NVS Server.")
         self.set_nvs_state(NVSState.Streaming)
         self.clients.append(sock)
         try:
             while self.nvs_state != NVSState.PendingStop:
                 try:
-                    data = await sock.recv()
-
-                    # Send through APPSRC
-                    #self.push_waiting = data
+                    data = self._process_data(await sock.recv())
 
                     if self.lastSender != sock:
                         self.lastSender = sock
@@ -126,8 +137,24 @@ class NVSServer:
         if sock in self.clients:
             self.clients.remove(sock)
 
+    @staticmethod
+    async def _process_data(data: bytes) -> bio:
+        """
+        This function adds EXIF data to the input image :param data, and returns the updated data.
+        :param data: Raw JPEG data
+        :return: Raw JPEG data with EXIF.
+        """
+        # Load as the data was a file.
+        output_buff = bio()
+        exif.set_gps_location(data, 0.0, 0.0, 0.0, output_buff)
+        return output_buff
+
 
     def get_nvs_state(self) -> int:
+        """
+        Retrieves the internal state of the object.
+        :return: Integer corresponding to an NVSState.
+        """
         return self.nvs_state
 
 
