@@ -5,7 +5,8 @@ export default defineNuxtConfig({
     public: {
       API_URL: process.env.API_URL,
       WEB_SOCKET_COMMUNICATION_URL:
-        process.env.WEB_SOCKET_COMMUNICATION_URL
+        process.env.WEB_SOCKET_COMMUNICATION_URL,
+      NVS_WEB_SOCKET_URL: process.env.NVS_WEB_SOCKET_URL
     }
   },
   modules: [

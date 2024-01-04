@@ -151,7 +151,7 @@ class NVSServer:
 
         while self.nvs_state != NVSState.PendingStop:
             try:
-                async with wss(self._handle_connection, "100.87.214.117", port=7000):  # [TODO] See what address to use.
+                async with wss(self._handle_connection, "0.0.0.0", port=7000):  # [TODO] See what address to use.
                     self.set_nvs_state(NVSState.WaitingConnection)
                     await aio.Future()
             except Exception:

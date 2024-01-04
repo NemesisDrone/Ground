@@ -13,20 +13,22 @@ const closeWindow = () => {
 
 onMounted(() => {
   function ws_connect() {
-    var ws = new WebSocket('ws://10.0.3.1:7000') // [TODO] See what address to use here.
+    var ws = new WebSocket(
+      useRuntimeConfig().public.NVS_WEB_SOCKET_URL as string
+    )
     //ws.binaryType = "arraybuffer";
 
     ws.addEventListener('error', (event) => {
-      console.error('WS ERROR: ', event.message)
+      console.error('WS ERROR: ', event)
       ws.close()
-      setTimeout(function () {
-        ws_connect()
-      }, 500)
+      // setTimeout(function () {
+      //   ws_connect()
+      // }, 500)
     })
 
     ws.addEventListener('close', (event) => {
       ws.close()
-      setTimeout(ws_connect, 500)
+      // setTimeout(ws_connect, 500)
     })
 
     ws.addEventListener('message', (event) => {
@@ -39,24 +41,24 @@ onMounted(() => {
         i.src = iu
       })
     })
-
-    ws.addEventListener('message', (event) => {
-      var abv = new Uint8Array(event.data)
-      var blob = new Blob([abv], { type: 'image/jpeg' })
-      var uc = window.URL || window.webkitURL
-      var iu = uc.createObjectURL(blob)
-      var i = document.querySelector('#imager')
-      i.src = iu
-    })
+    //
+    // ws.addEventListener('message', (event) => {
+    //   var abv = new Uint8Array(event.data)
+    //   var blob = new Blob([abv], { type: 'image/jpeg' })
+    //   var uc = window.URL || window.webkitURL
+    //   var iu = uc.createObjectURL(blob)
+    //   var i = document.querySelector('#imager')
+    //   i.src = iu
+    // })
   }
 
-  // ws_connect();
+  ws_connect()
 })
 </script>
 
 <template>
   <div class="relative h-full m-0 p-0 overflow-hidden">
-    <img class="w-full object-cover h-full" id="imager" />
+    <img class="object-cover h-full m-auto" id="imager" />
     <button
       class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
       v-if="route.path !== '/fullscreen/video'"

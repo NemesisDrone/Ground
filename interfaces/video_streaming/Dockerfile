@@ -18,6 +18,8 @@ RUN python3 -m pip install -r /app/interfaces/nvs/requirements.txt
 # Setup for run
 USER nemesis_nvs
 
+EXPOSE 7000
+
 # In the YAML
 CMD []
 ENTRYPOINT []
