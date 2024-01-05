@@ -11,8 +11,7 @@ const closeWindow = () => {
   window.close()
 }
 
-
-const paint = (showMessage: bool, x: number, y: number, src, canvas) => {
+const paint = (showMessage: bool, has_image: bool, x: number, y: number, src, canvas) => {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     console.log("Failed to get context!");
@@ -31,16 +30,20 @@ const paint = (showMessage: bool, x: number, y: number, src, canvas) => {
     return;
   }
 
-  let img = new Image(size, size);
-  img.src = src;
+  if (has_image) {
+    let img = new Image(size, size);
+    img.src = src;
+  }
 
   //ctx.drawImage(img,
 
   const begin = size/5;
   const axis_len = begin * 3;
 
-  ctx.fillStyle = "black";
-  ctx.font = "bold 9px serif";
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 2;
+  ctx.fillStyle = "red";
+  ctx.font = "bold 12px serif";
 
   let x_offset = begin * (x%1);
   let y_offset = begin * (y%1);
@@ -59,7 +62,7 @@ const paint = (showMessage: bool, x: number, y: number, src, canvas) => {
 
   const x_pos = dx + x_offset + begin;
   let value = Math.floor(x)-2;
-  for (i = (x%1 < -0.4 ? 1 : 0); i < (3 + (x%1 > 0.4 ? 0 : 1)); i++) {
+  for (let i = (x%1 < -0.4 ? 1 : 0); i < (3 + (x%1 > 0.4 ? 0 : 1)); i++) {
     let text = value.toFixed(2);
 
     ctx.fillText(text, x_pos + begin*i +4, dy + size - 14);
@@ -72,7 +75,7 @@ const paint = (showMessage: bool, x: number, y: number, src, canvas) => {
 
   const y_pos = dy + begin + y_offset;
   value = Math.floor(y)-2;
-  for (i = (y%1 < -0.2 ? 1 : 0); i < (3 + (y%1 > 0.2 ? 0 : 1)); i++) {
+  for (let i = (y%1 < -0.2 ? 1 : 0); i < (3 + (y%1 > 0.2 ? 0 : 1)); i++) {
     let text = value.toFixed(2);
 
     ctx.fillText(text, dx + 14, y_pos + begin*i - 4);
@@ -106,11 +109,19 @@ onMounted(() => {
     ws.addEventListener('message', event => {
       event.data.arrayBuffer().then(res => {
         let blob = new Blob([new Uint8Array(res)], {type: "image/jpeg"});
-        paint(false, -0.2, 2.1, (window.URL || window.webkitURL).createObjectURL(blob), canvas);
+        paint(false, true, -0.2, 2.1, (window.URL || window.webkitURL).createObjectURL(blob), canvas);
       });
     });
   };
 
+  addEventListener("resize", (event) => {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+  });
+
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  paint(false, false, -0.2, 2.1, "", canvas); // Dummy. [TODO] Remove it once properly settled.
   ws_connect();
 })
 
