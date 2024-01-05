@@ -6,7 +6,7 @@ import {
   LocateOff,
   ScanSearch,
   Box,
-  Map
+  Layers2
 } from 'lucide-vue-next'
 import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
@@ -270,9 +270,9 @@ const goToInitialZoom = () => {
       <button
         class="absolute top-[10rem] right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         @click="toggleMapView"
-        title="Toggle map view"
+        title="Change map layer"
       >
-        <Map :size="24" />
+        <Layers2 :size="24" />
       </button>
     </MapboxMap>
   </div>
