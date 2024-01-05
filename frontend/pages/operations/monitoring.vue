@@ -107,16 +107,16 @@ const downloadImage = async (image: DroneImage) => {
                       @click="selectImage(img)"
                       :disabled="selectedImage?.id === img.id"
                     >
-                      <MousePointerSquare :size="22" class="mr-2" />
+                      <MousePointerSquare :size="18" class="mr-2" />
                       Select
                     </UiContextMenuItem>
                     <UiContextMenuItem @click="downloadImage(img)">
-                      <Download :size="22" class="mr-2" />
+                      <Download :size="18" class="mr-2" />
                       Download
                     </UiContextMenuItem>
                     <UiDialogTrigger asChild>
                       <UiContextMenuItem class="text-red-500">
-                        <XCircle :size="22" class="mr-2" />
+                        <XCircle :size="18" class="mr-2" />
                         Delete
                       </UiContextMenuItem>
                     </UiDialogTrigger>
