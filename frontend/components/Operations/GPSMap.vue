@@ -6,7 +6,8 @@ import {
   LocateOff,
   ScanSearch,
   Box,
-  Layers2
+  Layers2,
+  Tags
 } from 'lucide-vue-next'
 import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
@@ -48,6 +49,23 @@ const closeWindow = () => {
   window.close()
 }
 
+const showLabels = ref(true)
+const toggleLabels = () => {
+  showLabels.value = !showLabels.value
+  // @ts-ignore Im sorry but mapbox is typed like a pig
+  mapRef.value?.style.stylesheet.layers.forEach(
+    (layer: mapboxgl.Layer) => {
+      if (layer.type === 'symbol') {
+        mapRef.value?.setLayoutProperty(
+          layer.id,
+          'visibility',
+          showLabels.value ? 'visible' : 'none'
+        )
+      }
+    }
+  )
+}
+
 const viewAttachedToDronePosition = ref(true)
 watch(gpsPosition, () => {
   if (!mapRef.value) return
@@ -77,7 +95,14 @@ watch(gpsPosition, () => {
     mapRef.value
       ?.getSource('droneDirection')
       // @ts-ignore Why does this function doesn't exist but exist ?
-      .setData(getMapBoxDroneDirectionSourceData(mapRef.value))
+      .setData(
+        getMapBoxDroneDirectionSourceData(
+          mapRef.value,
+          gpsPosition.value.lat,
+          gpsPosition.value.lng,
+          sensorsStore.full.yaw
+        )
+      )
   }
 })
 
@@ -134,7 +159,8 @@ watch(mapRef, () => {
     const layerDrone = getMapBox3DDroneModelLayer(
       camera,
       scene,
-      mapRef.value as mapboxgl.Map
+      mapRef.value as mapboxgl.Map,
+      false
     )
 
     mapRef.value?.addSource('droneDirection', {
@@ -247,6 +273,13 @@ const goToInitialZoom = () => {
         title="Change map layer"
       >
         <Layers2 :size="24" />
+      </button>
+      <button
+        class="absolute top-[12.5rem] right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
+        @click="toggleLabels"
+        title="Toggle labels"
+      >
+        <Tags :size="24" />
       </button>
     </MapboxMap>
   </div>
