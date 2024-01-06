@@ -11,7 +11,7 @@ const closeWindow = () => {
   window.close()
 }
 
-const paint = (showMessage: bool, has_image: bool, x: number, y: number, src, canvas) => {
+const paint = (showMessage: bool, has_image: bool, x: number, y: number, r: number, src, canvas) => {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     console.log("Failed to get context!");
@@ -33,6 +33,9 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, src, ca
   if (has_image) {
     let img = new Image(size, size);
     img.src = src;
+  } else {
+    ctx.fillStyle = "grey";
+    ctx.fillRect(dx, dy, size, size);
   }
 
   //ctx.drawImage(img,
@@ -43,7 +46,7 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, src, ca
   ctx.strokeStyle = "red";
   ctx.lineWidth = 2;
   ctx.fillStyle = "red";
-  ctx.font = "bold 12px serif";
+  ctx.font = "bold 12px serif"; // Beware that roll numbers drawing depends on this on a constant manner.
 
   let x_offset = begin * (x%1);
   let y_offset = begin * (y%1);
@@ -85,6 +88,45 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, src, ca
     ctx.stroke();
     value++;
   }
+
+  // Draw roll.
+  const radius = 50;
+  const r_x = dx + size - 20 - radius - 22;
+  const r_y = dy + 25 + radius;
+
+  // Arc first.
+  ctx.beginPath();
+  ctx.arc(r_x, r_y, radius, Math.PI * 1.01, Math.PI * -0.01, false);
+  ctx.stroke();
+
+  // Draw values
+  const floored = Math.floor(r);
+  const a_offset = r%5;
+  value = (floored - floored%5)-15 + (floored%5 >= 0 ? 5 : 0);
+  console.log(r%5);
+  for (let i = (floored%5 ? 0 : 1); i < (5 + (floored%5 ? 0 : 1)); i++) {
+    let text = value.toFixed(2);
+    console.log(i.toString() + ", " + text);
+
+    const rad = ((value - floored + 15) * 7 - a_offset - 180)*Math.PI/180;
+    const s = Math.sin(rad);
+    const c = Math.cos(rad);
+    const up = s * (radius+23);
+    const left = c * (radius+23);
+
+    ctx.fillText(text, r_x + left - (left >= 0 ? 16 : 9 * ((floored%100 ? 3 : (floored%10 ? 2 : (floored != 0 ? 1 : 0)))) + (floored < 0 ? 1 : 0)), r_y + up + (up < (radius+23)/7 ? 10 : -16));
+    ctx.beginPath();
+    if (value%45 == 0) {
+      ctx.moveTo(r_x + c*(4*radius/10), r_y + s*(4*radius/10));
+    } else if (value%10 == 0) {
+      ctx.moveTo(r_x + c*(6*radius/10), r_y + s*(6*radius/10));
+    } else {
+      ctx.moveTo(r_x + c*(8*radius/10), r_y + s*(8*radius/10));
+    }
+    ctx.lineTo(r_x + c*(radius), r_y + s*(radius));
+    ctx.stroke();
+    value += 5;
+  }
 }
 
 onMounted(() => {
@@ -109,7 +151,7 @@ onMounted(() => {
     ws.addEventListener('message', event => {
       event.data.arrayBuffer().then(res => {
         let blob = new Blob([new Uint8Array(res)], {type: "image/jpeg"});
-        paint(false, true, -0.2, 2.1, (window.URL || window.webkitURL).createObjectURL(blob), canvas);
+        paint(false, true, -0.2, 2.1, 0.0, (window.URL || window.webkitURL).createObjectURL(blob), canvas);
       });
     });
   };
@@ -121,8 +163,15 @@ onMounted(() => {
 
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
-  paint(false, false, -0.2, 2.1, "", canvas); // Dummy. [TODO] Remove it once properly settled.
   ws_connect();
+
+  // Dummy. [TODO] Remove it once properly settled.
+  let w = 0.0;
+  setInterval(() => {
+    w += 0.005;
+    let c = Math.cos(w);
+    paint(false, false, c*10, c*(-20), c * 360, "", canvas);
+  }, 100);
 })
 
 </script>
