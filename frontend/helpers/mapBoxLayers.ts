@@ -4,16 +4,45 @@ import * as THREE from 'three'
 import { MathUtils } from 'three'
 // @ts-ignore
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { useReplayStore } from '~/store/replayStore'
 
 /*
-Get the mapbox layer for the drone model
+Get the mapbox layer for the drone model.
  */
 export const getMapBox3DDroneModelLayer = (
   camera: THREE.Camera | null,
   scene: THREE.Scene | null,
-  map: mapboxgl.Map
+  map: mapboxgl.Map,
+  isForReplayMap: boolean
 ): mapboxgl.CustomLayerInterface => {
   const sensorStore = useSensorsStore()
+  const replayStore = useReplayStore()
+
+  /**
+   *  When the map is for the replay, the gps position is the one of the current frame from replayStore.
+   *  Otherwise, it's the one from the sensorStore, coming from the drone directly
+   */
+  const getDroneData = () => {
+    if (isForReplayMap) {
+      return {
+        lat: replayStore.currentFrame.gps.lat,
+        lng: replayStore.currentFrame.gps.lng,
+        altitude: replayStore.currentFrame.altitude,
+        roll: replayStore.currentFrame.roll,
+        pitch: replayStore.currentFrame.pitch,
+        yaw: replayStore.currentFrame.yaw
+      }
+    }
+
+    return {
+      lat: sensorStore.gpsPosition.lat,
+      lng: sensorStore.gpsPosition.lng,
+      altitude: sensorStore.altitude,
+      roll: sensorStore.full.roll,
+      pitch: sensorStore.full.pitch,
+      yaw: sensorStore.full.yaw
+    }
+  }
 
   const layer: mapboxgl.CustomLayerInterface = {
     id: 'drone-model',
@@ -51,15 +80,13 @@ export const getMapBox3DDroneModelLayer = (
       this.renderer.autoClear = false
     },
     render: function (gl, matrix) {
-      const modelOrigin: [number, number] = [
-        sensorStore.gpsPosition.lat,
-        sensorStore.gpsPosition.lng
-      ]
-      const modelAltitude = sensorStore.altitude
+      const droneData = getDroneData()
+      const modelOrigin: [number, number] = [droneData.lat, droneData.lng]
+      const modelAltitude = droneData.altitude
       const modelRotate = [
-        MathUtils.degToRad(sensorStore.full.roll) + Math.PI / 2,
-        -(MathUtils.degToRad(sensorStore.full.yaw) - Math.PI / 2),
-        MathUtils.degToRad(sensorStore.full.pitch)
+        MathUtils.degToRad(droneData.roll) + Math.PI / 2,
+        -(MathUtils.degToRad(droneData.yaw) - Math.PI / 2),
+        MathUtils.degToRad(droneData.pitch)
       ]
 
       const modelAsMercatorCoordinate =
@@ -68,7 +95,7 @@ export const getMapBox3DDroneModelLayer = (
       /*
       The factor variable is used to scale the size of the drone based on the zoom level.
        */
-      const factor = Math.pow(2, 22 - map.getZoom()) / 11
+      const factor = Math.pow(2, 22 - map.getZoom()) / 8
       const scale =
         modelAsMercatorCoordinate.meterInMercatorCoordinateUnits() * factor
 
