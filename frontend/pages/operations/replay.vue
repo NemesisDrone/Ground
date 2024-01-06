@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import ReplayMap from '~/components/Operations/Replay/ReplayMap.vue'
 import { useReplayStore } from '~/store/replayStore'
-import { Play, PauseCircle, Ban } from 'lucide-vue-next'
+import { Ban, Clock10, PauseCircle } from 'lucide-vue-next'
+
 definePageMeta({
   layout: 'sidebar',
   keepalive: false
@@ -20,35 +21,23 @@ const play = () => {
   // If the frame is the last one, then reset it to the first frame
   if (replayStore.lastFrameIndex === replayStore.frames.length - 1) {
     replayStore.lastFrameIndex = -1
-    replayStore.currentTimeStamp = -1
+    replayStore.currentTime = replayStore.frames[0].time
   }
 
-  // Set the current timestamp to the first one if it's not set
-  if (replayStore.currentTimeStamp === -1) {
-    replayStore.currentTimeStamp = replayStore.frames[0].timestamp
+  // Set the current time to the first one if it's not set
+  if (replayStore.currentTime === -1) {
+    replayStore.currentTime = replayStore.frames[0].time
   }
 }
 
 /*
- * Watch the current timestamp and update everything related to the replay
- * When the current timestamp is updated, we call the updateReplay function
- */
-watch(
-  () => replayStore.currentTimeStamp,
-  () => {
-    if (!replayStore.isPlaying) return
-
-    updateReplay()
-  }
-)
-/*
-Get the nearest frame index to the current timestamp
+Get the nearest frame index to the current time
 Udate the drone position, the drone direction, the drone model position, the drone model rotation
- to the matched timestamp
+ to the matched time
  */
 const updateReplay = () => {
   const frameIndex = replayStore.getNearestFrameIndex(
-    replayStore.currentTimeStamp
+    replayStore.currentTime
   )
 
   // If there is no new frame, don't update
@@ -58,7 +47,7 @@ const updateReplay = () => {
   replayStore.lastFrameIndex = frameIndex
   replayStore.currentFrame = replayStore.frames[frameIndex]
 
-  console.log(replayStore.frames[frameIndex])
+  // console.log(replayStore.frames[frameIndex])
 }
 
 const pause = () => {
@@ -68,13 +57,13 @@ const pause = () => {
 
 const stop = () => {
   replayStore.isPlaying = false
-  replayStore.currentTimeStamp = -1
+  replayStore.currentTime = replayStore.frames[0].time
   replayStore.lastFrameIndex = -1
   console.log('stopped')
 }
 
 /**
- * The next interval is used to update the current timestamp if the replay is playing
+ * The next interval is used to update the current time if the replay is playing
  */
 const playingInterval = setInterval(() => {
   if (!replayStore.isPlaying) return
@@ -84,8 +73,9 @@ const playingInterval = setInterval(() => {
     return
   }
 
-  // Update the current timestamp
-  replayStore.currentTimeStamp += 100
+  // Update the current time
+  replayStore.currentTime += 100
+  sliderTime.value = [replayStore.currentTime]
 }, 100)
 
 onUnmounted(() => {
@@ -94,10 +84,28 @@ onUnmounted(() => {
 })
 
 onMounted(() => {
-  replayStore.currentTimeStamp = -1
+  replayStore.currentTime = replayStore.frames[0].time
   replayStore.lastFrameIndex = -1
   replayStore.isPlaying = false
 })
+
+const sliderTime = ref([0])
+watch(
+  () => sliderTime.value,
+  () => {
+    replayStore.currentTime = sliderTime.value[0]
+    updateReplay()
+  }
+)
+
+const formatTime = (time: number) => {
+  let seconds = time / 1000
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  const twoDecimalSeconds = remainingSeconds.toFixed(2).padStart(5, '0')
+
+  return `${String(minutes).padStart(2, '0')}:${twoDecimalSeconds}`
+}
 </script>
 <template>
   <div class="w-full h-[100vh]">
@@ -107,8 +115,30 @@ onMounted(() => {
       </div>
       <div class="w-2/5">Other</div>
     </div>
-    <div class="h-1/6 w-full flex gap-4">
-      <div class="w-4/5 bg-red-500 h-full"></div>
+    <div class="h-1/6 w-full flex gap-4 p-4">
+      <div class="w-4/5 h-full flex flex-col">
+        <div class="mt-5">
+          <UiSlider
+            v-model="sliderTime"
+            :max="replayStore.frames[replayStore.frames.length - 1].time"
+            :min="replayStore.frames[0].time"
+            :step="100"
+          />
+        </div>
+        <div class="w-full mt-4 flex">
+          <div class="rounded bg-neutral-900 flex p-2 items-center">
+            <Clock10 :size="18" class="mr-2" />
+            <div>
+              {{ formatTime(replayStore.currentTime) }} /
+              {{
+                formatTime(
+                  replayStore.frames[replayStore.frames.length - 1].time
+                )
+              }}
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="w-1/5 h-full">
         <div class="flex gap-2">
           <UiButton @click="play">

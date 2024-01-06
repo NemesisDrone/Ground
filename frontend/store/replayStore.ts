@@ -2,6 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 
 type ReplayFrame = {
   timestamp: number
+  time: number
   gps: {
     lat: number
     lng: number
@@ -14,6 +15,7 @@ type ReplayFrame = {
 
 const initialFrame: ReplayFrame = {
   timestamp: 0,
+  time: 0,
   gps: {
     lat: -0.7563779,
     lng: 48.0879123
@@ -28,12 +30,13 @@ const ct = new Date().getTime()
 export const useReplayStore = defineStore('replay', {
   state: () => ({
     isPlaying: false,
-    currentTimeStamp: -1,
+    currentTime: -1,
     lastFrameIndex: -1,
     currentFrame: initialFrame,
     frames: [
       {
         timestamp: ct,
+        time: 0,
         gps: {
           lat: -0.7563779,
           lng: 48.0879123
@@ -45,6 +48,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 500,
+        time: 500,
         gps: {
           lat: -0.7564779,
           lng: 48.0879123
@@ -56,6 +60,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 2000,
+        time: 2000,
         gps: {
           lat: -0.7565779,
           lng: 48.0879123
@@ -68,6 +73,7 @@ export const useReplayStore = defineStore('replay', {
 
       {
         timestamp: ct + 3000,
+        time: 3000,
         gps: {
           lat: -0.7565779,
           lng: 48.0879123
@@ -79,6 +85,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 3500,
+        time: 3500,
         gps: {
           lat: -0.7566779,
           lng: 48.0879123
@@ -90,6 +97,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 4000,
+        time: 4000,
         gps: {
           lat: -0.7567779,
           lng: 48.0879123
@@ -101,6 +109,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 4600,
+        time: 4600,
         gps: {
           lat: -0.7568779,
           lng: 48.0879123
@@ -112,6 +121,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 5200,
+        time: 5200,
         gps: {
           lat: -0.7569779,
           lng: 48.0879123
@@ -123,6 +133,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 6000,
+        time: 6000,
         gps: {
           lat: -0.7570779,
           lng: 48.0879123
@@ -134,6 +145,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 7000,
+        time: 7000,
         gps: {
           lat: -0.7571779,
           lng: 48.0879123
@@ -145,6 +157,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 8000,
+        time: 8000,
         gps: {
           lat: -0.7572779,
           lng: 48.0879123
@@ -156,6 +169,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 9000,
+        time: 9000,
         gps: {
           lat: -0.7573779,
           lng: 48.0879123
@@ -167,6 +181,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 1000,
+        time: 10000,
         gps: {
           lat: -0.7574779,
           lng: 48.0879123
@@ -178,6 +193,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 11000,
+        time: 11000,
         gps: {
           lat: -0.7575779,
           lng: 48.0879123
@@ -189,6 +205,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 12000,
+        time: 12000,
         gps: {
           lat: -0.7576779,
           lng: 48.0879123
@@ -200,6 +217,7 @@ export const useReplayStore = defineStore('replay', {
       },
       {
         timestamp: ct + 13000,
+        time: 13000,
         gps: {
           lat: -0.7577779,
           lng: 48.0879123
@@ -212,12 +230,12 @@ export const useReplayStore = defineStore('replay', {
     ] as ReplayFrame[]
   }),
   getters: {
-    getNearestFrameIndex: (state) => (timestamp: number) => {
+    getNearestFrameIndex: (state) => (time: number) => {
       let nearest = state.lastFrameIndex
       let i = state.lastFrameIndex >= 0 ? state.lastFrameIndex : 0
 
-      for (i; i < state.frames.length; i++) {
-        if (state.frames[i].timestamp >= timestamp) {
+      for (i = 0; i < state.frames.length; i++) {
+        if (state.frames[i].time >= time) {
           break
         }
         nearest = i
