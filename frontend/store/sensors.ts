@@ -3,7 +3,7 @@ import { MathUtils } from 'three'
 
 export const useSensorsStore = defineStore('sensors', {
   state: () => ({
-    altitude: 20,
+    altitude: 100,
     gpsPosition: {
       lat: -0.7563779,
       lng: 48.0879123
@@ -14,7 +14,7 @@ export const useSensorsStore = defineStore('sensors', {
       timestamp: 0,
       roll: 0,
       pitch: 0,
-      yaw: MathUtils.degToRad(90),
+      yaw: 90,
       gyroRoll: 0,
       gyroPitch: 0,
       gyroYaw: 0,

@@ -140,13 +140,14 @@ export const getMapBox3DDroneModelLayer = (
 /**
  * Get the mapbox source for the drone direction
  */
-export const getMapBoxDroneDirectionSourceData = (map: mapboxgl.Map) => {
-  const sensorsStore = useSensorsStore()
+export const getMapBoxDroneDirectionSourceData = (
+  map: mapboxgl.Map,
+  lat: number,
+  lng: number,
+  yaw: number
+) => {
   const distance = 0.00015 * (Math.pow(2, 22 - (map.getZoom() || 0)) / 8)
-  const yaw = MathUtils.degToRad(sensorsStore.full.yaw)
-  const lat = sensorsStore.gpsPosition.lat
-  const lng = sensorsStore.gpsPosition.lng
-
+  yaw = MathUtils.degToRad(yaw)
   const newLng = lng + distance * Math.cos(yaw)
   const newLat = lat + distance * Math.sin(yaw)
 
@@ -178,4 +179,58 @@ export const getMapBoxDroneDirectionLineLayer = (): mapboxgl.LineLayer => {
       'line-width': 6
     }
   }
+}
+
+export const addMapBoxTerrain = (map: mapboxgl.Map) => {
+  map.addSource('mapbox-dem', {
+    type: 'raster-dem',
+    url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+    tileSize: 512,
+    maxzoom: 14
+  })
+  map.setTerrain({ source: 'mapbox-dem', exaggeration: 1 })
+}
+
+export const addMapBoxBuildingsLayer = (map: mapboxgl.Map) => {
+  const layers = map.getStyle().layers
+  // @ts-ignore
+  const labelLayerId = layers.find(
+    // @ts-ignore
+    (layer) => layer.type === 'symbol' && layer.layout['text-field']
+  ).id
+
+  map.addLayer(
+    {
+      id: 'add-3d-buildings',
+      source: 'composite',
+      'source-layer': 'building',
+      filter: ['==', 'extrude', 'true'],
+      type: 'fill-extrusion',
+      minzoom: 15,
+      paint: {
+        'fill-extrusion-color': '#aaa',
+
+        'fill-extrusion-height': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          15,
+          0,
+          15.05,
+          ['get', 'height']
+        ],
+        'fill-extrusion-base': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          15,
+          0,
+          15.05,
+          ['get', 'min_height']
+        ],
+        'fill-extrusion-opacity': 0.6
+      }
+    },
+    labelLayerId
+  )
 }

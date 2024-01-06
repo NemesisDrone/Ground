@@ -13,6 +13,8 @@ import { storeToRefs } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import * as THREE from 'three'
 import {
+  addMapBoxBuildingsLayer,
+  addMapBoxTerrain,
   getMapBox3DDroneModelLayer,
   getMapBoxDroneDirectionLineLayer,
   getMapBoxDroneDirectionSourceData
@@ -89,49 +91,8 @@ const toggleAttachedView = () => {
 }
 
 const add3dBuildings = () => {
-  const layers = mapRef.value?.getStyle().layers
-  // @ts-ignore
-  const labelLayerId = layers.find(
-    // @ts-ignore
-    (layer) => layer.type === 'symbol' && layer.layout['text-field']
-  ).id
-
-  mapRef.value?.addLayer(
-    {
-      id: 'add-3d-buildings',
-      source: 'composite',
-      'source-layer': 'building',
-      filter: ['==', 'extrude', 'true'],
-      type: 'fill-extrusion',
-      minzoom: 15,
-      paint: {
-        'fill-extrusion-color': '#aaa',
-
-        'fill-extrusion-height': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          15,
-          0,
-          15.05,
-          ['get', 'height']
-        ],
-        'fill-extrusion-base': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          15,
-          0,
-          15.05,
-          ['get', 'min_height']
-        ],
-        'fill-extrusion-opacity': 0.6
-      }
-    },
-    labelLayerId
-  )
+  addMapBoxBuildingsLayer(mapRef.value as mapboxgl.Map)
 }
-
 const use3dBuildings = ref(true)
 const toggle3dBuildings = () => {
   if (!mapRef.value) return
@@ -167,6 +128,7 @@ watch(mapRef, () => {
 
   // Add drone model, custom layers... , buildings
   mapRef.value.on('style.load', () => {
+    addMapBoxTerrain(mapRef.value as mapboxgl.Map)
     if (use3dBuildings.value) add3dBuildings()
 
     const layerDrone = getMapBox3DDroneModelLayer(
@@ -177,7 +139,12 @@ watch(mapRef, () => {
 
     mapRef.value?.addSource('droneDirection', {
       type: 'geojson',
-      data: getMapBoxDroneDirectionSourceData(mapRef.value) as any
+      data: getMapBoxDroneDirectionSourceData(
+        mapRef.value,
+        gpsPosition.value.lat,
+        gpsPosition.value.lng,
+        sensorsStore.full.yaw
+      ) as any
     })
 
     mapRef.value?.addLayer(
@@ -193,7 +160,14 @@ watch(mapRef, () => {
     mapRef.value
       ?.getSource('droneDirection')
       // @ts-ignore Why does this function doesn't exist but exist ?
-      .setData(getMapBoxDroneDirectionSourceData(mapRef.value))
+      .setData(
+        getMapBoxDroneDirectionSourceData(
+          mapRef.value,
+          gpsPosition.value.lat,
+          gpsPosition.value.lng,
+          sensorsStore.full.yaw
+        )
+      )
   })
 })
 
