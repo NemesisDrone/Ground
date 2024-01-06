@@ -9,7 +9,8 @@ import {
   KanbanSquare,
   View,
   Settings,
-  Camera
+  Camera,
+  Repeat1
 } from 'lucide-vue-next'
 import { useDroneSettingsStore } from '~/store/droneSettings'
 
@@ -83,6 +84,11 @@ const dashboardLayouts = [
     icon: Camera,
     title: 'Monitoring',
     route: '/operations/monitoring'
+  },
+  {
+    icon: Repeat1,
+    title: 'Replay',
+    route: '/operations/replay'
   }
 ]
 </script>
