@@ -99,14 +99,29 @@ setTimeout(
   100 / selectedIntervalReplayMultiple.value
 )
 
+const eventKeyboard = (e: KeyboardEvent) => {
+  if (e.code === 'Space') {
+    if (replayStore.isPlaying) {
+      pause()
+    } else {
+      play()
+    }
+  }
+}
+
 onMounted(() => {
   replayStore.currentTime = replayStore.frames[0].time
   replayStore.lastFrameIndex = -1
   replayStore.isPlaying = false
+
+  // Add space listener to play/pause on space
+  window.addEventListener('keydown', eventKeyboard)
 })
 
 onUnmounted(() => {
   continueInterval.value = false
+
+  window.removeEventListener('keydown', eventKeyboard)
 })
 
 /*
@@ -160,24 +175,22 @@ const isReplayEnd = computed(() => {
             </div>
             <div
               class="rounded bg-neutral-900 items-center justify-center hover:bg-neutral-800"
+              @click="replayStore.isPlaying ? pause() : play()"
             >
               <Play
                 v-if="!replayStore.isPlaying && !isReplayEnd"
                 :size="22"
                 class="m-2 cursor-pointer"
-                @click="play"
               />
               <RotateCcw
                 v-if="!replayStore.isPlaying && isReplayEnd"
                 :size="22"
                 class="m-2 cursor-pointer"
-                @click="play"
               />
               <Pause
                 v-if="replayStore.isPlaying"
                 :size="22"
                 class="m-2 cursor-pointer"
-                @click="pause"
               />
             </div>
             <div
