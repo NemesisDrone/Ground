@@ -9,7 +9,7 @@ import {
   PauseCircle,
   RotateCcw
 } from 'lucide-vue-next'
-import { formatTimer } from '../../helpers/utils'
+import { formatTimer } from '~/helpers/utils'
 
 definePageMeta({
   layout: 'sidebar',
@@ -70,10 +70,19 @@ const stop = () => {
   console.log('stopped')
 }
 
+const selectedIntervalReplayMultiple = ref(1)
+// When the page is unmounted, we stop the interval
+const continueInterval = ref(true)
 /**
- * The next interval is used to update the current time if the replay is playing
+ * The next function is used to update the current time if the replay is playing
+ * We use a setTimeout to call the function every 100ms and to be able to change the interval
  */
-const playingInterval = setInterval(() => {
+const updateIntervalFunction = () => {
+  if (!continueInterval.value) return
+  setTimeout(
+    updateIntervalFunction,
+    100 / selectedIntervalReplayMultiple.value
+  )
   if (!replayStore.isPlaying) return
 
   if (replayStore.lastFrameIndex === replayStore.frames.length - 1) {
@@ -84,12 +93,11 @@ const playingInterval = setInterval(() => {
   // Update the current time
   replayStore.currentTime += 100
   sliderTime.value = [replayStore.currentTime]
-}, 100)
-
-onUnmounted(() => {
-  // Clear the interval when the component is unmounted
-  clearInterval(playingInterval)
-})
+}
+setTimeout(
+  updateIntervalFunction,
+  100 / selectedIntervalReplayMultiple.value
+)
 
 onMounted(() => {
   replayStore.currentTime = replayStore.frames[0].time
@@ -97,6 +105,15 @@ onMounted(() => {
   replayStore.isPlaying = false
 })
 
+onUnmounted(() => {
+  continueInterval.value = false
+})
+
+/*
+The sliderTime is used to update the current time when the user change the slider
+sliderTime is also updated when the current time is updated by the interval
+sliderTime value is an array because the slider component need an array
+ */
 const sliderTime = ref([0])
 watch(
   () => sliderTime.value,
@@ -162,6 +179,21 @@ const isReplayEnd = computed(() => {
                 class="m-2 cursor-pointer"
                 @click="pause"
               />
+            </div>
+            <div
+              class="rounded bg-neutral-900 flex gap-2 items-center p-2"
+            >
+              <span
+                v-for="multiple in [0.5, 1, 2, 4]"
+                class="cursor-pointer hover:text-primary"
+                :class="{
+                  'text-primary':
+                    selectedIntervalReplayMultiple === multiple
+                }"
+                @click="selectedIntervalReplayMultiple = multiple"
+              >
+                {{ multiple }}x
+              </span>
             </div>
           </div>
         </div>
