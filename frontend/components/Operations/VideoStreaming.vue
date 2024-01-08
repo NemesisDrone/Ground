@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ScreenShare, XCircle } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
+import { useSensorsStore } from '~/store/sensors'
 
 const route = useRoute()
 
@@ -12,6 +14,8 @@ const closeWindow = () => {
 }
 
 const paint = (showMessage: bool, has_image: bool, x: number, y: number, r: number, src, canvas) => {
+  console.log(x.toString() + " " + y.toString() + " " + r.toString());
+
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     console.log("Failed to get context!");
@@ -21,24 +25,21 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, r: numb
   const size = Math.min(canvas.clientHeight, canvas.clientWidth);
   const dx = (canvas.clientWidth - size)/2;
   const dy = (canvas.clientHeight - size)/2;
-  console.log(size);
-  if (showMessage) {
-    ctx.fillStyle = "blue";
-    ctx.font = "bold 20px serif";
-    ctx.fillText("No video available.", dx, 20);
-    ctx.stroke();
-    return;
-  }
 
   if (has_image) {
     let img = new Image(size, size);
-    img.src = src;
+    img.src = src;  ctx.drawImage(img, dx, dy, size, size);
   } else {
     ctx.fillStyle = "grey";
     ctx.fillRect(dx, dy, size, size);
   }
 
-  //ctx.drawImage(img,
+  if (showMessage) {
+    ctx.fillStyle = "blue";
+    ctx.font = "bold 20px serif";
+    ctx.fillText("No video available.", dx, 20);
+    ctx.stroke();
+  }
 
   const begin = size/5;
   const axis_len = begin * 3;
@@ -46,7 +47,7 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, r: numb
   ctx.strokeStyle = "red";
   ctx.lineWidth = 2;
   ctx.fillStyle = "red";
-  ctx.font = "bold 12px serif"; // Beware that roll numbers drawing depends on this on a constant manner.
+  ctx.font = "bold 12px monospace"; // Beware that roll numbers drawing depends on this on a constant manner.
 
   let x_offset = begin * (x%1);
   let y_offset = begin * (y%1);
@@ -91,7 +92,7 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, r: numb
 
   // Draw roll.
   const radius = 50;
-  const r_x = dx + size - 20 - radius - 22;
+  const r_x = dx + size - radius - ctx.measureText("-000.00").width;
   const r_y = dy + 25 + radius;
 
   // Arc first.
@@ -99,22 +100,22 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, r: numb
   ctx.arc(r_x, r_y, radius, Math.PI * 1.01, Math.PI * -0.01, false);
   ctx.stroke();
 
+  const pixSize = window.getComputedStyle(canvas);
+
   // Draw values
   const floored = Math.floor(r);
   const a_offset = r%5;
   value = (floored - floored%5)-15 + (floored%5 >= 0 ? 5 : 0);
-  console.log(r%5);
   for (let i = (floored%5 ? 0 : 1); i < (5 + (floored%5 ? 0 : 1)); i++) {
     let text = value.toFixed(2);
-    console.log(i.toString() + ", " + text);
 
-    const rad = ((value - floored + 15) * 7 - a_offset - 180)*Math.PI/180;
+    const rad = ((value - floored + 15) * 6 - a_offset - 180)*Math.PI/180;
     const s = Math.sin(rad);
     const c = Math.cos(rad);
     const up = s * (radius+23);
     const left = c * (radius+23);
 
-    ctx.fillText(text, r_x + left - (left >= 0 ? 16 : 9 * ((floored%100 ? 3 : (floored%10 ? 2 : (floored != 0 ? 1 : 0)))) + (floored < 0 ? 1 : 0)), r_y + up + (up < (radius+23)/7 ? 10 : -16));
+    ctx.fillText(text, r_x + left - (left >= ((radius+23)/2) ? 16 : ctx.measureText(text).width - 16), r_y + up + (up < (radius+23)/7 ? 10 : -16));
     ctx.beginPath();
     if (value%45 == 0) {
       ctx.moveTo(r_x + c*(4*radius/10), r_y + s*(4*radius/10));
@@ -131,27 +132,48 @@ const paint = (showMessage: bool, has_image: bool, x: number, y: number, r: numb
 
 onMounted(() => {
   const canvas = document.querySelector("#imager");
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
+  let yaw = 0.0;
+  let pitch = 0.0;
+  let roll = 0.0;
+  let blob = null;
+  let url = "";
+
+  let ws = new WebSocket(
+    useRuntimeConfig().public.NVS_WEB_SOCKET_URL as string
+  );
+
+  function make_painting() {
+    paint((ws == null ? true : (ws.readyState != 1)), url != "", yaw, pitch, roll, url, canvas);
+  }
 
   function ws_connect() {
-    let ws = new WebSocket(
-      useRuntimeConfig().public.NVS_WEB_SOCKET_URL as string
-    );
-
     ws.addEventListener("error", event => {
       console.error("WS ERROR: ", event.message);
       ws.close();
       ws = null;
+      make_painting();
     });
 
     ws.addEventListener("close", event => {
       ws.close();
       ws = null;
+      make_painting();
     });
 
     ws.addEventListener('message', event => {
       event.data.arrayBuffer().then(res => {
-        let blob = new Blob([new Uint8Array(res)], {type: "image/jpeg"});
-        paint(false, true, -0.2, 2.1, 0.0, (window.URL || window.webkitURL).createObjectURL(blob), canvas);
+        let { _yaw, _pitch, _roll } = storeToRefs(useSensorsStore());
+
+        blob = new Blob([new Uint8Array(res)], {type: "image/jpeg"});
+        url = (window.URL || window.webkitURL).createObjectURL(blob);
+        yaw = _yaw;
+        pitch = _pitch;
+        roll = _roll;
+
+        make_painting();
       });
     });
   };
@@ -159,19 +181,12 @@ onMounted(() => {
   addEventListener("resize", (event) => {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
+
+    make_painting();
   });
 
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  make_painting();
   ws_connect();
-
-  // Dummy. [TODO] Remove it once properly settled.
-  let w = 0.0;
-  setInterval(() => {
-    w += 0.005;
-    let c = Math.cos(w);
-    paint(false, false, c*10, c*(-20), c * 360, "", canvas);
-  }, 100);
 })
 
 </script>
