@@ -174,24 +174,20 @@ const isReplayEnd = computed(() => {
               </div>
             </div>
             <div
-              class="rounded bg-neutral-900 items-center justify-center hover:bg-neutral-800"
+              class="rounded bg-neutral-900 items-center justify-center hover:bg-neutral-800 cursor-pointer"
               @click="replayStore.isPlaying ? pause() : play()"
             >
               <Play
                 v-if="!replayStore.isPlaying && !isReplayEnd"
                 :size="22"
-                class="m-2 cursor-pointer"
+                class="m-2"
               />
               <RotateCcw
                 v-if="!replayStore.isPlaying && isReplayEnd"
                 :size="22"
-                class="m-2 cursor-pointer"
+                class="m-2"
               />
-              <Pause
-                v-if="replayStore.isPlaying"
-                :size="22"
-                class="m-2 cursor-pointer"
-              />
+              <Pause v-if="replayStore.isPlaying" :size="22" class="m-2" />
             </div>
             <div
               class="rounded bg-neutral-900 flex gap-2 items-center p-2"

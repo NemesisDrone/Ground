@@ -7,6 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatTimer = (time: number) => {
+  if (time < 0) return '00:00.00'
   let seconds = time / 1000
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = seconds % 60
