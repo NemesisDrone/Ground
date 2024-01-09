@@ -10,6 +10,7 @@ import {
   RotateCcw
 } from 'lucide-vue-next'
 import { formatTimer } from '~/helpers/utils'
+import AltitudeChart from '~/components/Operations/Replay/AltitudeChart.vue'
 
 definePageMeta({
   layout: 'sidebar',
@@ -147,7 +148,7 @@ const isReplayEnd = computed(() => {
 </script>
 <template>
   <div class="w-full h-[100vh]">
-    <div class="h-full w-full flex gap-4">
+    <div class="h-full w-full flex">
       <div class="w-3/5">
         <div class="h-5/6">
           <ReplayMap />
@@ -207,8 +208,11 @@ const isReplayEnd = computed(() => {
           </div>
         </div>
       </div>
-      <div class="w-2/5">
-        {{ replayStore.isPlaying ? 'Playing' : 'Not playing' }}
+      <div class="w-2/5 h-full p-4">
+        <div class="h-1/2">
+          <AltitudeChart />
+        </div>
+        <div class="h-1/2"></div>
       </div>
     </div>
   </div>
