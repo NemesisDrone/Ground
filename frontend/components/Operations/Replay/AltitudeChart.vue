@@ -1,14 +1,34 @@
 <script setup lang="ts">
+import { useReplayStore } from '~/store/replayStore'
+
 let chartComponent = shallowRef<null | Component>(null)
 onMounted(async () => {
   chartComponent.value = (await import('vue3-apexcharts')).default
 })
 
-const series = {
-  series: [{ name: 'Altitude', data: [0, 0, 5, 0, 0, 0, 0] }]
-}
+const replayStore = useReplayStore()
+
+const altitudeData = computed(() => {
+  const series = [
+    { name: 'Altitude', data: [] as number[] },
+    { name: 'alt 2', data: [] as number[] }
+  ]
+  const labels: string[] = []
+
+  replayStore.frames.forEach((frame) => {
+    series[0].data.push(frame.altitude)
+    // series[1].data.push(frame.altitude)
+    labels.push(`${Math.round((frame.time / 1000) * 100) / 100}s`)
+  })
+
+  return {
+    series,
+    labels
+  }
+})
+
 const chartOptions = computed(() => ({
-  labels: ['0.0s', '0.5s', '0.7s'],
+  labels: altitudeData.value.labels,
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
@@ -26,7 +46,20 @@ const chartOptions = computed(() => ({
   legend: {
     show: false
   },
-  colors: ['#22C55E', '#0ff0ff'],
+  colors: ['#71FFA5', '#ebe9f1'],
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shade: 'dark',
+      inverseColors: false,
+      gradientToColors: ['#22C55E', '#ebe9f1'],
+      shadeIntensity: 1,
+      type: 'horizontal',
+      opacityFrom: 1,
+      opacityTo: 1,
+      stops: [0, 100, 100, 100]
+    }
+  },
   markers: {
     size: 0,
     hover: {
@@ -35,6 +68,7 @@ const chartOptions = computed(() => ({
   },
   xaxis: {
     labels: {
+      show: false,
       style: {
         colors: '#f2f2f2',
         fontSize: '1rem',
@@ -66,9 +100,9 @@ const chartOptions = computed(() => ({
   grid: {
     borderColor: '#f2f2f2',
     padding: {
-      top: -20,
-      bottom: -10,
-      left: 20
+      top: -10
+      // bottom: -10
+      // left: 20
     }
   },
   tooltip: {
@@ -78,13 +112,13 @@ const chartOptions = computed(() => ({
 </script>
 
 <template>
-  <div class="rounded bg-neutral-900 p-4 h-full">
+  <div class="rounded bg-neutral-900 h-full p-4">
     <component
       :is="chartComponent"
       height="auto"
       type="line"
       :options="chartOptions"
-      :series="series.series"
+      :series="altitudeData.series"
     />
   </div>
 </template>
