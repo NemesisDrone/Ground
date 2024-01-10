@@ -232,9 +232,8 @@ export const useReplayStore = defineStore('replay', {
   getters: {
     getNearestFrameIndex: (state) => (time: number) => {
       let nearest = state.lastFrameIndex
-      let i = state.lastFrameIndex >= 0 ? state.lastFrameIndex : 0
 
-      for (i = 0; i < state.frames.length; i++) {
+      for (let i = 0; i < state.frames.length; i++) {
         if (state.frames[i].time >= time) {
           break
         }

@@ -8,16 +8,29 @@ onMounted(async () => {
 
 const replayStore = useReplayStore()
 
+const altitudeDataFromReplayRange = computed(() => {
+  const data: number[] = []
+  if (replayStore.frames.length === 0 || replayStore.currentFrame === null)
+    return data
+
+  replayStore.frames.every((frame, index) => {
+    data.push(frame.altitude)
+    return index !== replayStore.lastFrameIndex
+  })
+
+  return data
+})
+
 const altitudeData = computed(() => {
   const series = [
-    { name: 'Altitude', data: [] as number[] },
-    { name: 'alt 2', data: [] as number[] }
+    { name: 'Altitude by frame', data: [] as number[] },
+    { name: 'Altitude', data: [] as number[] }
   ]
   const labels: string[] = []
+  series[0].data = altitudeDataFromReplayRange.value
 
   replayStore.frames.forEach((frame) => {
-    series[0].data.push(frame.altitude)
-    // series[1].data.push(frame.altitude)
+    series[1].data.push(frame.altitude)
     labels.push(`${Math.round((frame.time / 1000) * 100) / 100}s`)
   })
 
@@ -32,7 +45,7 @@ const chartOptions = computed(() => ({
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
-    type: 'area',
+    type: 'line',
     offsetX: -10
   },
   dataLabels: {
