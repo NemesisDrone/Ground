@@ -3,6 +3,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 type ReplayFrame = {
   timestamp: number
   time: number
+  speed: number
   gps: {
     lat: number
     lng: number
@@ -37,6 +38,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct,
         time: 0,
+        speed: 20,
         gps: {
           lat: -0.7563779,
           lng: 48.0879123
@@ -49,6 +51,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 500,
         time: 500,
+        speed: 23,
         gps: {
           lat: -0.7564779,
           lng: 48.0879123
@@ -61,6 +64,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 2000,
         time: 2000,
+        speed: 22,
         gps: {
           lat: -0.7565779,
           lng: 48.0879123
@@ -72,6 +76,7 @@ export const useReplayStore = defineStore('replay', {
       },
 
       {
+        speed: 20,
         timestamp: ct + 3000,
         time: 3000,
         gps: {
@@ -86,6 +91,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 3500,
         time: 3500,
+        speed: 23,
         gps: {
           lat: -0.7566779,
           lng: 48.0879123
@@ -98,6 +104,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 4000,
         time: 4000,
+        speed: 21,
         gps: {
           lat: -0.7567779,
           lng: 48.0879123
@@ -110,6 +117,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 4600,
         time: 4600,
+        speed: 24,
         gps: {
           lat: -0.7568779,
           lng: 48.0879123
@@ -122,6 +130,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 5200,
         time: 5200,
+        speed: 30,
         gps: {
           lat: -0.7569779,
           lng: 48.0879123
@@ -134,6 +143,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 6000,
         time: 6000,
+        speed: 35,
         gps: {
           lat: -0.7570779,
           lng: 48.0879123
@@ -146,6 +156,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 7000,
         time: 7000,
+        speed: 29,
         gps: {
           lat: -0.7571779,
           lng: 48.0879123
@@ -158,6 +169,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 8000,
         time: 8000,
+        speed: 27,
         gps: {
           lat: -0.7572779,
           lng: 48.0879123
@@ -170,6 +182,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 9000,
         time: 9000,
+        speed: 22,
         gps: {
           lat: -0.7573779,
           lng: 48.0879123
@@ -182,6 +195,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 1000,
         time: 10000,
+        speed: 21,
         gps: {
           lat: -0.7574779,
           lng: 48.0879123
@@ -194,6 +208,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 11000,
         time: 11000,
+        speed: 21,
         gps: {
           lat: -0.7575779,
           lng: 48.0879123
@@ -206,6 +221,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 12000,
         time: 12000,
+        speed: 18,
         gps: {
           lat: -0.7576779,
           lng: 48.0879123
@@ -218,6 +234,7 @@ export const useReplayStore = defineStore('replay', {
       {
         timestamp: ct + 13000,
         time: 13000,
+        speed: 17,
         gps: {
           lat: -0.7577779,
           lng: 48.0879123

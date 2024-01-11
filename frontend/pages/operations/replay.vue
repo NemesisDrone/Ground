@@ -11,6 +11,7 @@ import {
 } from 'lucide-vue-next'
 import { formatTimer } from '~/helpers/utils'
 import AltitudeChart from '~/components/Operations/Replay/AltitudeChart.vue'
+import SpeedChart from '~/components/Operations/Replay/SpeedChart.vue'
 
 definePageMeta({
   layout: 'sidebar',
@@ -208,11 +209,13 @@ const isReplayEnd = computed(() => {
           </div>
         </div>
       </div>
-      <div class="w-2/5 h-full p-4">
-        <div class="h-1/2">
+      <div class="w-2/5 h-full p-4 flex flex-col gap-4">
+        <div>
           <AltitudeChart />
         </div>
-        <div class="h-1/2"></div>
+        <div>
+          <SpeedChart />
+        </div>
       </div>
     </div>
   </div>

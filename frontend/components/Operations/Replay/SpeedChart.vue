@@ -8,37 +8,22 @@ onMounted(async () => {
 
 const replayStore = useReplayStore()
 
-const altitudeDataFromReplayRange = computed(() => {
-  const data: number[] = []
-  if (replayStore.frames.length === 0 || replayStore.currentFrame === null)
-    return data
-
-  replayStore.frames.every((frame, index) => {
-    data.push(frame.altitude)
-    return index !== replayStore.lastFrameIndex
-  })
-
-  return data
-})
-
-const altitudeData = computed(() => {
+const speedData = computed(() => {
   const series = [
-    { name: 'Altitude by frame', data: [] as number[] },
-    { name: 'Altitude', data: [] as number[] }
+    { name: 'Speed by frame', data: [] as number[] },
+    { name: 'speed', data: [] as number[] }
   ]
   const labels: string[] = []
 
-  // if true then we had the altitude in 'Altitude by frame'
-  let addInAltitudeByFrame = true
+  // if true then we had the speed in 'Speed by frame'
+  let addInSpeedByFrame = true
   replayStore.frames.forEach((frame, index) => {
-    series[1].data.push(frame.altitude)
-
-    if (addInAltitudeByFrame) {
-      series[0].data.push(frame.altitude)
-      if (index === replayStore.lastFrameIndex)
-        addInAltitudeByFrame = false
+    if (addInSpeedByFrame) {
+      series[0].data.push(frame.speed)
+      if (index === replayStore.lastFrameIndex) addInSpeedByFrame = false
     }
 
+    series[1].data.push(frame.speed)
     labels.push(`${Math.round((frame.time / 1000) * 100) / 100}s`)
   })
 
@@ -49,7 +34,7 @@ const altitudeData = computed(() => {
 })
 
 const chartOptions = computed(() => ({
-  labels: altitudeData.value.labels,
+  labels: speedData.value.labels,
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
@@ -114,7 +99,7 @@ const chartOptions = computed(() => ({
         fontFamily: 'Montserrat, Helvetica, Arial, serif'
       },
       formatter(val: number) {
-        return `${val} m`
+        return `${val} km/h`
       }
     }
   },
@@ -133,13 +118,13 @@ const chartOptions = computed(() => ({
 </script>
 
 <template>
-  <div class="rounded bg-neutral-900 h-full p-4">
+  <div class="rounded bg-neutral-900 p-4">
     <component
       :is="chartComponent"
-      height="auto"
+      height="250"
       type="line"
       :options="chartOptions"
-      :series="altitudeData.series"
+      :series="speedData.series"
     />
   </div>
 </template>
