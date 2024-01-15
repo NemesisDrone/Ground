@@ -8,19 +8,6 @@ onMounted(async () => {
 
 const replayStore = useReplayStore()
 
-const altitudeDataFromReplayRange = computed(() => {
-  const data: number[] = []
-  if (replayStore.frames.length === 0 || replayStore.currentFrame === null)
-    return data
-
-  replayStore.frames.every((frame, index) => {
-    data.push(frame.altitude)
-    return index !== replayStore.lastFrameIndex
-  })
-
-  return data
-})
-
 const altitudeData = computed(() => {
   const series = [
     { name: 'Altitude by frame', data: [] as number[] },
