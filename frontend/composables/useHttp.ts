@@ -26,6 +26,14 @@ export const useHttp = () => {
     async (error) => {
       if (error instanceof AxiosError) {
         const originalRequest = error.config
+        // Prevent infinite loops
+        // @ts-ignore Property '_retry' does not exist on type 'AxiosRequestConfig'.
+        if (originalRequest._retry) {
+          await useUserStore().logOut()
+          document.location.href = '/?disconnected'
+        }
+        // @ts-ignore
+        originalRequest._retry = true
 
         if (
           error.response?.status === 401 &&
@@ -39,7 +47,7 @@ export const useHttp = () => {
 
           if (userStore.accessToken) {
             // @ts-ignore
-            return http(originalRequest)
+            return await http(originalRequest)
           } else {
             if (document.location.pathname !== '/?disconnected') {
               await useUserStore().logOut()
