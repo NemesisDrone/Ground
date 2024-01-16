@@ -23,6 +23,7 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path("", include("apps.user.urls")),
     path("", include("apps.drone.urls")),
+    path("", include("apps.replay.urls")),
 ]
 
 if settings.DEBUG:

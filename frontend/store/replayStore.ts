@@ -17,6 +17,7 @@ type ReplayFrame = {
 const initialFrame: ReplayFrame = {
   timestamp: 0,
   time: 0,
+  speed: 0,
   gps: {
     lat: -0.7563779,
     lng: 48.0879123
