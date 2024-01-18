@@ -4,8 +4,6 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-
-
 RUN mkdir -p /app/interfaces/communication
 COPY . /app/interfaces/communication
 WORKDIR /app/interfaces/communication

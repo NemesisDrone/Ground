@@ -4,12 +4,15 @@ useHead({
     class: 'bg-background dark'
   }
 })
+
+import Toaster from '@/components/ui/toast/Toaster.vue'
 </script>
 
 <template>
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <Toaster />
 </template>
 
 <style>

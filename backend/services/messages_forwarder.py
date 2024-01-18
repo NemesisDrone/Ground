@@ -44,7 +44,7 @@ while True:
             async_to_sync(channel_layer.group_send)(group_name, payload)
 
         """
-        If time since last heartbeat is more than 6 seconds, set the drone as disconnected
+        If time since last heartbeat is more than 3 seconds, set the drone as disconnected
         """
         if ((time.time() - float(r.get("LAST_HEARTBEAT_RECEIVED"))) > 3) and int(
             r.get("IS_DRONE_CONNECTED")

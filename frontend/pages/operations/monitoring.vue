@@ -1,78 +1,75 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Operations/GPSMap.vue'
 import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
-import ImageViewer from '~/components/ui/image-viewer/ImageViewer.vue'
-import ScrollArea from '~/components/ui/scroll-area/ScrollArea.vue'
-import { CameraOff } from 'lucide-vue-next'
+import {
+  CameraOff,
+  MousePointerSquare,
+  XCircle,
+  Download
+} from 'lucide-vue-next'
+import { useMonitoringStore } from '~/store/monitoring'
+import { DroneImage } from '~/types/images.types'
 definePageMeta({
-  layout: 'operations'
+  layout: 'sidebar'
 })
 useHead({
   title: 'Monitoring'
 })
 
-const images = [
-  {
-    id: 1,
-    src: '/images/demo/img1.jpg'
-  },
-  {
-    id: 2,
-    src: '/images/demo/img2.jpg'
-  },
-  {
-    id: 3,
-    src: '/images/demo/img3.jpg'
-  },
-  {
-    id: 4,
-    src: '/images/demo/img4.jpg'
-  },
-  {
-    id: 5,
-    src: '/images/demo/img3.jpg'
-  },
-  {
-    id: 6,
-    src: '/images/demo/img1.jpg'
-  },
-  {
-    id: 7,
-    src: '/images/demo/img4.jpg'
-  },
-  {
-    id: 8,
-    src: '/images/demo/img2.jpg'
-  },
-  {
-    id: 9,
-    src: '/images/demo/img3.jpg'
-  }
-]
+const monitoringStore = useMonitoringStore()
 
-const selectedImage = ref<any>(null)
-const imageViewer = ref<any>(null)
+const selectedImage = ref<DroneImage | null>(null)
+const isImagesLoading = ref(false)
+const isImageDeletionLoading = ref(false)
 
-const selectImage = (image: { id: number; src: string }) => {
+const selectImage = (image: DroneImage) => {
   selectedImage.value = image
 }
 
-onMounted(() => {
-  if (images.length > 0) {
-    selectedImage.value = images[0]
+onMounted(async () => {
+  isImagesLoading.value = true
+  await monitoringStore.getImages()
+  isImagesLoading.value = false
+
+  if (monitoringStore.images.length > 0) {
+    selectedImage.value = monitoringStore.images[0]
   }
 })
+
+const deleteImage = async (image: DroneImage) => {
+  isImageDeletionLoading.value = true
+
+  await monitoringStore.deleteImage(image)
+  if (selectedImage.value?.id === image.id) {
+    if (monitoringStore.images.length > 0) {
+      selectedImage.value = monitoringStore.images[0]
+    } else {
+      selectedImage.value = null
+    }
+  }
+
+  isImageDeletionLoading.value = false
+}
+
+const downloadImage = async (image: DroneImage) => {
+  const link = document.createElement('a')
+  link.href = image.url
+  link.target = '_blank'
+  link.download = image.url.split('/').pop() || ''
+  link.click()
+}
 </script>
 <template>
   <div class="w-full h-[100vh] p-4">
     <div class="h-1/2 w-full flex gap-4">
       <div class="w-1/2 h-full">
-        <ImageViewer
-          :src="selectedImage ? selectedImage.src : ''"
-          :allow-style-change="true"
-          :allow-zoom="true"
-          :allow-open-in-new-tab="true"
-        />
+        <UiOverlay :show="isImagesLoading">
+          <UiImageViewer
+            :src="selectedImage ? selectedImage.url : ''"
+            :allow-style-change="true"
+            :allow-zoom="true"
+            :allow-open-in-new-tab="true"
+          />
+        </UiOverlay>
       </div>
       <div class="w-1/2 h-full">
         <div class="rounded-md bg-neutral-900 h-full p-2">
@@ -81,39 +78,83 @@ onMounted(() => {
       </div>
     </div>
     <div class="h-1/2 w-full flex gap-4 pt-4">
-      <scroll-area class="w-2/3 h-full">
-        <div
-          class="h-full grid grid-cols-4 gap-2 rounded-md bg-neutral-900 p-2"
-        >
+      <UiScrollArea class="w-2/3 h-full" :scroll-to-bottom="false">
+        <UiOverlay :show="isImagesLoading">
           <div
-            v-for="img in images"
-            :key="img.id"
-            class="rounded-md border-4 h-[calc(25vh-2rem)] cursor-pointer"
-            :class="{
-              'border-primary':
-                img.id === (selectedImage ? selectedImage.id : -1)
-            }"
-            @click="selectImage(img)"
-          >
-            <img
-              :src="img.src"
-              alt=""
-              class="h-full w-full rounded-[0.12rem]"
-            />
-          </div>
-          <div
-            v-if="images.length < 8"
-            v-for="i in 8 - images.length"
-            :key="i"
+            class="h-full grid grid-cols-4 gap-2 rounded-md bg-neutral-900 p-2"
           >
             <div
-              class="rounded-md border-4 h-[calc(25vh-2rem)] flex justify-center items-center"
+              v-for="img in monitoringStore.images"
+              :key="img.id"
+              class="rounded-md border-4 h-[calc(25vh-2rem)] cursor-pointer"
+              :class="{
+                'border-primary':
+                  img.id === (selectedImage ? selectedImage.id : -1)
+              }"
+              @click="selectImage(img)"
             >
-              <CameraOff :size="32" color="#27272A" />
+              <UiDialog>
+                <UiContextMenu>
+                  <UiContextMenuTrigger>
+                    <img
+                      :src="img.url"
+                      alt=""
+                      class="h-full w-full rounded-[0.12rem]"
+                    />
+                  </UiContextMenuTrigger>
+                  <UiContextMenuContent>
+                    <UiContextMenuItem
+                      @click="selectImage(img)"
+                      :disabled="selectedImage?.id === img.id"
+                    >
+                      <MousePointerSquare :size="18" class="mr-2" />
+                      Select
+                    </UiContextMenuItem>
+                    <UiContextMenuItem @click="downloadImage(img)">
+                      <Download :size="18" class="mr-2" />
+                      Download
+                    </UiContextMenuItem>
+                    <UiDialogTrigger asChild>
+                      <UiContextMenuItem class="text-red-500">
+                        <XCircle :size="18" class="mr-2" />
+                        Delete
+                      </UiContextMenuItem>
+                    </UiDialogTrigger>
+                  </UiContextMenuContent>
+                </UiContextMenu>
+                <UiDialogContent>
+                  <UiDialogHeader>
+                    <UiDialogTitle>Delete picture?</UiDialogTitle>
+                    <UiDialogDescription>
+                      The picture will be deleted permanently.
+                    </UiDialogDescription>
+                  </UiDialogHeader>
+                  <UiDialogFooter>
+                    <UiButton
+                      variant="destructive"
+                      @click="deleteImage(img)"
+                      :is-loading="isImageDeletionLoading"
+                    >
+                      Confirm
+                    </UiButton>
+                  </UiDialogFooter>
+                </UiDialogContent>
+              </UiDialog>
+            </div>
+            <div
+              v-if="monitoringStore.images.length < 8"
+              v-for="i in 8 - monitoringStore.images.length"
+              :key="i"
+            >
+              <div
+                class="rounded-md border-4 h-[calc(25vh-2rem)] flex justify-center items-center"
+              >
+                <CameraOff :size="32" color="#27272A" />
+              </div>
             </div>
           </div>
-        </div>
-      </scroll-area>
+        </UiOverlay>
+      </UiScrollArea>
       <div class="w-1/3 h-full"></div>
     </div>
   </div>

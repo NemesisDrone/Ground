@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.user",
     "apps.communication",
+    "apps.drone",
+    "apps.replay"
 ]
 
 MIDDLEWARE = [
@@ -142,9 +144,14 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
+    # ofetch lib is really fucking bad, interceptors are not real interceptos so i can't ...
+    # "ACCESS_TOKEN_LIFETIME": timedelta(seconds=5),
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
-    "SLIDING_TOKEN_LIFETIME": timedelta(days=30),
+    # "REFRESH_TOKEN_LIFETIME": timedelta(seconds=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=20),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(seconds=10),
+    # "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timedelta(seconds=10),
     "SLIDING_TOKEN_REFRESH_AT_LOGIN": True,
 }
 
@@ -164,3 +171,9 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
+
+BACKEND_URL = "http://127.0.0.1:8000"

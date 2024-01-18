@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --dotenv .env.local",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -39,6 +39,8 @@
     "@tresjs/post-processing": "^0.4.0",
     "@tweakpane/plugin-essentials": "^0.2.0",
     "@vueuse/core": "^10.5.0",
+    "apexcharts": "^3.45.1",
+    "axios": "^1.6.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "lucide-vue-next": "^0.284.0",
@@ -52,6 +54,7 @@
     "three": "^0.157.0",
     "tweakpane": "^4.0.1",
     "typescript": "^5.2.2",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "vue3-apexcharts": "^1.4.4"
   }
 }

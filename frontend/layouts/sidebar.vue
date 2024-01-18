@@ -9,8 +9,10 @@ import {
   KanbanSquare,
   View,
   Settings,
-  Camera
+  Camera,
+  Repeat1
 } from 'lucide-vue-next'
+import { useDroneSettingsStore } from '~/store/droneSettings'
 
 let ws: WebSocketWrapper | null = null
 const droneStore = useComponentsStore()
@@ -82,6 +84,11 @@ const dashboardLayouts = [
     icon: Camera,
     title: 'Monitoring',
     route: '/operations/monitoring'
+  },
+  {
+    icon: Repeat1,
+    title: 'Replay',
+    route: '/operations/replay'
   }
 ]
 </script>
@@ -89,7 +96,7 @@ const dashboardLayouts = [
 <template>
   <div class="flex">
     <div
-      class="w-[62px] h-[100vh] border-r-2 border-neutral-900 flex flex-col items-center justify-between"
+      class="w-[62px] h-[100vh] border-r-2 border-neutral-900 flex flex-col items-center justify-between fixed"
     >
       <div class="flex flex-col gap-2 mt-[1.5rem]">
         <router-link
@@ -116,8 +123,10 @@ const dashboardLayouts = [
         </router-link>
       </div>
     </div>
-    <main class="w-full">
-      <slot />
+    <main class="w-full ml-[62px]">
+      <div>
+        <slot />
+      </div>
     </main>
   </div>
 </template>

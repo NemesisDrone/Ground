@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GPSMap from '~/components/Operations/GPSMap.vue'
 definePageMeta({
-  layout: 'operations'
+  layout: 'sidebar'
 })
 </script>
 

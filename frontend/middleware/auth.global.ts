@@ -6,11 +6,10 @@ import { useUserStore } from '~/store/user'
  */
 export default defineNuxtRouteMiddleware((to, from) => {
   const userStore = useUserStore()
-  const { authenticated } = storeToRefs(userStore)
-  const access = useCookie('access')
-  const refresh = useCookie('refresh')
+  const { authenticated, accessToken, refreshToken } =
+    storeToRefs(userStore)
 
-  if (access.value && refresh.value) {
+  if (accessToken && refreshToken) {
     authenticated.value = true
 
     // if (to?.name === 'index') {
@@ -19,7 +18,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   }
   userStore.getUserData()
 
-  if ((!access.value || !refresh.value) && to?.name !== 'index') {
+  if ((!accessToken || !refreshToken) && to?.name !== 'index') {
     abortNavigation()
     return navigateTo('/')
   }

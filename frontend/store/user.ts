@@ -9,92 +9,71 @@ interface UserLoginPayload {
 export const useUserStore = defineStore('user', {
   state: () => ({
     authenticated: false,
-    user: null as null | UserData
+    user: null as null | UserData,
+    accessToken: null as null | string,
+    refreshToken: null as null | string
   }),
   actions: {
     async getUserData() {
-      const { data } = await useApi<UserData>('/api/user/data')
-
-      if (data.value) {
-        this.user = data.value
+      const { data } = await useHttp().get<UserData>('/api/user/data')
+      if (data) {
+        this.user = data
       }
     },
 
     async authenticateUser({ identifier, password }: UserLoginPayload) {
-      const { data } = await useApi<
-        {
-          access: string
-          refresh: string
-        },
-        any
-      >('/api/user/token', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          identifier,
-          password
-        }
+      const { data } = await useHttp().post<{
+        access: string
+        refresh: string
+      }>('/api/user/token', {
+        identifier,
+        password
       })
 
-      if (data.value?.access && data.value?.refresh) {
-        const access = useCookie('access')
-        access.value = data.value.access
-
-        const refresh = useCookie('refresh')
-        refresh.value = data.value.refresh
+      if (data.access && data.refresh) {
+        this.accessToken = data.access
+        this.refreshToken = data.refresh
 
         this.authenticated = true
       } else {
         this.authenticated = false
-        const access = useCookie('access')
-        access.value = null
-
-        const refresh = useCookie('refresh')
-        refresh.value = null
+        this.accessToken = null
+        this.refreshToken = null
       }
     },
 
     async logOut() {
-      const token = useCookie('token')
-      const refresh = useCookie('refresh')
-      const { data } = await useApi('/api/user/blacklist', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          refresh
-        }
-      })
+      // await useHttp().post('/api/user/blacklist', {
+      //   refresh: refresh.value,
+      //   token: token.value
+      // })
 
-      token.value = null
-      refresh.value = null
+      this.accessToken = null
+      this.refreshToken = null
       this.authenticated = false
     },
 
-    async refreshTokens() {
-      const refresh = useCookie('refresh')
-      const accessCookie = useCookie('access')
-
-      const { data } = await useApi<
-        {
+    async refreshExpiredToken() {
+      try {
+        const { data } = await useHttp().post<{
           access: string
-        },
-        any
-      >('/api/user/refresh', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          refresh: refresh.value
+        }>('/api/user/refresh', {
+          refresh: this.refreshToken
+        })
+
+        if (data.access) {
+          this.accessToken = data.access
+
+          this.authenticated = true
+        } else {
+          this.authenticated = false
+          this.accessToken = null
+          this.refreshToken = null
         }
-      })
-
-      if (data.value?.access) {
-        accessCookie.value = data.value.access
-
-        this.authenticated = true
-      } else {
+      } catch (e) {
         this.authenticated = false
-        accessCookie.value = null
-        refresh.value = null
+        this.accessToken = null
+        this.refreshToken = null
       }
     }
   },

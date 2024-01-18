@@ -12,10 +12,11 @@ def get_user(scope) -> User:
     This function take a django channel scope and return a user object.
     It will return an AnonymousUser if the user is not authenticated.
     """
-    access = scope["cookies"]["access"]
-    refresh = scope["cookies"]["refresh"]
 
     try:
+        query_string = scope["query_string"].decode("utf-8").split("&")
+        access = query_string[0].split("=")[1]
+        refresh = query_string[1].split("=")[1]
         user = User.objects.get(id=AccessToken(access)["user_id"])
     # Handle jwt token auto refreshing
     except rest_framework_simplejwt.exceptions.TokenError:
@@ -24,7 +25,7 @@ def get_user(scope) -> User:
         except rest_framework_simplejwt.exceptions.TokenError:
             user = AnonymousUser()
 
-    except ObjectDoesNotExist:
+    except:
         user = AnonymousUser()
 
     return user
