@@ -1,263 +1,73 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
+import {
+  ReplaySessionData,
+  ReplaySession,
+  ListingReplaySession
+} from '~/types/replay.types'
 
-type ReplayFrame = {
-  timestamp: number
-  time: number
-  speed: number
-  gps: {
-    lat: number
-    lng: number
-  }
-  altitude: number
-  roll: number
-  pitch: number
-  yaw: number
-}
-
-const initialFrame: ReplayFrame = {
-  timestamp: 0,
-  time: 0,
+const initialFrame: ReplaySessionData = {
+  id: 0,
+  index: 0,
   speed: 0,
-  gps: {
-    lat: -0.7563779,
-    lng: 48.0879123
-  },
-  altitude: 100,
+  latitude: 0,
+  longitude: 0,
+  altitude: 0,
   roll: 0,
   pitch: 0,
-  yaw: -90
+  yaw: 0
 }
 
-const ct = new Date().getTime()
 export const useReplayStore = defineStore('replay', {
   state: () => ({
+    isDialogSessionsOpen: false,
+    sessions: [] as ListingReplaySession[],
+    currentSession: null as null | ReplaySession,
+
     isPlaying: false,
     currentTime: -1,
     lastFrameIndex: -1,
-    currentFrame: initialFrame,
-    frames: [
-      {
-        timestamp: ct,
-        time: 0,
-        speed: 20,
-        gps: {
-          lat: -0.7563779,
-          lng: 48.0879123
-        },
-        altitude: 100,
-        roll: 0,
-        pitch: 0,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 500,
-        time: 500,
-        speed: 23,
-        gps: {
-          lat: -0.7564779,
-          lng: 48.0879123
-        },
-        altitude: 102,
-        roll: 0,
-        pitch: 10,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 2000,
-        time: 2000,
-        speed: 22,
-        gps: {
-          lat: -0.7565779,
-          lng: 48.0879123
-        },
-        altitude: 105,
-        roll: 0,
-        pitch: 20,
-        yaw: -90
-      },
-
-      {
-        speed: 20,
-        timestamp: ct + 3000,
-        time: 3000,
-        gps: {
-          lat: -0.7565779,
-          lng: 48.0879123
-        },
-        altitude: 110,
-        roll: 0,
-        pitch: 20,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 3500,
-        time: 3500,
-        speed: 23,
-        gps: {
-          lat: -0.7566779,
-          lng: 48.0879123
-        },
-        altitude: 109,
-        roll: 0,
-        pitch: 0,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 4000,
-        time: 4000,
-        speed: 21,
-        gps: {
-          lat: -0.7567779,
-          lng: 48.0879123
-        },
-        altitude: 112,
-        roll: 0,
-        pitch: -10,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 4600,
-        time: 4600,
-        speed: 24,
-        gps: {
-          lat: -0.7568779,
-          lng: 48.0879123
-        },
-        altitude: 108,
-        roll: 0,
-        pitch: -10,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 5200,
-        time: 5200,
-        speed: 30,
-        gps: {
-          lat: -0.7569779,
-          lng: 48.0879123
-        },
-        altitude: 105,
-        roll: 0,
-        pitch: -10,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 6000,
-        time: 6000,
-        speed: 35,
-        gps: {
-          lat: -0.7570779,
-          lng: 48.0879123
-        },
-        altitude: 100,
-        roll: 0,
-        pitch: 0,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 7000,
-        time: 7000,
-        speed: 29,
-        gps: {
-          lat: -0.7571779,
-          lng: 48.0879123
-        },
-        altitude: 110,
-        roll: 0,
-        pitch: 30,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 8000,
-        time: 8000,
-        speed: 27,
-        gps: {
-          lat: -0.7572779,
-          lng: 48.0879123
-        },
-        altitude: 115,
-        roll: 0,
-        pitch: 30,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 9000,
-        time: 9000,
-        speed: 22,
-        gps: {
-          lat: -0.7573779,
-          lng: 48.0879123
-        },
-        altitude: 120,
-        roll: 0,
-        pitch: 30,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 1000,
-        time: 10000,
-        speed: 21,
-        gps: {
-          lat: -0.7574779,
-          lng: 48.0879123
-        },
-        altitude: 125,
-        roll: 0,
-        pitch: 30,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 11000,
-        time: 11000,
-        speed: 21,
-        gps: {
-          lat: -0.7575779,
-          lng: 48.0879123
-        },
-        altitude: 130,
-        roll: 0,
-        pitch: 10,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 12000,
-        time: 12000,
-        speed: 18,
-        gps: {
-          lat: -0.7576779,
-          lng: 48.0879123
-        },
-        altitude: 135,
-        roll: 0,
-        pitch: 0,
-        yaw: -90
-      },
-      {
-        timestamp: ct + 13000,
-        time: 13000,
-        speed: 17,
-        gps: {
-          lat: -0.7577779,
-          lng: 48.0879123
-        },
-        altitude: 135,
-        roll: 0,
-        pitch: 0,
-        yaw: -90
-      }
-    ] as ReplayFrame[]
+    currentFrame: initialFrame
   }),
   getters: {
+    frames: (state) => {
+      if (!state.currentSession) {
+        return []
+      }
+      return state.currentSession.data
+    },
+
     getNearestFrameIndex: (state) => (time: number) => {
       let nearest = state.lastFrameIndex
 
       for (let i = 0; i < state.frames.length; i++) {
-        if (state.frames[i].time >= time) {
+        if (state.frames[i].index >= time) {
           break
         }
         nearest = i
       }
       return nearest
+    }
+  },
+
+  actions: {
+    /*
+     * Load all the sessions for listing, without the data
+     */
+    async getSessions() {
+      const { data } = await useHttp().get<ListingReplaySession[]>(
+        '/api/replay/sessions/'
+      )
+      this.sessions = data
+    },
+
+    /*
+     * Load a session with the data from the backend
+     */
+    async loadSession(id: number) {
+      const { data } = await useHttp().get<ReplaySession>(
+        `/api/replay/sessions/${id}/`
+      )
+      this.currentSession = data
     }
   }
 })

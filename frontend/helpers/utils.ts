@@ -15,3 +15,26 @@ export const formatTimer = (time: number) => {
 
   return `${String(minutes).padStart(2, '0')}:${twoDecimalSeconds}`
 }
+
+export const formatTime = (timestamp: number) => {
+  const date = new Date(timestamp * 1000)
+
+  return date.toLocaleString('fr-FR', {
+    timeZone: 'Europe/Paris',
+    hour12: false
+  })
+}
+
+export const getDurationBetweenTimestampsFormat = (
+  start: number,
+  end: number
+): string => {
+  start = start * 1000
+  end = end * 1000
+  const duration = end - start
+  const minutes = Math.floor(duration / 60000)
+  const seconds = ((duration % 60000) / 1000).toFixed(0)
+  const hours = Math.floor(duration / 3600000)
+
+  return `${hours}h ${minutes}mn ${seconds}s`
+}
