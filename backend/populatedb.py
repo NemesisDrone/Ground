@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import django
 
 django.setup()
@@ -139,9 +141,12 @@ for i in range(0, 136):
             replay_data.roll = 0
             replay_data.yaw = 0
 
-
     last_replay_data = replay_data
     replay_data.save()
+
+session.end_time = session_beginning + timedelta(seconds=13)
+session.name = "Test session"
+session.save()
 
 
 print("DB populated")
