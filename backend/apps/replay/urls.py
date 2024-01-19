@@ -4,10 +4,8 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-# router.register(r"api/drone/images", views.DroneImagesViewSet, basename="drone_images")
+router.register(r"api/replay/sessions", views.ReplaySessionViewset, basename="replay_sessions")
 
 urlpatterns = [
-    # path("api/drone/settings/", views.get_drone_settings),
 ]
-
 urlpatterns += router.urls
