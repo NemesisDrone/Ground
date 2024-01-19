@@ -23,6 +23,10 @@ def default_canals():
 class DroneSettings(BaseModel):
     canals = models.JSONField(default=default_canals)
 
+    objects = models.Manager()
+
 
 class DroneImage(BaseModel):
     image = models.ImageField(upload_to="drone_images/")
+
+    objects = models.Manager()
