@@ -32,6 +32,8 @@ class ReplaySessionSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_end_time(obj):
+        if obj.end_time is None:
+            return 0
         return obj.end_time.timestamp()
 
     class Meta:
@@ -51,6 +53,8 @@ class ReplaySessionListSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_end_time(obj):
+        if obj.end_time is None:
+            return 0
         return obj.end_time.timestamp()
 
     class Meta:

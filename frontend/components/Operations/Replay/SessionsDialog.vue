@@ -20,9 +20,9 @@ const sessions = computed(() => {
   )
 })
 
-const selectSession = (session: ListingReplaySession) => {
+const selectSession = async (session: ListingReplaySession) => {
   isLoading.value = true
-  replayStore.loadSession(session.id)
+  await replayStore.loadSession(session.id)
   isLoading.value = false
 
   replayStore.isDialogSessionsOpen = false

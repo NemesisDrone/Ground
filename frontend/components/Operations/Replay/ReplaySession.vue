@@ -57,13 +57,6 @@ const pause = () => {
   console.log('paused')
 }
 
-const stop = () => {
-  replayStore.isPlaying = false
-  replayStore.currentTime = replayStore.frames[0].index
-  replayStore.lastFrameIndex = -1
-  console.log('stopped')
-}
-
 const selectedIntervalReplayMultiple = ref(1)
 // When the page is unmounted, we stop the interval
 const continueInterval = ref(true)
@@ -104,7 +97,6 @@ const eventKeyboard = (e: KeyboardEvent) => {
 }
 
 onMounted(() => {
-  replayStore.getSessions()
   if (replayStore.frames.length === 0) return
   replayStore.currentTime = replayStore.frames[0].index
   replayStore.lastFrameIndex = -1

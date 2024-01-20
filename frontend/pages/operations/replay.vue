@@ -16,12 +16,13 @@ const replayStore = useReplayStore()
 const isLoading = ref(false)
 
 onMounted(async () => {
+  // Open the dialog to select a session if there is no session selected
+  if (replayStore.currentSession === null)
+    replayStore.isDialogSessionsOpen = true
+
   isLoading.value = true
   await replayStore.getSessions()
   isLoading.value = false
-
-  // Open the dialog to select a session
-  replayStore.isDialogSessionsOpen = true
 })
 </script>
 <template>
