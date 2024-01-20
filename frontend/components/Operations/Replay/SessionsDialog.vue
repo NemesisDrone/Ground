@@ -2,6 +2,7 @@
 import { useReplayStore } from '~/store/replayStore'
 import { ListingReplaySession, ReplaySession } from '~/types/replay.types'
 import Overlay from '~/components/ui/overlay/Overlay.vue'
+import { Trash } from 'lucide-vue-next'
 import {
   formatTime,
   getDurationBetweenTimestampsFormat
@@ -26,6 +27,15 @@ const selectSession = (session: ListingReplaySession) => {
 
   replayStore.isDialogSessionsOpen = false
 }
+
+const deleteSession = async (session: ListingReplaySession) => {
+  isLoading.value = true
+
+  await replayStore.deleteSession(session.id)
+  await replayStore.getSessions()
+
+  isLoading.value = false
+}
 </script>
 
 <template>
@@ -49,6 +59,7 @@ const selectSession = (session: ListingReplaySession) => {
               <UiTableHead> Name </UiTableHead>
               <UiTableHead> Date </UiTableHead>
               <UiTableHead> Duration </UiTableHead>
+              <UiTableHead> Action </UiTableHead>
             </UiTableRow>
           </UiTableHeader>
           <UiTableBody>
@@ -74,9 +85,34 @@ const selectSession = (session: ListingReplaySession) => {
                   )
                 }}
               </UiTableCell>
+              <UiTableCell>
+                <UiDialog>
+                  <UiDialogTrigger>
+                    <Trash :size="18" class="m-2 text-red-600" />
+                  </UiDialogTrigger>
+                  <UiDialogContent>
+                    <UiDialogHeader>
+                      <UiDialogTitle>
+                        Are you sure you want to delete this session?
+                      </UiDialogTitle>
+                    </UiDialogHeader>
+                    <UiDialogFooter>
+                      <UiDialogClose as-child>
+                        <UiButton
+                          type="button"
+                          variant="destructive"
+                          @click="deleteSession(session)"
+                        >
+                          Delete
+                        </UiButton>
+                      </UiDialogClose>
+                    </UiDialogFooter>
+                  </UiDialogContent>
+                </UiDialog>
+              </UiTableCell>
             </UiTableRow>
             <UiTableRow v-if="sessions.length === 0" class="text-center">
-              <UiTableCell colspan="3"> No sessions found </UiTableCell>
+              <UiTableCell colspan="4"> No sessions found </UiTableCell>
             </UiTableRow>
           </UiTableBody>
         </UiTable>
