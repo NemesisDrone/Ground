@@ -7,7 +7,9 @@ import {
   Ban,
   Clock10,
   PauseCircle,
-  RotateCcw
+  RotateCcw,
+  Aperture,
+  Undo2
 } from 'lucide-vue-next'
 import { formatTimer } from '~/helpers/utils'
 import AltitudeChart from '~/components/Operations/Replay/AltitudeChart.vue'
@@ -38,18 +40,16 @@ Udate the drone position, the drone direction, the drone model position, the dro
  to the matched time
  */
 const updateReplay = () => {
-  const frameIndex = replayStore.getNearestFrameIndex(
-    replayStore.currentTime
+  const currentFrameIndex = replayStore.frames.findIndex(
+    (frame) => frame.index === replayStore.currentTime
   )
 
-  // If there is no new frame, don't update
-  if (frameIndex === replayStore.lastFrameIndex) return
+  if (!currentFrameIndex) return
+  replayStore.lastFrameIndex = currentFrameIndex
 
-  // Update the last frame index
-  replayStore.lastFrameIndex = frameIndex
-  replayStore.currentFrame = replayStore.frames[frameIndex]
+  replayStore.currentFrame = replayStore.frames[currentFrameIndex]
 
-  // console.log(replayStore.frames[frameIndex])
+  console.log(replayStore.currentFrame)
 }
 
 const pause = () => {
@@ -67,6 +67,7 @@ const stop = () => {
 const selectedIntervalReplayMultiple = ref(1)
 // When the page is unmounted, we stop the interval
 const continueInterval = ref(true)
+
 /**
  * The next function is used to update the current time if the replay is playing
  * We use a setTimeout to call the function every 100ms and to be able to change the interval
@@ -78,14 +79,13 @@ const updateIntervalFunction = () => {
     100 / selectedIntervalReplayMultiple.value
   )
   if (!replayStore.isPlaying) return
-
   if (replayStore.lastFrameIndex === replayStore.frames.length - 1) {
     replayStore.isPlaying = false
     return
   }
 
   // Update the current time
-  replayStore.currentTime += 100
+  replayStore.currentTime += 10
   sliderTime.value = [replayStore.currentTime]
 }
 setTimeout(
@@ -157,10 +157,16 @@ const isReplayEnd = computed(() => {
                 replayStore.frames[replayStore.frames.length - 1].index
               "
               :min="replayStore.frames[0].index"
-              :step="100"
+              :step="10"
             />
           </div>
           <div class="w-full flex gap-2">
+            <div
+              class="rounded bg-neutral-900 items-center justify-center hover:bg-neutral-800 cursor-pointer"
+              @click="replayStore.isDialogSessionsOpen = true"
+            >
+              <Undo2 :size="22" class="m-2" />
+            </div>
             <div
               v-if="replayStore.frames.length > 0"
               class="rounded bg-neutral-900 flex p-2 items-center"

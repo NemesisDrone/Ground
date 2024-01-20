@@ -51,7 +51,7 @@ for i in range(0, 136):
         index=i * 10,
         latitude=-0.7563779,
         longitude=48.0879123,
-        altitude=0,
+        altitude=100,
         speed=0,
         roll=0,
         pitch=0,
@@ -63,7 +63,7 @@ for i in range(0, 136):
         if last_replay_data is not None:
             replay_data.altitude = last_replay_data.altitude + 1
         else:
-            replay_data.altitude = 0
+            replay_data.altitude = 100
 
         if last_replay_data is not None:
             replay_data.latitude = last_replay_data.latitude + 0.0001
@@ -74,7 +74,7 @@ for i in range(0, 136):
         if last_replay_data is not None:
             replay_data.altitude = last_replay_data.altitude
         else:
-            replay_data.altitude = 0
+            replay_data.altitude = 100
 
         if last_replay_data is not None:
             replay_data.latitude = last_replay_data.latitude

@@ -9,24 +9,13 @@ onMounted(async () => {
 const replayStore = useReplayStore()
 
 const altitudeData = computed(() => {
-  const series = [
-    { name: 'Altitude by frame', data: [] as number[] },
-    { name: 'Altitude', data: [] as number[] }
-  ]
+  const series = [{ name: 'Altitude', data: [] as number[] }]
   const labels: string[] = []
 
-  // if true then we had the altitude in 'Altitude by frame'
-  let addInAltitudeByFrame = true
   replayStore.frames.forEach((frame, index) => {
-    series[1].data.push(frame.altitude)
+    series[0].data.push(frame.altitude)
 
-    if (addInAltitudeByFrame) {
-      series[0].data.push(frame.altitude)
-      if (index === replayStore.lastFrameIndex)
-        addInAltitudeByFrame = false
-    }
-
-    labels.push(`${Math.round((frame.time / 1000) * 100) / 100}s`)
+    labels.push(`${Math.round((frame.index / 100) * 100) / 100}s`)
   })
 
   return {

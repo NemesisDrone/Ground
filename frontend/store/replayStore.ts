@@ -34,18 +34,6 @@ export const useReplayStore = defineStore('replay', {
         return []
       }
       return state.currentSession.data
-    },
-
-    getNearestFrameIndex: (state) => (time: number) => {
-      let nearest = state.lastFrameIndex
-
-      for (let i = 0; i < state.frames.length; i++) {
-        if (state.frames[i].index >= time) {
-          break
-        }
-        nearest = i
-      }
-      return nearest
     }
   },
 
@@ -68,6 +56,10 @@ export const useReplayStore = defineStore('replay', {
         `/api/replay/sessions/${id}/`
       )
       this.currentSession = data
+
+      if (this.currentSession.data.length > 0) {
+        this.currentFrame = this.currentSession.data[0]
+      }
     },
 
     /*
