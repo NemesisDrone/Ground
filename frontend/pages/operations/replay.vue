@@ -25,9 +25,21 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <Overlay :show="isLoading">
-    <SessionsDialog />
-    <ReplaySession />
+  <SessionsDialog />
+  <Overlay :show="isLoading" class="h-full">
+    <ReplaySession v-if="replayStore.currentSession !== null" />
+    <div
+      v-else
+      class="h-[100vh] flex flex-col justify-center items-center"
+    >
+      <div class="text-2xl">No session selected</div>
+      <UiButton
+        class="mt-4"
+        @click="replayStore.isDialogSessionsOpen = true"
+      >
+        Select a session
+      </UiButton>
+    </div>
   </Overlay>
 </template>
 
