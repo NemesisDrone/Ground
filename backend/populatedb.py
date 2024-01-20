@@ -25,6 +25,30 @@ DroneSettings().save()
 print("Drone settings created")
 
 """
+Create monitoring images
+"""
+from apps.drone.models import DroneImage
+from django.core.files import File
+DroneImage.objects.all().delete()
+
+image = DroneImage()
+image.image.save("img1.jpg", File(open("/app/tmp/images/img1.jpg", "rb")))
+image.save()
+
+image = DroneImage()
+image.image.save("img2.jpg", File(open("/app/tmp/images/img2.jpg", "rb")))
+image.save()
+
+image = DroneImage()
+image.image.save("img3.jpg", File(open("/app/tmp/images/img3.jpg", "rb")))
+image.save()
+
+image = DroneImage()
+image.image.save("img4.jpg", File(open("/app/tmp/images/img4.jpg", "rb")))
+image.save()
+
+
+"""
 Create a replay session
 """
 from apps.replay.models import ReplaySession, ReplaySessionData
