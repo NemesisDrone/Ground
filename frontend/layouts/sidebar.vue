@@ -42,7 +42,7 @@ onMounted(() => {
   ws.onMessage('sensors:gps', (event) => {
     sensorsStore.gpsPosition = event.data
   })
-  ws.onMessage('sensors:full', (event) => {
+  ws.onMessage('sensors:sense_hat:data', (event) => {
     sensorsStore.full = event.data
   })
   ws.onMessage('log', (event) => {

@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Operations/GPSMap.vue'
-import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
-import SpeedGauge from '~/components/Operations/SpeedGauge.vue'
-import Altitude from '~/components/Operations/Altitude.vue'
-import Battery from '~/components/Operations/Battery.vue'
-import PropulsorSpeed from '~/components/Operations/PropulsorSpeed.vue'
-import LogsViewer from '~/components/Operations/LogsViewer.vue'
+import GPSMap from '~/components/Operations/Dashboard/GPSMap.vue'
+import VideoStreaming from '~/components/Operations/Dashboard/VideoStreaming.vue'
+import SpeedGauge from '~/components/Operations/Dashboard/SpeedGauge.vue'
+import Altitude from '~/components/Operations/Dashboard/Altitude.vue'
+import Battery from '~/components/Operations/Dashboard/Battery.vue'
+import PropulsorSpeed from '~/components/Operations/Dashboard/PropulsorSpeed.vue'
+import LogsViewer from '~/components/Operations/Dashboard/LogsViewer.vue'
 import { useComponentsStore } from '~/store/components'
-import ComponentStatus from '~/components/Operations/ComponentStatus.vue'
-import DroneViewer from '~/components/Operations/DroneViewer.vue'
-import DroneStatusConnection from '~/components/Operations/DroneStatusConnection.vue'
+import ComponentStatus from '~/components/Operations/Dashboard/ComponentStatus.vue'
+import DroneViewer from '~/components/Operations/Dashboard/DroneViewer.vue'
+import DroneStatusConnection from '~/components/Operations/Dashboard/DroneStatusConnection.vue'
 import {
   Gamepad2,
   Locate,

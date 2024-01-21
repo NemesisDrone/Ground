@@ -12,14 +12,14 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger
-} from '@/components/ui/popover'
+} from '~/components/ui/popover'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '@/components/ui/tooltip'
-import { Separator } from '@/components/ui/separator'
+} from '~/components/ui/tooltip'
+import { Separator } from '~/components/ui/separator'
 import { useComponentsStore } from '~/store/components'
 
 const componentsStore = useComponentsStore()

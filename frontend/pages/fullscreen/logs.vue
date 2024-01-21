@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LogsViewer from '~/components/Operations/LogsViewer.vue'
+import LogsViewer from '~/components/Operations/Dashboard/LogsViewer.vue'
 definePageMeta({
   layout: 'sidebar'
 })
