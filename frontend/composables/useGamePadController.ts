@@ -59,7 +59,7 @@ export const useGamepadController = () => {
         if (pitch < 0.01 && pitch > -0.01) pitch = 0
 
         if (roll !== lastRoll || pitch !== lastPitch) {
-          componentsStore.websocket?.send({
+          componentsStore.communicationWebsocket?.send({
             route: 'controller',
             data: {
               roll,
@@ -117,7 +117,7 @@ export const useGamepadController = () => {
         if (
           propulsionSpeed !== componentsStore.propulsionController.speed
         ) {
-          componentsStore.websocket?.send({
+          componentsStore.communicationWebsocket?.send({
             route: 'propulsion',
             data: {
               speed: propulsionSpeed

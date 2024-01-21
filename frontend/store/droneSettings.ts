@@ -17,7 +17,7 @@ export const useDroneSettingsStore = defineStore('droneSettings', {
 
   actions: {
     async sendDroneConfig() {
-      const ws = useComponentsStore().websocket
+      const ws = useComponentsStore().communicationWebsocket
       if (ws) {
         ws.send({
           route: 'config',

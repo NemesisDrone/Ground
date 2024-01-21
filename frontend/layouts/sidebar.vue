@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
 import { useSensorsStore } from '~/store/sensors'
 import { useLogsStore } from '~/store/logs'
 import { useComponentsStore } from '~/store/components'
@@ -12,48 +11,14 @@ import {
   Camera,
   Repeat1
 } from 'lucide-vue-next'
-import { useDroneSettingsStore } from '~/store/droneSettings'
+import { useCommunicationWebsocket } from '~/composables/communicationWebsocket'
 
-let ws: WebSocketWrapper | null = null
-const droneStore = useComponentsStore()
-const sensorsStore = useSensorsStore()
-const logsStore = useLogsStore()
+const { close: closeCommunicationWebSocket } = useCommunicationWebsocket()
 
 let controllerAxesInterval: NodeJS.Timeout | null = null
 let controllerButtonsInterval: NodeJS.Timeout | null = null
-onMounted(() => {
-  /**
-   * Create a new WebSocketWrapper instance
-   * and provide it to the whole application
-   * Add callbacks to handle incoming messages
-   */
-  ws = new WebSocketWrapper(
-    useRuntimeConfig().public.WEB_SOCKET_COMMUNICATION_URL as string
-  )
-  ws.onMessage('sensors:altitude', (event) => {
-    sensorsStore.altitude = event.data
-  })
-  ws.onMessage('sensors:battery', (event) => {
-    sensorsStore.battery = event.data
-  })
-  ws.onMessage('sensors:speed', (event) => {
-    sensorsStore.speed = event.data
-  })
-  ws.onMessage('sensors:gps', (event) => {
-    sensorsStore.gpsPosition = event.data
-  })
-  ws.onMessage('sensors:sense_hat:data', (event) => {
-    sensorsStore.full = event.data
-  })
-  ws.onMessage('log', (event) => {
-    logsStore.logs.push(event.data)
-    if (logsStore.logs.length > 1000) logsStore.logs.splice(0, 200)
-  })
-  ws.onMessage('drone:connection-status', (event) => {
-    droneStore.connectionStatus = event.data
-  })
-  droneStore.websocket = ws
 
+onMounted(() => {
   const { controllerGetAxesInterval, controllerGetButtonsInterval } =
     useGamepadController()
   controllerAxesInterval = controllerGetAxesInterval
@@ -61,7 +26,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  ws?.close()
+  closeCommunicationWebSocket()
 
   if (controllerAxesInterval) clearInterval(controllerAxesInterval)
   if (controllerButtonsInterval) clearInterval(controllerButtonsInterval)

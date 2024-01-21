@@ -38,5 +38,6 @@ export default defineNuxtConfig({
       extensions: ['.vue'],
       prefix: 'Ui'
     }
-  ]
+  ],
+  ssr: false
 })

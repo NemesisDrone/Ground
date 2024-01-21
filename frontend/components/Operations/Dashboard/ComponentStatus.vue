@@ -79,10 +79,10 @@ const IconFromStatus = computed(() => {
 
 // watch for changes in websocket
 watch(
-  () => componentsStore.websocket,
+  () => componentsStore.communicationWebsocket,
   () => {
     if (props.component.routeSlug) {
-      componentsStore.websocket?.onMessage(
+      componentsStore.communicationWebsocket?.onMessage(
         [
           `state:${props.component.routeSlug}:started`,
           `state:${props.component.routeSlug}:running`
@@ -92,7 +92,7 @@ watch(
         }
       )
 
-      componentsStore.websocket?.onMessage(
+      componentsStore.communicationWebsocket?.onMessage(
         [`state:${props.component.routeSlug}:stopped`],
         (event: any) => {
           props.component.status = ComponentsState.STOPPED
@@ -103,7 +103,7 @@ watch(
 )
 
 const startComponent = () => {
-  componentsStore.websocket?.send({
+  componentsStore.communicationWebsocket?.send({
     route: `state:start:${props.component.routeSlug}`,
     data: {
       component: props.component.routeSlug
@@ -112,7 +112,7 @@ const startComponent = () => {
 }
 
 const stopComponent = () => {
-  componentsStore.websocket?.send({
+  componentsStore.communicationWebsocket?.send({
     route: `state:stop:${props.component.routeSlug}`,
     data: {
       component: props.component.routeSlug
@@ -121,7 +121,7 @@ const stopComponent = () => {
 }
 
 const restartComponent = () => {
-  componentsStore.websocket?.send({
+  componentsStore.communicationWebsocket?.send({
     route: `state:restart:${props.component.routeSlug}`,
     data: {
       component: props.component.routeSlug
