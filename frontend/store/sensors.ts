@@ -14,19 +14,7 @@ export const useSensorsStore = defineStore('sensors', {
       timestamp: 0,
       roll: 0,
       pitch: 0,
-      yaw: 90,
-      gyroRoll: 0,
-      gyroPitch: 0,
-      gyroYaw: 0,
-      accelX: 0,
-      accelY: 0,
-      accelZ: 0,
-      compassX: 0,
-      compassY: 0,
-      compassZ: 0,
-      pressure: 0,
-      temperature: 0,
-      humidity: 0
+      yaw: 90
     }
   })
 })

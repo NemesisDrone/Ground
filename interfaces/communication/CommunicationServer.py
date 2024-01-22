@@ -73,6 +73,7 @@ def handle_reception(client_socket):
     :param client_socket: The socket to use to receive messages
     """
     logging.info("Thread Handle Reception started")
+    message = None
     while True:
         try:
             message_length_bytes = client_socket.recv(4)
@@ -93,7 +94,7 @@ def handle_reception(client_socket):
                 r.publish("communication_forwarding", message)
 
         except Exception as e:
-            logging.error("Reception error: %s", e)
+            logging.error("Reception error: %s, message: ", e, message)
             publish_drone_connection_status(False)
             break
 

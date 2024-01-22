@@ -34,6 +34,7 @@ pubsub.subscribe("communication_forwarding")
 
 logging.info("Starting communication forwarder")
 while True:
+    message = None
     try:
         message = pubsub.get_message(ignore_subscribe_messages=True)
         if message:
@@ -63,4 +64,4 @@ while True:
             logging.critical("Drone disconnected")
 
     except Exception as e:
-        logging.error("Error: %s", e)
+        logging.error("Error: %s with message: ", e, message)
