@@ -93,10 +93,15 @@ def handle_reception(client_socket):
                 # logging.debug("from socket: %s", message)
                 r.publish("communication_forwarding", message)
 
-        except Exception as e:
-            logging.error("Reception error: %s, message: ", e, message)
+        except OSError as e:
+            logging.error("Reception error: %s, message: %s", e, message)
             publish_drone_connection_status(False)
             break
+
+        except Exception as e:
+            logging.error("Reception error: %s, message: %s", e, message)
+            # publish_drone_connection_status(False)
+            # break
 
 
 class CommunicationServer:
