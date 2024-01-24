@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useDroneSettingsStore } from '~/store/droneSettings'
 import { useToast } from '~/components/ui/toast'
-import { LogOut } from 'lucide-vue-next'
-import { useUserStore } from '~/store/user'
+import LogOut from '~/components/Operations/Settings/LogOut.vue'
 
 definePageMeta({
   layout: 'sidebar',
@@ -18,10 +17,10 @@ const localCanals = ref<{ canal: number; gpios: string }[]>([])
 
 onMounted(async () => {
   await droneSettingsStore.getSettings()
-  localCanals.value = droneSettingsStore.canals.map((canal) => ({
-    canal: canal.canal,
-    gpios: canal.gpios.join(', ')
-  }))
+  // localCanals.value = droneSettingsStore.canals.map((canal) => ({
+  //   canal: canal.canal,
+  //   gpios: canal.gpios.join(', ')
+  // }))
 })
 
 const updateSettings = async () => {
@@ -37,23 +36,16 @@ const updateSettings = async () => {
 
   isLoading.value = false
 }
-
-const isLogOutLoading = ref(false)
-const logOut = async () => {
-  isLogOutLoading.value = true
-
-  await useUserStore().logOut()
-  useRouter().push('/?disconnected')
-
-  isLogOutLoading.value = false
-}
 </script>
 
 <template>
   <div>
     <div class="p-4">
       <h1 class="text-3xl">Settings</h1>
-      <p>Temporary raw settings.</p>
+      <p>
+        TEMPORARY SETTINGS PAGE. This page will be developped/designed
+        correctly later
+      </p>
       <div class="w-[600px] mt-4">
         <UiTable>
           <UiTableHeader>
@@ -76,31 +68,7 @@ const logOut = async () => {
         </div>
       </div>
       <div class="mt-3">
-        <UiDialog>
-          <UiDialogTrigger>
-            <UiButton variant="destructive">
-              <LogOut :size="18" class="mr-2" />
-              Log out
-            </UiButton>
-          </UiDialogTrigger>
-          <UiDialogContent>
-            <UiDialogHeader>
-              <UiDialogTitle>Log out?</UiDialogTitle>
-              <UiDialogDescription>
-                You will be logged out. You can log in again.
-              </UiDialogDescription>
-            </UiDialogHeader>
-            <UiDialogFooter>
-              <UiButton
-                variant="destructive"
-                @click="logOut"
-                :is-loading="isLogOutLoading"
-              >
-                Confirm
-              </UiButton>
-            </UiDialogFooter>
-          </UiDialogContent>
-        </UiDialog>
+        <LogOut />
       </div>
     </div>
   </div>
