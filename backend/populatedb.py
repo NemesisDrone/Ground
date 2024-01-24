@@ -22,10 +22,24 @@ def add_drone_settings():
     """
     Create a drone settings in the database
     """
-    from apps.drone.models import DroneSettings
+    from apps.drone.models import DroneSettings, DroneModelSettings
     DroneSettings.objects.all().delete()
-    DroneSettings().save()
+    DroneModelSettings.objects.all().delete()
+
+    drone_settings = DroneSettings.objects.create(
+        selected_drone_model=None
+    )
+    drone_model_settings = DroneModelSettings(
+        name="Model 1",
+        prediction_model="model-1",
+        drone_settings=drone_settings
+    )
+    drone_model_settings.save()
+    drone_settings.selected_drone_model = drone_model_settings
+    drone_settings.save()
+
     print("Drone settings created")
+
 
 def add_monitoring_images():
     """
