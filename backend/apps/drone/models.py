@@ -32,6 +32,20 @@ class DroneModelSettings(BaseModel):
 class DroneSettings(BaseModel):
     selected_drone_model = models.ForeignKey("DroneModelSettings", on_delete=models.CASCADE, related_name="drone_related_settings", null=True)
 
+    def get_current_config(self):
+        """
+        This method is used to get the config of the drone model as a payload to send to the drone
+        :return: The config
+        """
+        if not self.selected_drone_model:
+            return None
+
+        return {
+            "name": self.selected_drone_model.name,
+            "servo_canals": self.selected_drone_model.servo_canals,
+            "brushless_canals": self.selected_drone_model.brushless_canals
+        }
+
     objects = models.Manager()
 
 

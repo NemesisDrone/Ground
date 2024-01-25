@@ -62,11 +62,17 @@ const updateDroneSettingsModel = async (model: LocalModel) => {
     ...model,
     servo_canals: model.servo_canals.map((canal) => ({
       canal: canal.canal,
-      gpios: canal.gpios.split(';').map((gpio) => parseInt(gpio.trim()))
+      gpios: canal.gpios
+        .split(';')
+        .map((gpio) => parseInt(gpio.trim()))
+        .filter((gpio) => !isNaN(gpio))
     })),
     brushless_canals: model.brushless_canals.map((canal) => ({
       canal: canal.canal,
-      gpios: canal.gpios.split(';').map((gpio) => parseInt(gpio.trim()))
+      gpios: canal.gpios
+        .split(';')
+        .map((gpio) => parseInt(gpio.trim()))
+        .filter((gpio) => !isNaN(gpio))
     }))
   }
 
@@ -126,11 +132,17 @@ const createDroneSettingsModel = async () => {
     name: newModel.value.name,
     servo_canals: newModel.value.servo_canals.map((canal) => ({
       canal: canal.canal,
-      gpios: canal.gpios.split(';').map((gpio) => parseInt(gpio.trim()))
+      gpios: canal.gpios
+        .split(';')
+        .map((gpio) => parseInt(gpio.trim()))
+        .filter((gpio) => !isNaN(gpio))
     })),
     brushless_canals: newModel.value.brushless_canals.map((canal) => ({
       canal: canal.canal,
-      gpios: canal.gpios.split(';').map((gpio) => parseInt(gpio.trim()))
+      gpios: canal.gpios
+        .split(';')
+        .map((gpio) => parseInt(gpio.trim()))
+        .filter((gpio) => !isNaN(gpio))
     })),
     drone_settings: droneSettingsStore.id
   }

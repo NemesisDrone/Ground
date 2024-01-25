@@ -20,6 +20,8 @@ sys.path.append("../")
 sys.path.append("./")
 django.setup()
 
+from apps.drone.models import DroneSettings
+
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
 
@@ -32,6 +34,7 @@ class DroneMessagesHandler:
     - Answer to heartbeat
 
     """
+
     def __init__(self) -> None:
         self.redis = redis.Redis(
             host=os.environ.get("REDIS_HOST"),
@@ -47,23 +50,30 @@ class DroneMessagesHandler:
 
         self._worker()
 
-    def _forward_message(self, message: Dict) -> None:
+    def _send_to_frontend(self, message: Dict) -> None:
         """
-        Forward a message to the frontend
+        Send a message to the frontend
         """
         payload = {"type": "communication.message", "message": message}
 
         async_to_sync(self.channel_layer.group_send)(self.group_name, payload)
+
+    def _send_to_drone(self, message: Dict) -> None:
+        """
+        Send a message to the drone
+        """
+        self.redis.publish("actions", json.dumps(message))
 
     def _check_connection_status(self) -> None:
         """
         Check if the time since the last heartbeat is more than 3 seconds.
         If so, set the drone as disconnected
         """
-        if time.time() - float(self.redis.get("LAST_HEARTBEAT_RECEIVED")) > 3 and int(
-            self.redis.get("IS_DRONE_CONNECTED")
-        ) == 1:
-            self._forward_message(
+        if (
+            time.time() - float(self.redis.get("LAST_HEARTBEAT_RECEIVED")) > 3
+            and int(self.redis.get("IS_DRONE_CONNECTED")) == 1
+        ):
+            self._send_to_frontend(
                 {
                     "type": "drone:connection-status",
                     "data": {"connected": False},
@@ -71,6 +81,22 @@ class DroneMessagesHandler:
             )
             self.redis.set("IS_DRONE_CONNECTED", 0)
             logging.critical("Drone disconnected")
+
+    def _send_config(self) -> None:
+        """
+        Send the config to the drone
+        """
+        config = DroneSettings.objects.get().get_current_config()
+        self._send_to_drone({"route": "config:data", "data": config})
+        print("Sending config to drone")
+
+    def _handle_message_answer(self, message: Dict) -> None:
+        """
+        Handle the message answer
+        """
+        match message["type"]:
+            case "config:get":
+                self._send_config()
 
     def _worker(self) -> None:
         logging.info("Starting communication forwarder")
@@ -83,13 +109,17 @@ class DroneMessagesHandler:
                 if message:
                     data = json.loads(message["data"])
                     # Forward the message to the frontend
-                    self._forward_message(data)
+                    self._send_to_frontend(data)
+                    # Handle the message answer
+                    self._handle_message_answer(data)
 
                 # Check whether the drone is connected or not
                 self._check_connection_status()
 
             except Exception as e:
-                logging.error(f"Error while handling drone message: {e}.\nWith message: {message}")
+                logging.error(
+                    f"Error while handling drone message: {e}.\nWith message: {message}"
+                )
 
 
 if __name__ == "__main__":
