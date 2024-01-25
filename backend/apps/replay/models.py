@@ -27,7 +27,7 @@ class ReplaySession(BaseModel):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(null=True)
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, null=True, blank=True)
 
     objects = models.Manager()
 

@@ -31,7 +31,6 @@ def add_drone_settings():
     )
     drone_model_settings = DroneModelSettings(
         name="Model 1",
-        prediction_model="model-1",
         drone_settings=drone_settings
     )
     drone_model_settings.save()

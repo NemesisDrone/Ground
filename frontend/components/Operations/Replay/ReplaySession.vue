@@ -9,7 +9,8 @@ import {
   PauseCircle,
   RotateCcw,
   Aperture,
-  Undo2
+  Undo2,
+  FilePenLine
 } from 'lucide-vue-next'
 import { formatTimer } from '~/helpers/utils'
 import AltitudeChart from '~/components/Operations/Replay/AltitudeChart.vue'
