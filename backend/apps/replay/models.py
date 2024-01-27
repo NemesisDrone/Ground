@@ -3,7 +3,9 @@ from ..core.models import BaseModel
 
 
 class ReplaySessionData(BaseModel):
-    session = models.ForeignKey("ReplaySession", on_delete=models.CASCADE, related_name="data")
+    session = models.ForeignKey(
+        "ReplaySession", on_delete=models.CASCADE, related_name="data"
+    )
 
     # From timestamp in tenths of seconds
     index = models.IntegerField()

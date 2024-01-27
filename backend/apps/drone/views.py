@@ -4,7 +4,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .serializers import DroneSettingsSerializer, DroneImageSerializer, DroneModelSettingsSerializer
+from .serializers import (
+    DroneSettingsSerializer,
+    DroneImageSerializer,
+    DroneModelSettingsSerializer,
+)
 
 from .models import DroneSettings, DroneImage, DroneModelSettings
 
@@ -28,7 +32,9 @@ def update_selected_drone_settings_model(request: Request):
     """
     drone_settings = DroneSettings.objects.first()
 
-    serializer = DroneSettingsSerializer(drone_settings, data=request.data, partial=True)
+    serializer = DroneSettingsSerializer(
+        drone_settings, data=request.data, partial=True
+    )
     serializer.is_valid(raise_exception=True)
     serializer.save()
 
@@ -41,7 +47,8 @@ class DroneSettingsModelViewSet(viewsets.ModelViewSet):
     """
     This viewset is used to list all the drone settings model, and to create new ones or delete/update them.
     """
-    queryset = DroneModelSettings.objects.all().order_by('-created_at')
+
+    queryset = DroneModelSettings.objects.all().order_by("-created_at")
     serializer_class = DroneModelSettingsSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -59,6 +66,7 @@ class DroneImagesViewSet(viewsets.ModelViewSet):
     """
     This viewset is used to list all the drone images, and to create new ones or delete them.
     """
-    queryset = DroneImage.objects.all().order_by('-created_at')
+
+    queryset = DroneImage.objects.all().order_by("-created_at")
     serializer_class = DroneImageSerializer
     permission_classes = [permissions.IsAuthenticated]

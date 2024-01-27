@@ -2,10 +2,16 @@ from datetime import timedelta
 import django
 import argparse
 
-parser = argparse.ArgumentParser(description='Create a big replay session.')
-parser.add_argument('--nb', type=int, default=136, help='Number of replay_data to create')
-parser.add_argument('--name', type=str, default="Test big session", help='Name of the session')
-parser.add_argument('--clear', action='store_true', help='Clear the database before populating it')
+parser = argparse.ArgumentParser(description="Create a big replay session.")
+parser.add_argument(
+    "--nb", type=int, default=136, help="Number of replay_data to create"
+)
+parser.add_argument(
+    "--name", type=str, default="Test big session", help="Name of the session"
+)
+parser.add_argument(
+    "--clear", action="store_true", help="Clear the database before populating it"
+)
 
 args = parser.parse_args()
 
@@ -139,7 +145,7 @@ for i in range(0, args.nb):
     last_replay_data = replay_data
     replay_data.save()
 
-session.end_time = session_beginning + timedelta(seconds=args.nb/10)
+session.end_time = session_beginning + timedelta(seconds=args.nb / 10)
 session.name = args.name
 session.save()
 

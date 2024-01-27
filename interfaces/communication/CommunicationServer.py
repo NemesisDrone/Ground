@@ -7,9 +7,14 @@ import redis
 import logging
 import time
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
-r = redis.Redis(host=os.environ.get("REDIS_HOST"), port=os.environ.get("REDIS_PORT"), decode_responses=True, db=0)
+r = redis.Redis(
+    host=os.environ.get("REDIS_HOST"),
+    port=os.environ.get("REDIS_PORT"),
+    decode_responses=True,
+    db=0,
+)
 r.set("IS_DRONE_CONNECTED", 0)
 r.set("LAST_HEARTBEAT_RECEIVED", 0)
 r.set("LAST_HEARTBEAT_SENT", 0)
@@ -22,12 +27,10 @@ def publish_drone_connection_status(status: bool) -> None:
     Publish the drone connection status on REDIS.
     """
     r.set("IS_DRONE_CONNECTED", int(status))
-    r.publish("communication_forwarding", json.dumps({
-        "type": "drone:connection-status",
-        "data": {
-            "connected": status
-        }
-    }))
+    r.publish(
+        "communication_forwarding",
+        json.dumps({"type": "drone:connection-status", "data": {"connected": status}}),
+    )
 
     if not status:
         logging.critical("Drone disconnected")
@@ -49,13 +52,13 @@ def handle_emission(client_socket):
                 message = message["data"]
                 logging.debug("from redis: %s", message)
                 data = json.dumps(message)
-                client_socket.send(len(data).to_bytes(4, byteorder='big'))
+                client_socket.send(len(data).to_bytes(4, byteorder="big"))
                 client_socket.send(data.encode())
 
             # Wait 3 seconds before sending another heartbeat
             if time.time() - float(r.get("LAST_HEARTBEAT_SENT")) > 1.5:
                 time.sleep(0.1)
-                client_socket.send(len("heartbeat").to_bytes(4, byteorder='big'))
+                client_socket.send(len("heartbeat").to_bytes(4, byteorder="big"))
                 client_socket.send("heartbeat".encode())
                 r.set("LAST_HEARTBEAT_SENT", time.time())
                 logging.debug("Heartbeat sent")
@@ -77,7 +80,7 @@ def handle_reception(client_socket):
     while True:
         try:
             message_length_bytes = client_socket.recv(4)
-            message_length = int.from_bytes(message_length_bytes, byteorder='big')
+            message_length = int.from_bytes(message_length_bytes, byteorder="big")
             message = client_socket.recv(message_length).decode()
 
             if message:
@@ -133,7 +136,11 @@ class CommunicationServer:
         thread_emission.start()
 
     def accept_connections(self):
-        logging.info("CommunicationServer - Waiting for connection on %s:%s", self.host, self.port)
+        logging.info(
+            "CommunicationServer - Waiting for connection on %s:%s",
+            self.host,
+            self.port,
+        )
         while True:
             try:
                 client_socket, _ = self.server_socket.accept()
