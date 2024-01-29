@@ -230,7 +230,7 @@ const updateSelectedDroneModel = async (model: LocalModel) => {
             </UiTableHeader>
             <UiTableBody>
               <UiTableRow v-for="i in 10">
-                <UiTableCell>Ch{{ i }}</UiTableCell>
+                <UiTableCell>{{ i }}</UiTableCell>
                 <UiTableCell>
                   <UiInput v-model="model.servo_canals[i - 1].gpios" />
                 </UiTableCell>
@@ -240,6 +240,13 @@ const updateSelectedDroneModel = async (model: LocalModel) => {
               </UiTableRow>
             </UiTableBody>
           </UiTable>
+
+          <UiLabel class="mt-4"> FlightMode Channel </UiLabel>
+          <UiInput
+            class="mt-2"
+            v-model="model.flight_mode_channel"
+            placeholder="FlightMode Channel"
+          />
 
           <div class="mt-4 flex justify-end gap-4">
             <UiButton
