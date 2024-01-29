@@ -8,11 +8,13 @@ django.setup()
 For every model we clear the database before populating it
 """
 
+
 def add_user():
     """
     Create a first user in the database
     """
     from apps.user.models import User
+
     User.objects.all().delete()
     user = User.objects.create_user(identifier="Nemesis", password="nemesis")
     print('User Nemesis with password "nemesis" created')
@@ -23,15 +25,13 @@ def add_drone_settings():
     Create a drone settings in the database
     """
     from apps.drone.models import DroneSettings, DroneModelSettings
+
     DroneSettings.objects.all().delete()
     DroneModelSettings.objects.all().delete()
 
-    drone_settings = DroneSettings.objects.create(
-        selected_drone_model=None
-    )
+    drone_settings = DroneSettings.objects.create(selected_drone_model=None)
     drone_model_settings = DroneModelSettings(
-        name="Model 1",
-        drone_settings=drone_settings
+        name="Model 1", drone_settings=drone_settings
     )
     drone_model_settings.save()
     drone_settings.selected_drone_model = drone_model_settings
@@ -46,6 +46,7 @@ def add_monitoring_images():
     """
     from apps.drone.models import DroneImage
     from django.core.files import File
+
     DroneImage.objects.all().delete()
 
     image = DroneImage()
@@ -73,6 +74,7 @@ def add_replay_session():
     """
     from apps.replay.models import ReplaySession, ReplaySessionData
     from django.utils import timezone
+
     ReplaySession.objects.all().delete()
     ReplaySessionData.objects.all().delete()
 
@@ -196,16 +198,28 @@ def add_replay_session():
     print("Replay session created")
 
 
-parser = argparse.ArgumentParser(description='Populate the database with some data')
-parser.add_argument('--all', action='store_true', help='Populate all the database')
-parser.add_argument('--user', action='store_true', help='Populate the user table')
-parser.add_argument('--drone-settings', action='store_true', help='Populate the drone settings table')
-parser.add_argument('--monitoring', action='store_true', help='Populate the monitoring images table')
-parser.add_argument('--replay', action='store_true', help='Populate the replay session table')
+parser = argparse.ArgumentParser(description="Populate the database with some data")
+parser.add_argument("--all", action="store_true", help="Populate all the database")
+parser.add_argument("--user", action="store_true", help="Populate the user table")
+parser.add_argument(
+    "--drone-settings", action="store_true", help="Populate the drone settings table"
+)
+parser.add_argument(
+    "--monitoring", action="store_true", help="Populate the monitoring images table"
+)
+parser.add_argument(
+    "--replay", action="store_true", help="Populate the replay session table"
+)
 
 args = parser.parse_args()
 
-if not args.all and not args.user and not args.drone_settings and not args.monitoring and not args.replay:
+if (
+    not args.all
+    and not args.user
+    and not args.drone_settings
+    and not args.monitoring
+    and not args.replay
+):
     parser.print_help()
 
 if args.all:
