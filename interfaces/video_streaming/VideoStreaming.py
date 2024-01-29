@@ -3,7 +3,7 @@
 import os
 import gi
 
-gi.require_version('Gst', '1.0')
+gi.require_version("Gst", "1.0")
 from gi.repository import GObject, Gst
 
 import threading
@@ -24,6 +24,7 @@ class NVSState(int):
     """
     @brief Class representing the different states of NVSComponent.
     """
+
     GstInitFail: int = 0
     PipelineCreationFail: int = 1
     SinkLookupFail: int = 2
@@ -54,7 +55,7 @@ class NVSServer:
         # Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
 
         gst_pipeline_str = "udpsrc port=7001 caps="
-        gst_pipeline_str += "\"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\""
+        gst_pipeline_str += '"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96"'
         gst_pipeline_str += " ! rtph264depay ! h264parse ! avdec_h264 ! queue "
         gst_pipeline_str += " ! videoconvert ! jpegenc ! appsink name=sink"
 
@@ -153,7 +154,7 @@ class NVSServer:
                 if ret:
                     # Pending for all clients.
                     for cli in self.clients.items():
-                        if len(cli[1]) < 9:  # Frame not scheduled as there's no more space.
+                        if True:  # Frame not scheduled as there's no more space.
                             cli[1].append(bytes(buffer_map.data))
                     # Just release this frame.
                     gst_buffer.unmap(buffer_map)
@@ -164,6 +165,7 @@ class NVSServer:
                 pass
 
         return Gst.FlowReturn.OK
+
 
 nvss = NVSServer()
 aio.run(nvss.run())
