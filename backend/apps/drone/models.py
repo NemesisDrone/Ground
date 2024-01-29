@@ -21,6 +21,8 @@ class DroneModelSettings(BaseModel):
     # Gpios used for each canal of brushless motors
     brushless_canals = models.JSONField(default=default_canals)
 
+    flight_mode_channel = models.IntegerField(default=7)
+
     objects = models.Manager()
 
     drone_settings = models.ForeignKey(
@@ -36,6 +38,7 @@ class DroneModelSettings(BaseModel):
             "name": self.name,
             "servo_canals": self.servo_canals,
             "brushless_canals": self.brushless_canals,
+            "flight_mode_channel": self.flight_mode_channel,
         }
 
     def send_config_to_drone(self):

@@ -23,7 +23,7 @@ class DroneModelSettingsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DroneModelSettings
-        fields = ("id", "name", "servo_canals", "brushless_canals", "drone_settings")
+        fields = ("id", "name", "servo_canals", "brushless_canals", "drone_settings", "flight_mode_channel")
         read_only_fields = ("id",)
 
 
