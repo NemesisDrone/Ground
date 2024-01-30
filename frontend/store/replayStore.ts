@@ -67,6 +67,15 @@ export const useReplayStore = defineStore('replay', {
      */
     async deleteSession(id: number) {
       await useHttp().delete(`/api/replay/sessions/${id}/`)
+    },
+
+    /*
+     * Update session name
+     */
+    async updateSessionName(id: number, name: string) {
+      await useHttp().patch(`/api/replay/sessions/${id}/`, {
+        name
+      })
     }
   }
 })

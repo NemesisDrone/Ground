@@ -15,6 +15,7 @@ import {
 import { formatTimer } from '~/helpers/utils'
 import AltitudeChart from '~/components/Operations/Replay/AltitudeChart.vue'
 import SpeedChart from '~/components/Operations/Replay/SpeedChart.vue'
+import SessionSettings from '~/components/Operations/Replay/SessionSettings.vue'
 
 const replayStore = useReplayStore()
 
@@ -160,6 +161,7 @@ const isReplayEnd = computed(() => {
             >
               <Undo2 :size="22" class="m-2" />
             </div>
+            <SessionSettings />
             <div
               v-if="replayStore.frames.length > 0"
               class="rounded bg-neutral-900 flex p-2 items-center"
