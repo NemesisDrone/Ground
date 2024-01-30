@@ -59,6 +59,7 @@ export const useReplayStore = defineStore('replay', {
 
       if (this.currentSession.data.length > 0) {
         this.currentFrame = this.currentSession.data[0]
+        this.isPlaying = false
       }
     },
 
