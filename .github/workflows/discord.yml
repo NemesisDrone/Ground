@@ -26,6 +26,5 @@ jobs:
             by **${{ github.actor }}** 
             succeeded! Commit: 
             **${{ github.event.head_commit.message }}**. 
-            [Build details here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
             
             [Link commit](${{ github.event.head_commit.url }})
