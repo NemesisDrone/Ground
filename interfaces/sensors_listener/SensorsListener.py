@@ -1,3 +1,5 @@
 import DjangoSetup
 
-print("Hello world!")
+print("Starting")
+while True:
+    pass

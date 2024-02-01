@@ -2,6 +2,9 @@ import django
 from django.conf import settings
 import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 settings.configure(
     DATABASES={
         "default": {
@@ -15,7 +18,8 @@ settings.configure(
     }
 )
 
-INSTALLED_APPS = []
-
-
 django.setup()
+import sys
+sys.path.append('/app/backend')
+
+from apps.replay import models
