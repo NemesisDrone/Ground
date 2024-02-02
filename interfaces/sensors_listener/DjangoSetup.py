@@ -4,7 +4,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
 settings.configure(
     DATABASES={
         "default": {
@@ -16,11 +15,12 @@ settings.configure(
             "PORT": os.environ.get("DB_PORT"),
         }
     },
-    INSTALLED_APPS=['apps.replay']
+    INSTALLED_APPS=["apps.replay"],
+    TIME_ZONE="Europe/Paris",
+    USE_TZ=True,
 )
 
 import sys
-sys.path.append('../../backend')
-django.setup()
 
-from apps.replay import models
+sys.path.append("../../backend")
+django.setup()

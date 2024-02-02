@@ -30,22 +30,6 @@ useHead({
 
 const componentsStore = useComponentsStore()
 const sensorsStore = useSensorsStore()
-const stop = () => {
-  componentsStore.communicationWebsocket?.send({
-    route: 'state:stop:gps',
-    data: {
-      component: 'gps'
-    }
-  })
-}
-const start = () => {
-  componentsStore.communicationWebsocket?.send({
-    route: 'state:start:gps',
-    data: {
-      component: 'gps'
-    }
-  })
-}
 
 const demoSpeed = (value: number) => {
   componentsStore.communicationWebsocket?.send({
