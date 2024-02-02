@@ -15,11 +15,12 @@ settings.configure(
             "HOST": os.environ.get("DB_HOST"),
             "PORT": os.environ.get("DB_PORT"),
         }
-    }
+    },
+    INSTALLED_APPS=['apps.replay']
 )
 
-django.setup()
 import sys
-sys.path.append('/app/backend')
+sys.path.append('../../backend')
+django.setup()
 
 from apps.replay import models
