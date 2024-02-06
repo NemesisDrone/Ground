@@ -45,7 +45,7 @@ const deleteSession = async (session: ListingReplaySession) => {
   >
     <UiDialogContent>
       <UiDialogHeader>
-        <UiDialogTitle> Select a session </UiDialogTitle>
+        <UiDialogTitle> Select a session</UiDialogTitle>
       </UiDialogHeader>
       <Overlay :show="isLoading">
         <UiInput
@@ -53,69 +53,71 @@ const deleteSession = async (session: ListingReplaySession) => {
           placeholder="Search"
           class="mb-4"
         />
-        <UiTable class="w-full">
-          <UiTableHeader>
-            <UiTableRow>
-              <UiTableHead> Name </UiTableHead>
-              <UiTableHead> Date </UiTableHead>
-              <UiTableHead> Duration </UiTableHead>
-              <UiTableHead> Action </UiTableHead>
-            </UiTableRow>
-          </UiTableHeader>
-          <UiTableBody>
-            <UiTableRow
-              v-for="session in sessions"
-              :key="session.id"
-              class="cursor-pointer"
-              :class="{
-                'bg-neutral-800': selectedSession?.id === session.id
-              }"
-              @click="selectedSession = session"
-              @dblclick="selectSession(session)"
-            >
-              <UiTableCell> {{ session.name }} </UiTableCell>
-              <UiTableCell>
-                {{ formatTime(session.start_time) }}
-              </UiTableCell>
-              <UiTableCell>
-                {{
-                  getDurationBetweenTimestampsFormat(
-                    session.start_time,
-                    session.end_time
-                  )
-                }}
-              </UiTableCell>
-              <UiTableCell>
-                <UiDialog>
-                  <UiDialogTrigger>
-                    <Trash :size="18" class="m-2 text-red-600" />
-                  </UiDialogTrigger>
-                  <UiDialogContent>
-                    <UiDialogHeader>
-                      <UiDialogTitle>
-                        Are you sure you want to delete this session?
-                      </UiDialogTitle>
-                    </UiDialogHeader>
-                    <UiDialogFooter>
-                      <UiDialogClose as-child>
-                        <UiButton
-                          type="button"
-                          variant="destructive"
-                          @click="deleteSession(session)"
-                        >
-                          Delete
-                        </UiButton>
-                      </UiDialogClose>
-                    </UiDialogFooter>
-                  </UiDialogContent>
-                </UiDialog>
-              </UiTableCell>
-            </UiTableRow>
-            <UiTableRow v-if="sessions.length === 0" class="text-center">
-              <UiTableCell colspan="4"> No sessions found </UiTableCell>
-            </UiTableRow>
-          </UiTableBody>
-        </UiTable>
+        <UiScrollArea style="height: 300px">
+          <UiTable class="w-full">
+            <UiTableHeader>
+              <UiTableRow>
+                <UiTableHead> Name</UiTableHead>
+                <UiTableHead> Date</UiTableHead>
+                <UiTableHead> Duration</UiTableHead>
+                <UiTableHead> Action</UiTableHead>
+              </UiTableRow>
+            </UiTableHeader>
+            <UiTableBody>
+              <UiTableRow
+                v-for="session in sessions"
+                :key="session.id"
+                class="cursor-pointer"
+                :class="{
+                  'bg-neutral-800': selectedSession?.id === session.id
+                }"
+                @click="selectedSession = session"
+                @dblclick="selectSession(session)"
+              >
+                <UiTableCell> {{ session.name }}</UiTableCell>
+                <UiTableCell>
+                  {{ formatTime(session.start_time) }}
+                </UiTableCell>
+                <UiTableCell>
+                  {{
+                    getDurationBetweenTimestampsFormat(
+                      session.start_time,
+                      session.end_time
+                    )
+                  }}
+                </UiTableCell>
+                <UiTableCell>
+                  <UiDialog>
+                    <UiDialogTrigger>
+                      <Trash :size="18" class="m-2 text-red-600" />
+                    </UiDialogTrigger>
+                    <UiDialogContent>
+                      <UiDialogHeader>
+                        <UiDialogTitle>
+                          Are you sure you want to delete this session?
+                        </UiDialogTitle>
+                      </UiDialogHeader>
+                      <UiDialogFooter>
+                        <UiDialogClose as-child>
+                          <UiButton
+                            type="button"
+                            variant="destructive"
+                            @click="deleteSession(session)"
+                          >
+                            Delete
+                          </UiButton>
+                        </UiDialogClose>
+                      </UiDialogFooter>
+                    </UiDialogContent>
+                  </UiDialog>
+                </UiTableCell>
+              </UiTableRow>
+              <UiTableRow v-if="sessions.length === 0" class="text-center">
+                <UiTableCell colspan="4"> No sessions found</UiTableCell>
+              </UiTableRow>
+            </UiTableBody>
+          </UiTable>
+        </UiScrollArea>
         <UiDialogFooter>
           <UiButton
             :disabled="selectedSession === null"
