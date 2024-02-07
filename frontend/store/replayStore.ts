@@ -1,8 +1,8 @@
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import {
-  ReplaySessionData,
+  ListingReplaySession,
   ReplaySession,
-  ListingReplaySession
+  ReplaySessionData
 } from '~/types/replay.types'
 
 const initialFrame: ReplaySessionData = {
@@ -26,7 +26,14 @@ export const useReplayStore = defineStore('replay', {
     isPlaying: false,
     currentTime: -1,
     lastFrameIndex: -1,
-    currentFrame: initialFrame
+    currentFrame: initialFrame,
+
+    recorder: {
+      isRecording: false,
+      isPaused: false,
+      // Time in seconds
+      recordingSince: 0
+    }
   }),
   getters: {
     frames: (state) => {
