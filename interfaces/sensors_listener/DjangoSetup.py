@@ -18,6 +18,16 @@ settings.configure(
     INSTALLED_APPS=["apps.replay"],
     TIME_ZONE="Europe/Paris",
     USE_TZ=True,
+    CHANNEL_LAYERS={
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(os.environ.get("REDIS_HOST"), os.environ.get("REDIS_PORT"))],
+                "capacity": 3000,
+                "expiry": 10,
+            },
+        },
+    },
 )
 
 import sys
