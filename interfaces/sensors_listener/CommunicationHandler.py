@@ -19,10 +19,10 @@ class CommunicationLayer:
             decode_responses=True,
         )
         # Messages from the drone
-        self.ps_drone = self.redis.pubsub()
+        self.ps_drone = self.redis.pubsub(ignore_subscribe_messages=True)
         self.ps_drone.subscribe("communication_forwarding")
 
-        self.ps_frontend = self.redis.pubsub()
+        self.ps_frontend = self.redis.pubsub(ignore_subscribe_messages=True)
         self.ps_frontend.subscribe("actions")
 
         # Get the django channel layer. It is used to send messages to the frontend

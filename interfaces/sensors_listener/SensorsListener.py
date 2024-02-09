@@ -23,19 +23,23 @@ class SensorsListener(CommunicationLayer):
         )
         self.action_thread.start()
 
+        self.sensors_thread = threading.Thread(
+            target=self._listen_sensors,
+            daemon=True,
+        )
+        self.sensors_thread.start()
+
         self.send_to_frontend({"route": "recorder:ready"})
         self.action_thread.join()
+        self.sensors_thread.join()
 
     def _listen_redis_actions(self):
         """
         This method is used to listen to redis actions from the frontend
         """
         print("Listening to actions")
-        pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
-        pubsub.subscribe("actions")
-        for message in pubsub.listen():
+        for message in self.ps_frontend.listen():
             data = json.loads(message["data"])
-            print(data)
 
             match data["route"]:
                 case "recorder:start":
@@ -46,6 +50,22 @@ class SensorsListener(CommunicationLayer):
 
                 case "recorder:pause":
                     self.replay_session_manager.pause_recording()
+
+    def _listen_sensors(self):
+        """
+        This method is used to listen to the sensors data
+        """
+        print("Listening to sensors")
+        for message in self.ps_drone.listen():
+            try:
+                data = json.loads(message["data"])
+                self.replay_session_manager.add_update_data(data)
+
+            except json.decoder.JSONDecodeError:
+                print("Decode error")
+                pass
+            # data = json.loads(message["data"])
+            # print(data)
 
 
 if __name__ == "__main__":
