@@ -117,7 +117,8 @@ class ReplaySessionManager(CommunicationLayer):
                     self._sessions_data_bulk.append(self._current_session_data)
 
                 self._current_session_data = ReplaySessionData(
-                    session=self.session, index=self._time_index
+                    session=self.session,
+                    index=self._time_index,
                 )
 
                 if self._last_session_data:
@@ -134,6 +135,11 @@ class ReplaySessionManager(CommunicationLayer):
                     self._current_session_data.roll = self._last_session_data.roll
                     self._current_session_data.pitch = self._last_session_data.pitch
                     self._current_session_data.yaw = self._last_session_data.yaw
+                else:
+                    self._current_session_data.altitude = 100
+                    self._current_session_data.speed = 12
+                    self._current_session_data.latitude = -0.7563779
+                    self._current_session_data.longitude = 48.0879123
 
                 self._time_index += 10
 
@@ -168,14 +174,9 @@ class ReplaySessionManager(CommunicationLayer):
 
         match message_type:
             case "sensors:sense_hat:data":
-                print(data)
                 self._current_session_data.roll = data["roll"]
                 self._current_session_data.pitch = data["pitch"]
                 self._current_session_data.yaw = data["yaw"]
-                self._current_session_data.altitude = 100
-                self._current_session_data.speed = 12
-                self._current_session_data.latitude = -0.7563779
-                self._current_session_data.longitude = 48.0879123
 
             case "sensors:altitude":
                 self._current_session_data.altitude = data["altitude"]

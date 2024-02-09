@@ -50,8 +50,6 @@ const updateReplay = () => {
   replayStore.lastFrameIndex = currentFrameIndex
 
   replayStore.currentFrame = replayStore.frames[currentFrameIndex]
-
-  console.log(replayStore.currentFrame)
 }
 
 const pause = () => {
