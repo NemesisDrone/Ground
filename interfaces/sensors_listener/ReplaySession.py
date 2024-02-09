@@ -63,6 +63,7 @@ class ReplaySessionManager(CommunicationLayer):
         self.session.save()
 
         self._is_recording = True
+        self._time_index = 0
         self._send_status_to_frontend()
 
     def pause_recording(self):
@@ -105,13 +106,11 @@ class ReplaySessionManager(CommunicationLayer):
                 time.sleep(0.1)
                 continue
 
-            print(len(self._sessions_data_bulk))
             if len(self._sessions_data_bulk) > 20:
                 self._save_bulk_session_data()
 
             if (current_time - self._last_recording_time) > 1:
                 self._last_recording_time = current_time
-                self._time_index += 10
 
                 if self._current_session_data:
                     self._last_session_data = self._current_session_data
@@ -135,6 +134,8 @@ class ReplaySessionManager(CommunicationLayer):
                     self._current_session_data.roll = self._last_session_data.roll
                     self._current_session_data.pitch = self._last_session_data.pitch
                     self._current_session_data.yaw = self._last_session_data.yaw
+
+                self._time_index += 10
 
             time.sleep(0.03)
 
@@ -171,7 +172,10 @@ class ReplaySessionManager(CommunicationLayer):
                 self._current_session_data.roll = data["roll"]
                 self._current_session_data.pitch = data["pitch"]
                 self._current_session_data.yaw = data["yaw"]
-                self._current_session_data.altitude = 20
+                self._current_session_data.altitude = 100
+                self._current_session_data.speed = 12
+                self._current_session_data.latitude = -0.7563779
+                self._current_session_data.longitude = 48.0879123
 
             case "sensors:altitude":
                 self._current_session_data.altitude = data["altitude"]
