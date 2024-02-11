@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Operations/GPSMap.vue'
-import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
+import GPSMap from '~/components/Operations/Dashboard/GPSMap.vue'
+import VideoStreaming from '~/components/Operations/Dashboard/VideoStreaming.vue'
 definePageMeta({
   layout: 'sidebar',
   keepalive: false

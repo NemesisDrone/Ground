@@ -11,6 +11,6 @@ check_postgres() {
 check_postgres
 
 # Start Messages forwarder service
-python services/messages_forwarder.py &
+python services/messages_handler.py &
 # Start main service
 exec "$@"

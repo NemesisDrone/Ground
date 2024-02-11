@@ -1,3 +1,4 @@
+
 version: '3.7'
 services:
   redis:
@@ -57,6 +58,23 @@ services:
     networks:
       - ground_network
 
+  sensors_listener:
+    container_name: sensors_listener_ground
+    build:
+      context: ./
+      dockerfile: ./interfaces/sensors_listener/Dockerfile
+
+    depends_on:
+      - redis
+      - database
+    env_file:
+      - backend/.env
+    volumes:
+      - ./interfaces/sensors_listener:/app/interfaces/sensors_listener
+    command: python /app/interfaces/sensors_listener/SensorsListener.py 0.0.0.0
+    networks:
+      - ground_network
+
   nvs_serve:
     container_name: nvs_server
     build:
@@ -65,6 +83,7 @@ services:
       - redis
     ports:
       - "7000:7000"
+      - "7001:7001/udp"
     networks:
       - ground_network
     command: ["python3", "VideoStreaming.py"]
@@ -72,5 +91,3 @@ services:
 networks:
     ground_network:
         external: true
-
-

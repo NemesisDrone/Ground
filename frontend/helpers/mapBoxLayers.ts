@@ -1,10 +1,10 @@
 import mapboxgl from 'mapbox-gl'
-import { useSensorsStore } from '~/store/sensors'
+import {useSensorsStore} from '~/store/sensors'
 import * as THREE from 'three'
-import { MathUtils } from 'three'
+import {MathUtils} from 'three'
 // @ts-ignore
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { useReplayStore } from '~/store/replayStore'
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js'
+import {useReplayStore} from '~/store/replayStore'
 
 /*
 Get the mapbox layer for the drone model.
@@ -25,8 +25,8 @@ export const getMapBox3DDroneModelLayer = (
   const getDroneData = () => {
     if (isForReplayMap) {
       return {
-        lat: replayStore.currentFrame.gps.lat,
-        lng: replayStore.currentFrame.gps.lng,
+        lat: replayStore.currentFrame.latitude,
+        lng: replayStore.currentFrame.longitude,
         altitude: replayStore.currentFrame.altitude,
         roll: replayStore.currentFrame.roll,
         pitch: replayStore.currentFrame.pitch,

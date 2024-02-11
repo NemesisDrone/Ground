@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import GPSMap from '~/components/Operations/GPSMap.vue'
-import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
-import SpeedGauge from '~/components/Operations/SpeedGauge.vue'
-import Altitude from '~/components/Operations/Altitude.vue'
-import Battery from '~/components/Operations/Battery.vue'
-import PropulsorSpeed from '~/components/Operations/PropulsorSpeed.vue'
-import LogsViewer from '~/components/Operations/LogsViewer.vue'
+import GPSMap from '~/components/Operations/Dashboard/GPSMap.vue'
+import VideoStreaming from '~/components/Operations/Dashboard/VideoStreaming.vue'
+import SpeedGauge from '~/components/Operations/Dashboard/SpeedGauge.vue'
+import Altitude from '~/components/Operations/Dashboard/Altitude.vue'
+import Battery from '~/components/Operations/Dashboard/Battery.vue'
+import PropulsorSpeed from '~/components/Operations/Dashboard/PropulsorSpeed.vue'
+import LogsViewer from '~/components/Operations/Dashboard/LogsViewer.vue'
 import { useComponentsStore } from '~/store/components'
-import ComponentStatus from '~/components/Operations/ComponentStatus.vue'
-import DroneViewer from '~/components/Operations/DroneViewer.vue'
-import DroneStatusConnection from '~/components/Operations/DroneStatusConnection.vue'
+import ComponentStatus from '~/components/Operations/Dashboard/ComponentStatus.vue'
+import DroneViewer from '~/components/Operations/Dashboard/DroneViewer.vue'
+import DroneStatusConnection from '~/components/Operations/Dashboard/DroneStatusConnection.vue'
 import {
   Gamepad2,
   Locate,
@@ -18,6 +18,7 @@ import {
   PlugZap
 } from 'lucide-vue-next'
 import { useSensorsStore } from '~/store/sensors'
+import SessionRecorderManager from '~/components/Operations/Dashboard/SessionRecorderManager.vue'
 
 definePageMeta({
   layout: 'sidebar',
@@ -29,46 +30,30 @@ useHead({
 
 const componentsStore = useComponentsStore()
 const sensorsStore = useSensorsStore()
-const stop = () => {
-  componentsStore.websocket?.send({
-    route: 'state:stop:gps',
-    data: {
-      component: 'gps'
-    }
-  })
-}
-const start = () => {
-  componentsStore.websocket?.send({
-    route: 'state:start:gps',
-    data: {
-      component: 'gps'
-    }
-  })
-}
 
 const demoSpeed = (value: number) => {
-  componentsStore.websocket?.send({
+  componentsStore.communicationWebsocket?.send({
     route: 'propulsion:speed',
     data: value
   })
 }
 
 const demoCalibrate = () => {
-  componentsStore.websocket?.send({
+  componentsStore.communicationWebsocket?.send({
     route: 'propulsion:calibrate',
     data: null
   })
 }
 
 const demoArm = () => {
-  componentsStore.websocket?.send({
+  componentsStore.communicationWebsocket?.send({
     route: 'propulsion:arm',
     data: null
   })
 }
 
 const demoDisarm = () => {
-  componentsStore.websocket?.send({
+  componentsStore.communicationWebsocket?.send({
     route: 'propulsion:disarm',
     data: null
   })
@@ -100,38 +85,41 @@ const demoDisarm = () => {
         <div class="w-1/2 py-4">
           <DroneViewer />
         </div>
-        <div class="w-1/2">
-          <!--          <UiButton class="mt-7" @click="demoSpeed(0)">0</UiButton>-->
-          <!--          <UiButton class="mt-7 ml-2" @click="demoSpeed(800)"-->
-          <!--            >800</UiButton-->
-          <!--          >-->
-          <!--          <UiButton class="mt-7 ml-2" @click="demoSpeed(1100)"-->
-          <!--            >1100</UiButton-->
-          <!--          >-->
-          <!--          <UiButton class="mt-7 ml-2" @click="demoSpeed(1500)"-->
-          <!--            >1500</UiButton-->
-          <!--          >-->
-          <!--          <UiButton class="mt-7 ml-2" @click="demoSpeed(1800)"-->
-          <!--            >1800</UiButton-->
-          <!--          >-->
-          <!--          <UiButton class="mt-7 ml-2" @click="demoSpeed(2100)"-->
-          <!--            >2100</UiButton-->
-          <!--          >-->
-          <!--          <UiButton class="ml-2 mt-2" @click="demoSpeed(2500)">-->
-          <!--            2500-->
-          <!--          </UiButton>-->
-          <!--          <UiButton class="ml-2 mt-2" @click="demoCalibrate">-->
-          <!--            Calibrate-->
-          <!--          </UiButton>-->
-          <!--          <UiButton class="ml-2 mt-2" @click="demoArm"> Arm </UiButton>-->
-          <!--          <UiButton class="ml-2 mt-2" @click="demoDisarm">-->
-          <!--            Disarm-->
-          <!--          </UiButton>-->
-          <!--          <br />-->
-          <!--          {{ componentsStore.connectionStatus }}-->
-          <!--          <br />-->
-          <!--          {{ componentsStore.controller.axes }}-->
-          <!--          {{ sensorsStore.full }}-->
+        <div class="w-1/2 py-4">
+          <div class="flex flex-col gap-4">
+            <SessionRecorderManager />
+          </div>
+          <UiButton class="mt-7" @click="demoSpeed(0)">0</UiButton>
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(800)"
+            >800</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1100)"
+            >1100</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1500)"
+            >1500</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(1800)"
+            >1800</UiButton
+          >
+          <UiButton class="mt-7 ml-2" @click="demoSpeed(2100)"
+            >2100</UiButton
+          >
+          <UiButton class="ml-2 mt-2" @click="demoSpeed(2500)">
+            2500
+          </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoCalibrate">
+            Calibrate
+          </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoArm"> Arm </UiButton>
+          <UiButton class="ml-2 mt-2" @click="demoDisarm">
+            Disarm
+          </UiButton>
+          <br />
+          {{ componentsStore.connectionStatus }}
+          <br />
+          {{ componentsStore.controller.axes }}
+          {{ sensorsStore.full }}
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
+import VideoStreaming from '~/components/Operations/Dashboard/VideoStreaming.vue'
 definePageMeta({
   layout: 'sidebar'
 })

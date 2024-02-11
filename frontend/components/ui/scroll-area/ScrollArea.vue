@@ -11,7 +11,7 @@ import { cn } from '@/helpers/utils'
 const random = ref(Math.random().toString(36).substr(2, 9))
 const props = withDefaults(
   defineProps<
-    ScrollAreaRootProps & { class?: string; scrollToBottom: boolean }
+    ScrollAreaRootProps & { class?: string; scrollToBottom?: boolean }
   >(),
   {
     class: '',

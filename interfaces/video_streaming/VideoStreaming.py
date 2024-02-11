@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 
+import os
 import gi
 
-gi.require_version('Gst', '1.0')
-from gi.repository import GObject as gobject, Gst
+gi.require_version("Gst", "1.0")
+from gi.repository import GObject, Gst
 
 import threading
 import asyncio as aio
@@ -23,48 +24,73 @@ class NVSState(int):
     """
     @brief Class representing the different states of NVSComponent.
     """
+
     GstInitFail: int = 0
     PipelineCreationFail: int = 1
     SinkLookupFail: int = 2
-    SrcLookupFail: int = 3
-    GstFlowError: int = 4
-    GstBufferFail = 5
-    Initialized: int = 6
-    WaitingConnection: int = 7
-    Streaming: int = 8
-    Cleaning: int = 9
-    Unknown: int = 10
-    PendingStop: int = 11
+    GstBufferFail = 3
+    Unknown: int = 4
+    Initialized: int = 5
+    WaitingConnection: int = 6
+    PendingStop: int = 7
 
 
 class NVSServer:
     def __init__(self) -> None:
-        self.clients: list = []
-        self.pendingBuffers: list = []
+        self.clients: dict = {}  # List of connected clients plus their pending frames
+
         self.nvs_state: int = NVSState.Unknown
-        self.waiting: tuple = None
         self.lastSender: wssp = None
-        self.push_waiting: bytes = None
-        self.enable_src_push = False
-        self.cthread: threading.Thread = None
-        self.cloop: aio.AbstractEventLoop = None
 
+        self.thread: threading.Thread = None
+        self.loop: aio.AbstractEventLoop = None
+
+        if not Gst.init_check(None):  # init gstreamer
+            self.print("GST init failed!")
+            self.set_nvs_state(NVSState.GstInitFail)
+            return
+
+        # Setting GST's logging level to output.
+        # see https://gstreamer.freedesktop.org/documentation/tutorials/basic/debugging-tools.html
+        # Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
+
+        gst_pipeline_str = "udpsrc port=7001 caps="
+        gst_pipeline_str += '"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96"'
+        gst_pipeline_str += " ! rtph264depay ! h264parse ! avdec_h264 ! queue "
+        gst_pipeline_str += " ! videoconvert ! jpegenc ! appsink name=sink"
+
+        self.pipeline = Gst.parse_launch(gst_pipeline_str)
+
+        if not self.pipeline:
+            print("Could not create pipeline.")
+            self.set_nvs_state(NVSState.PipelineCreationFail)
+            return
+
+        self.sink = self.pipeline.get_by_name("sink")
+        if not self.sink:
+            print("Could not find pipeline sink.", self.NAME)
+            self.set_nvs_state(NVSState.SinkLookupFail)
+            return
+
+        # Notify us when it receives a frame
+        self.sink.set_property("emit-signals", True)
+        # Set CB for new data
+        self.sink.connect("new-sample", self._on_data_available)
+
+        print("Initialized.")
         self.set_nvs_state(NVSState.Initialized)
-
 
     def __del__(self) -> None:
         self.stop()
-
 
     def set_nvs_state(self, val) -> None:
         """
         Setter for the object's internal state. Also implements guards to log unproper behaviours.
         :param val: Integer corresponding to a NVSState.
         """
-        if int(val) < int(NVSState.Initialized):
+        if val < NVSState.Initialized:
             print("Warning, state:" + str(val))
         self.nvs_state = val
-
 
     def stop(self) -> None:
         """
@@ -75,8 +101,8 @@ class NVSServer:
         for sock in self.clients:
             sock.close()
 
+        self.pipeline.set_state(Gst.State.NULL)
         self.set_nvs_state(NVSState.Initialized)
-
 
     async def run(self) -> None:
         """
@@ -87,75 +113,58 @@ class NVSServer:
 
         await self._connection_loop()
 
-
     async def _connection_loop(self) -> None:
         """
         Function generating a loop, waiting for new clients to connect and handles it.
         """
-        if self.nvs_state != NVSState.Initialized:
-            return
-
+        self.pipeline.set_state(Gst.State.PLAYING)
         print("NVS Server up and running.")
 
         while self.nvs_state != NVSState.PendingStop:
             try:
-                async with wss(self._handle_connection, "0.0.0.0", port=7000):  # [TODO] See what address to use.
+                async with wss(self._handle_connection, "0.0.0.0", port=7000):
                     self.set_nvs_state(NVSState.WaitingConnection)
                     await aio.Future()
-            except Exception:
+            finally:
                 pass
 
+    async def _handle_connection(self, sock):
+        print("Client connected")
+        self.clients[sock] = []
 
-    async def _handle_connection(self, sock: wssp) -> None:
-        """
-        Handles the connection established with a client.
-        :param sock: Websocket for the client that just connected.
-        """
-        print("Client connected to NVS Server.")
-        self.set_nvs_state(NVSState.Streaming)
-        self.clients.append(sock)
         try:
-            while self.nvs_state != NVSState.PendingStop:
-                try:
-                    data = self._process_data(await sock.recv())
-
-                    if self.lastSender != sock:
-                        self.lastSender = sock
-
-                    for socket in self.clients:
-                        if socket != self.lastSender:
-                            await socket.send(data)
-
-                finally:
-                    pass
-
-            await sock.close()
-
+            while True:
+                if len(self.clients[sock]) > 0:
+                    buff = self.clients[sock].pop(0)
+                    await sock.send(buff)
         except wssexcept.ConnectionClosed:
-            pass
+            del self.clients[sock]
 
-        if sock in self.clients:
-            self.clients.remove(sock)
+    def _on_data_available(self, appsink):
+        """
+        Handles incoming data from a GST pipeline and buffers it. If new data is available but the previous has not
+        been sent, the previous is dropped and the new one will be scheduled for sending.
+        """
+        sample = appsink.emit("pull-sample")
 
-    @staticmethod
-    async def _process_data(data: bytes) -> bio:
-        """
-        This function adds EXIF data to the input image :param data, and returns the updated data.
-        :param data: Raw JPEG data
-        :return: Raw JPEG data with EXIF.
-        """
-        # Load as the data was a file.
-        output_buff = bio()
-        exif.set_gps_location(data, 0.0, 0.0, 0.0, output_buff)
-        return output_buff
+        if sample:
+            gst_buffer = sample.get_buffer()
+            try:
+                (ret, buffer_map) = gst_buffer.map(Gst.MapFlags.READ)
+                if ret:
+                    # Pending for all clients.
+                    for cli in self.clients.items():
+                        if True:  # Frame not scheduled as there's no more space.
+                            cli[1].append(bytes(buffer_map.data))
+                    # Just release this frame.
+                    gst_buffer.unmap(buffer_map)
+                else:
+                    self.set_nvs_state(NVSState.GstBufferFail)
 
+            finally:
+                pass
 
-    def get_nvs_state(self) -> int:
-        """
-        Retrieves the internal state of the object.
-        :return: Integer corresponding to an NVSState.
-        """
-        return self.nvs_state
+        return Gst.FlowReturn.OK
 
 
 nvss = NVSServer()

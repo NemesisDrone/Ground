@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue' // Import ref from Vue
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { ScrollArea } from '~/components/ui/scroll-area'
 import { useLogsStore } from '~/store/logs'
 import { storeToRefs } from 'pinia'
 import { LogLevels } from '~/types/logs.types'

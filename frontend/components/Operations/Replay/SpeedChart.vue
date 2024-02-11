@@ -9,22 +9,12 @@ onMounted(async () => {
 const replayStore = useReplayStore()
 
 const speedData = computed(() => {
-  const series = [
-    { name: 'Speed by frame', data: [] as number[] },
-    { name: 'speed', data: [] as number[] }
-  ]
+  const series = [{ name: 'Speed', data: [] as number[] }]
   const labels: string[] = []
 
-  // if true then we had the speed in 'Speed by frame'
-  let addInSpeedByFrame = true
   replayStore.frames.forEach((frame, index) => {
-    if (addInSpeedByFrame) {
-      series[0].data.push(frame.speed)
-      if (index === replayStore.lastFrameIndex) addInSpeedByFrame = false
-    }
-
-    series[1].data.push(frame.speed)
-    labels.push(`${Math.round((frame.time / 1000) * 100) / 100}s`)
+    series[0].data.push(frame.speed)
+    labels.push(`${Math.round((frame.index / 100) * 100) / 100}s`)
   })
 
   return {

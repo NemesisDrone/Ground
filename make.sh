@@ -53,7 +53,7 @@ sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${password}/" ./backend/.env
 sudo docker network create ground_network || true
 nohup sudo docker-compose up &
 sudo docker-compose exec web python manage.py migrate
-sudo docker-compose exec web python populatedb.py
+sudo docker-compose exec web python populatedb.py --all
 cd frontend
 yarn install
 

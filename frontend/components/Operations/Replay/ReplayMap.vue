@@ -55,7 +55,10 @@ const toggleLabels = () => {
 
 const viewAttachedToDronePosition = ref(true)
 watch(
-  () => replayStore.currentFrame.gps,
+  [
+    () => replayStore.currentFrame.latitude,
+    () => replayStore.currentFrame.longitude
+  ],
   () => {
     if (!mapRef.value) return
 
@@ -66,8 +69,8 @@ watch(
           ?.getCenter()
           .distanceTo(
             new mapboxgl.LngLat(
-              replayStore.currentFrame.gps.lat,
-              replayStore.currentFrame.gps.lng
+              replayStore.currentFrame.latitude,
+              replayStore.currentFrame.longitude
             )
           )
       )
@@ -79,8 +82,8 @@ watch(
       if (distance > maxDistanceFromCenter) {
         mapRef.value?.panTo(
           [
-            replayStore.currentFrame.gps.lat,
-            replayStore.currentFrame.gps.lng
+            replayStore.currentFrame.latitude,
+            replayStore.currentFrame.longitude
           ],
           {
             duration: 1000
@@ -96,8 +99,8 @@ watch(
         .setData(
           getMapBoxDroneDirectionSourceData(
             mapRef.value,
-            replayStore.currentFrame.gps.lat,
-            replayStore.currentFrame.gps.lng,
+            replayStore.currentFrame.latitude,
+            replayStore.currentFrame.longitude,
             replayStore.currentFrame.yaw
           )
         )
@@ -109,7 +112,10 @@ const toggleAttachedView = () => {
   viewAttachedToDronePosition.value = !viewAttachedToDronePosition.value
   if (viewAttachedToDronePosition.value) {
     mapRef.value?.panTo(
-      [replayStore.currentFrame.gps.lat, replayStore.currentFrame.gps.lng],
+      [
+        replayStore.currentFrame.latitude,
+        replayStore.currentFrame.longitude
+      ],
       {
         duration: 1000
       }
@@ -153,8 +159,8 @@ watch(mapRef, () => {
   if (!mapRef.value) return
   // Center the map on the drone position, or default position
   mapRef.value.setCenter([
-    replayStore.currentFrame.gps.lat,
-    replayStore.currentFrame.gps.lng
+    replayStore.currentFrame.latitude,
+    replayStore.currentFrame.longitude
   ])
 
   // Add drone model, custom layers... , buildings
@@ -176,8 +182,8 @@ watch(mapRef, () => {
       type: 'geojson',
       data: getMapBoxDroneDirectionSourceData(
         mapRef.value,
-        replayStore.currentFrame.gps.lat,
-        replayStore.currentFrame.gps.lng,
+        replayStore.currentFrame.latitude,
+        replayStore.currentFrame.longitude,
         replayStore.currentFrame.yaw
       ) as any
     })
@@ -198,8 +204,8 @@ watch(mapRef, () => {
       .setData(
         getMapBoxDroneDirectionSourceData(
           mapRef.value,
-          replayStore.currentFrame.gps.lat,
-          replayStore.currentFrame.gps.lng,
+          replayStore.currentFrame.latitude,
+          replayStore.currentFrame.longitude,
           replayStore.currentFrame.yaw
         )
       )

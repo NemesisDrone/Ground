@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "apps.user",
     "apps.communication",
     "apps.drone",
-    "apps.replay"
+    "apps.replay",
 ]
 
 MIDDLEWARE = [

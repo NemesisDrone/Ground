@@ -49,7 +49,7 @@ docker-compose up
 In another shell :
 ```bash
 docker-compose exec web python manage.py migrate
-docker-compose exec web python populatedb.py
+docker-compose exec web python populatedb.py --all
 ```
 
 When you add a python dependency, you will need to rebuild the docker image:

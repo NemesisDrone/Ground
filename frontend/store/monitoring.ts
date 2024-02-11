@@ -13,7 +13,7 @@ export const useMonitoringStore = defineStore('monitoring', {
 
   actions: {
     async takePicture() {
-      const ws = useComponentsStore().websocket
+      const ws = useComponentsStore().communicationWebsocket
       if (ws) {
         ws.send({
           route: 'take-picture',

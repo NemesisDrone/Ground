@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import VideoStreaming from '~/components/Operations/VideoStreaming.vue'
+import VideoStreaming from '~/components/Operations/Dashboard/VideoStreaming.vue'
 import {
   CameraOff,
   MousePointerSquare,

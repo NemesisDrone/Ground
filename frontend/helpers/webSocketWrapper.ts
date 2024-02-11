@@ -1,5 +1,10 @@
 import { useUserStore } from '~/store/user'
 
+export interface MessageEvent<T> {
+  type: string
+  data: T
+}
+
 /**
  * A wrapper around the WebSocket class that allows for adding and removing listeners
  * for specific message types.
@@ -50,7 +55,7 @@ class WebSocketWrapper {
     }
   }
 
-  private handleMessage(message: any) {
+  private handleMessage(message: Event) {
     if (message.type && this.listeners[message.type]) {
       this.listeners[message.type].forEach((callback) => {
         callback(message)

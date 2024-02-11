@@ -12,7 +12,7 @@ interface State {
     speed: number
   }
   servoController: DroneComponent
-  websocket: WebSocketWrapper | null
+  communicationWebsocket: WebSocketWrapper | null
   connectionStatus: {
     connected: boolean
   }
@@ -32,7 +32,7 @@ interface State {
 
 export const useComponentsStore = defineStore('components', {
   state: (): State => ({
-    websocket: null,
+    communicationWebsocket: null,
     gps: {
       status: ComponentsState.STOPPED,
       name: 'GPS',

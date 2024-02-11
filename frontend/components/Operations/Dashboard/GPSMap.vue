@@ -183,17 +183,19 @@ watch(mapRef, () => {
 
   mapRef.value?.on('move', () => {
     if (!mapRef.value) return
-    mapRef.value
-      ?.getSource('droneDirection')
-      // @ts-ignore Why does this function doesn't exist but exist ?
-      .setData(
-        getMapBoxDroneDirectionSourceData(
-          mapRef.value,
-          gpsPosition.value.lat,
-          gpsPosition.value.lng,
-          sensorsStore.full.yaw
+    try {
+      mapRef.value
+        ?.getSource('droneDirection')
+        // @ts-ignore Why does this function doesn't exist but exist ?
+        .setData(
+          getMapBoxDroneDirectionSourceData(
+            mapRef.value,
+            gpsPosition.value.lat,
+            gpsPosition.value.lng,
+            sensorsStore.full.yaw
+          )
         )
-      )
+    } catch {}
   })
 })
 
