@@ -11,7 +11,6 @@ class CommunicationLayer:
     """
 
     def __init__(self) -> None:
-
         self.redis = redis.StrictRedis(
             host=os.environ.get("REDIS_HOST"),
             port=os.environ.get("REDIS_PORT"),
