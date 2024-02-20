@@ -2,6 +2,7 @@ from socket import AF_INET, socket, SOCK_STREAM, IPPROTO_TCP, TCP_NODELAY
 from threading import Thread
 from dataclasses import dataclass
 from typing import List, Union
+from enum import Enum
 
 import numpy as np
 import math
@@ -27,6 +28,12 @@ Control 0 -1 [Sets channel 0 to -1]
 RequestTelemetry 0.1 [Requests data every 0.1 seconds. Send 0 to stop it.]
 """
 
+class Channels(Enum):
+    AILERON = 0
+    ELEVATOR = 1
+    THROTTLE = 3
+    RUDDER = 2
+
 
 @dataclass
 class TelemetryData:
@@ -43,6 +50,8 @@ class TelemetryData:
     roll: float = 0
     pitch: float = 0
     yaw: float = 0
+
+    altitude: float = 0
 
 
 class PicaSimConnectorClass:
@@ -68,12 +77,15 @@ class PicaSimConnectorClass:
         self._last_telemetry: Union[TelemetryData, None] = None
 
     def __new__(cls, *args, **kwargs):
-        print(cls.instance)
         if cls.instance is None:
             cls.instance = super().__new__(cls)
         return cls.instance
 
     def get_last_telemetry(self) -> TelemetryData:
+        """
+        Returns the last telemetry data received from the PicaSim server
+        :return:
+        """
         return self._last_telemetry
 
     def _data_receiver(self) -> None:
@@ -157,9 +169,8 @@ class PicaSimConnectorClass:
             roll=roll,
             pitch=pitch,
             yaw=yaw,
+            altitude=float(_data[18]),
         )
-
-        print(telemetry)
 
         return telemetry
 
@@ -202,7 +213,9 @@ class Plane(PicaSimConnectorClass):
         """
         self.send_data(f"releasecontrol")
 
-    def control(self, channel: int, value: float) -> None:
+    def control(self, channel: Union[int, Channels], value: float) -> None:
+        if isinstance(channel, Channels):
+            channel = channel.value
         self.send_data(f"control {channel} {value}")
 
     def get_telemetry(self) -> Union[TelemetryData, None]:
