@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { useSensorsStore } from '~/store/sensors'
-import { useLogsStore } from '~/store/logs'
-import { useComponentsStore } from '~/store/components'
 import { useGamepadController } from '~/composables/useGamePadController'
 import {
-  Menu,
   KanbanSquare,
   View,
   Settings,
