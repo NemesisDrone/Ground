@@ -1,7 +1,7 @@
 from socket import AF_INET, socket, SOCK_STREAM, IPPROTO_TCP, TCP_NODELAY
 from threading import Thread
 from dataclasses import dataclass
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import math
@@ -45,11 +45,10 @@ class TelemetryData:
     yaw: float = 0
 
 
-class PicaSimConnector:
+class PicaSimConnectorClass:
     """
     Connects to the PicaSim server, sends and receives data.
     """
-
     instance = None
 
     def __init__(self):
@@ -66,25 +65,16 @@ class PicaSimConnector:
         # Request telemetry data
         self.sock.send(bytes("requesttelemetry 0.1\n", "utf8"))
 
-        # TODO: Clear first 50 telemetry data when reaching 150
-        self._list_of_telemetry: List[TelemetryData] = []
+        self._last_telemetry: Union[TelemetryData, None] = None
 
-    def __new__(cls):
-        """
-        Singleton pattern
-        """
-        if not cls.instance:
-            cls.instance = super(PicaSimConnector, cls).__new__(cls)
+    def __new__(cls, *args, **kwargs):
+        print(cls.instance)
+        if cls.instance is None:
+            cls.instance = super().__new__(cls)
         return cls.instance
 
-    def get_telemetry(self) -> List[TelemetryData]:
-        return self._list_of_telemetry
-
     def get_last_telemetry(self) -> TelemetryData:
-        return self._list_of_telemetry[-1]
-
-    def clear_telemetry(self) -> None:
-        self._list_of_telemetry = []
+        return self._last_telemetry
 
     def _data_receiver(self) -> None:
         """
@@ -99,7 +89,7 @@ class PicaSimConnector:
                     break
 
                 if _data.split(" ")[2] == "Telemetry":
-                    self._parse_telemetry(_data)
+                    self._last_telemetry = self._parse_telemetry(_data)
 
             except Exception as e:
                 print("receive error\n", e)
@@ -188,3 +178,32 @@ class PicaSimConnector:
         :return:
         """
         self.sock.close()
+
+
+class Plane(PicaSimConnectorClass):
+    def __init__(self, agent=0):
+        """
+        :param agent: The numeros of the plane. Don't change it if you don't know what you are doing
+        """
+        super().__init__()
+        self._agent = agent
+
+    def take_control(self) -> None:
+        """
+        Takes control of the plane
+        :return:
+        """
+        self.send_data(f"takecontrol")
+
+    def release_control(self) -> None:
+        """
+        Releases control of the plane
+        :return:
+        """
+        self.send_data(f"releasecontrol")
+
+    def control(self, channel: int, value: float) -> None:
+        self.send_data(f"control {channel} {value}")
+
+    def get_telemetry(self) -> Union[TelemetryData, None]:
+        return self.get_last_telemetry()
