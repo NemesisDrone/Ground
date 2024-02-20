@@ -127,47 +127,11 @@ class PicaSimConnector:
         face_dir = np.array([face_dir_x, face_dir_y, face_dir_z])
         up_dir = np.array([up_dir_x, up_dir_y, up_dir_z])
         left_dir = np.cross(up_dir, face_dir)
-        world_up_dir = np.array([0, 0, 1])
-        hor_left_dir = np.cross(world_up_dir, face_dir)
-        hor_left_dir /= np.linalg.norm(hor_left_dir)
+        # world_up_dir = np.array([0, 0, 1])
+        # hor_left_dir = np.cross(world_up_dir, face_dir)
+        # hor_left_dir /= np.linalg.norm(hor_left_dir)
 
-        elevation_angle = math.asin(face_dir_z)
-
-        matrix = np.array(
-            [
-                [
-                    hor_left_dir[0] ** 2 * (1 - math.cos(elevation_angle))
-                    + math.cos(elevation_angle),
-                    hor_left_dir[0] * hor_left_dir[1] * (1 - math.cos(elevation_angle))
-                    - hor_left_dir[2] * math.sin(elevation_angle),
-                    hor_left_dir[0] * hor_left_dir[2] * (1 - math.cos(elevation_angle))
-                    + hor_left_dir[1] * math.sin(elevation_angle),
-                ],
-                [
-                    hor_left_dir[1] * hor_left_dir[0] * (1 - math.cos(elevation_angle))
-                    + hor_left_dir[2] * math.sin(elevation_angle),
-                    hor_left_dir[1] ** 2 * (1 - math.cos(elevation_angle))
-                    + math.cos(elevation_angle),
-                    hor_left_dir[1] * hor_left_dir[2] * (1 - math.cos(elevation_angle))
-                    - hor_left_dir[0] * math.sin(elevation_angle),
-                ],
-                [
-                    hor_left_dir[2] * hor_left_dir[0] * (1 - math.cos(elevation_angle))
-                    - hor_left_dir[1] * math.sin(elevation_angle),
-                    hor_left_dir[2] * hor_left_dir[1] * (1 - math.cos(elevation_angle))
-                    + hor_left_dir[0] * math.sin(elevation_angle),
-                    hor_left_dir[2] ** 2 * (1 - math.cos(elevation_angle))
-                    + math.cos(elevation_angle),
-                ],
-            ]
-        )
-
-        flattened_left_dir = np.dot(matrix, left_dir)
-
-        roll = math.asin(flattened_left_dir[2])
-
-        roll = math.degrees(roll)
-
+        roll = math.degrees(math.atan2(left_dir[2], up_dir_z))
         return roll
 
     def _parse_telemetry(self, _data: str) -> TelemetryData:
@@ -197,9 +161,9 @@ class PicaSimConnector:
 
         telemetry = TelemetryData(
             time=float(_data[4]),
-            # position_x=float(_data[6]),
-            # position_y=float(_data[7]),
-            # position_z=float(_data[8]),
+            position_x=float(_data[6]),
+            position_y=float(_data[7]),
+            position_z=float(_data[8]),
             roll=roll,
             pitch=pitch,
             yaw=yaw,
