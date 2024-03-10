@@ -11,6 +11,7 @@ import asyncio as aio
 from websockets import exceptions as wssexcept
 from websockets.server import serve as wss
 from websockets.server import WebSocketServerProtocol as wssp
+import redis
 
 from io import BytesIO as bio
 import exif
@@ -44,6 +45,21 @@ class NVSServer:
 
         self.thread: threading.Thread = None
         self.loop: aio.AbstractEventLoop = None
+
+        self.lat: tuple = (0, 0.0)
+        self.lon: tuple = (0, 0.0)
+        self.alt: float = 0.0
+
+        self.redis = redis.Redis(
+            host=os.environ.get("REDIS_HOST"),
+            port=os.environ.get("REDIS_PORT"),
+            db=0,
+            decode_responses=True,
+        )
+
+        # Messages from the drone
+        self.ps_drone = self.redis.pubsub(ignore_subscribe_messages=True)
+        self.ps_drone.subscribe(**{"sensors:sim7600:gnss": self._on_gnss_update})
 
         if not Gst.init_check(None):  # init gstreamer
             self.print("GST init failed!")
@@ -165,6 +181,18 @@ class NVSServer:
                 pass
 
         return Gst.FlowReturn.OK
+
+    def _on_gnss_update(self, message) -> None:
+        if message is None:
+            return
+
+        try:
+            self.lat = message["lat"].decode()
+            self.lon = message["lon"].decode()
+            self.alt = message["alt"].decode()
+
+        finally:
+            pass
 
 
 nvss = NVSServer()

@@ -2,3 +2,4 @@ PyGObject
 websockets
 piexif
 Pillow
+redis
