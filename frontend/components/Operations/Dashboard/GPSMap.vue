@@ -377,7 +377,7 @@ const isObjectAltitudeInRange = computed(() => {
         <div class="text-black">
           <UiButton id="btn-position" class="flex items-center gap-2">
             <Goal :size="24" />
-            <span>Change objectif</span>
+            <span>Change objective</span>
           </UiButton>
         </div>
       </MapboxDefaultPopup>
