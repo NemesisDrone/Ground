@@ -70,6 +70,10 @@ class DroneSettings(BaseModel):
         null=True,
     )
 
+    altitude_objective = models.FloatField(default=0)
+    latitude_objective = models.FloatField(default=0)
+    longitude_objective = models.FloatField(default=0)
+
     def get_current_config(self):
         """
         This method is used to get the config of the drone model as a payload to send to the drone
@@ -79,6 +83,33 @@ class DroneSettings(BaseModel):
             return None
 
         return self.selected_drone_model.get_config()
+
+    def get_objectives(self):
+        """
+        This method is used to get the objectives of the drone
+        :return: The objectives
+        """
+        return {
+            "altitude": self.altitude_objective,
+            "direction": {"lat": self.latitude_objective, "lng": self.longitude_objective},
+        }
+
+    def send_objectives_to_drone(self):
+        """
+        This method is used to send the objectives to the drone
+        As to be called from django views/signal
+        """
+        import redis
+
+        r = redis.Redis(
+            host=os.environ.get("REDIS_HOST"),
+            port=os.environ.get("REDIS_PORT"),
+            decode_responses=True,
+            db=0,
+        )
+        r.publish(
+            "actions", json.dumps({"route": "config:objectives", "data": self.get_objectives()})
+        )
 
     objects = models.Manager()
 

@@ -16,6 +16,7 @@ urlpatterns = [
     path(
         "api/drone/settings/select-model/", views.update_selected_drone_settings_model
     ),
+    path("api/drone/settings/objectives/", views.update_objectives),
 ]
 
 urlpatterns += router.urls

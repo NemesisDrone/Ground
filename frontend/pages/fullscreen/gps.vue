@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GPSMap from '~/components/Operations/Dashboard/GPSMap.vue'
+
 definePageMeta({
   layout: 'sidebar'
 })
@@ -7,7 +8,7 @@ definePageMeta({
 
 <template>
   <div class="h-[100vh]">
-    <GPSMap />
+    <GPSMap enable-altitude-manipulation />
   </div>
 </template>
 

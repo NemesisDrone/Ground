@@ -54,6 +54,9 @@ class DroneSettingsSerializer(serializers.ModelSerializer):
             "id",
             "models",
             "selected_drone_model",
+            "altitude_objective",
+            "latitude_objective",
+            "longitude_objective",
         )
         read_only_fields = ("id", "models")
 

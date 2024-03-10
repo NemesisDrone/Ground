@@ -90,6 +90,13 @@ class DroneMessagesHandler:
         self._send_to_drone({"route": "config:data", "data": config})
         print("Sending config to drone")
 
+    def _send_objectives(self) -> None:
+        """
+        Send the objectives to the drone
+        """
+        objectives = DroneSettings.objects.get().get_objectives()
+        self._send_to_drone({"route": "config:objectives", "data": objectives})
+
     def _handle_message_answer(self, message: Dict) -> None:
         """
         Handle the message answer
@@ -97,6 +104,8 @@ class DroneMessagesHandler:
         match message["type"]:
             case "config:get":
                 self._send_config()
+            case "config:objectives:get":
+                self._send_objectives()
 
     def _worker(self) -> None:
         logging.info("Starting communication forwarder")
