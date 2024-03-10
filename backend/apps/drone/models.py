@@ -65,7 +65,7 @@ class DroneModelSettings(BaseModel):
 class DroneSettings(BaseModel):
     selected_drone_model = models.ForeignKey(
         "DroneModelSettings",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="drone_related_settings",
         null=True,
     )

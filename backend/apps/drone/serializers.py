@@ -39,12 +39,13 @@ class DroneSettingsSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["selected_drone_model"] = {
-            "id": data["selected_drone_model"],
-            "name": DroneModelSettings.objects.get(
-                id=data["selected_drone_model"]
-            ).name,
-        }
+        if data["selected_drone_model"]:
+            data["selected_drone_model"] = {
+                "id": data["selected_drone_model"],
+                "name": DroneModelSettings.objects.get(
+                    id=data["selected_drone_model"]
+                ).name,
+            }
         return data
 
     class Meta:

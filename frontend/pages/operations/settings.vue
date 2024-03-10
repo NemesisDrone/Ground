@@ -181,18 +181,18 @@ const updateSelectedDroneModel = async (model: LocalModel) => {
       <div class="flex mt-4 gap-4 items-center">
         <div class="flex flex-col">
           <h3 class="text-xl">Models</h3>
-          <p>
+          <p v-if="droneSettingsStore.selected_drone_model">
             Currently selected:
             {{ droneSettingsStore.selected_drone_model.name }}
           </p>
         </div>
         <UiDialog>
           <UiDialogTrigger>
-            <UiButton> Create model </UiButton>
+            <UiButton> Create model</UiButton>
           </UiDialogTrigger>
           <UiDialogContent>
             <UiDialogHeader>
-              <UiDialogTitle> Create a model </UiDialogTitle>
+              <UiDialogTitle> Create a model</UiDialogTitle>
             </UiDialogHeader>
 
             <div class="grid space-y-1">
@@ -241,7 +241,7 @@ const updateSelectedDroneModel = async (model: LocalModel) => {
             </UiTableBody>
           </UiTable>
 
-          <UiLabel class="mt-4"> FlightMode Channel </UiLabel>
+          <UiLabel class="mt-4"> FlightMode Channel</UiLabel>
           <UiInput
             class="mt-2"
             v-model="model.flight_mode_channel"
@@ -256,8 +256,9 @@ const updateSelectedDroneModel = async (model: LocalModel) => {
               Delete
             </UiButton>
             <UiButton @click="updateSelectedDroneModel(model)">
-              Select </UiButton
-            ><UiButton @click="updateDroneSettingsModel(model)">
+              Select
+            </UiButton>
+            <UiButton @click="updateDroneSettingsModel(model)">
               Save
             </UiButton>
           </div>
