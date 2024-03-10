@@ -49,7 +49,7 @@ const popupDirectionPosition = ref({
 })
 const showPopupDirection = ref(false)
 
-const localAltitudeObjective = ref(droneStore.altitudeObjective)
+const localObjectiveAltitude = ref(droneStore.objectives.altitude)
 
 /**
  * Load the map after 1.5s
@@ -243,19 +243,23 @@ const goToInitialZoom = () => {
 
 const updateDirection = () => {
   showPopupDirection.value = false
-  droneStore.droneDirectionPosition = { ...popupDirectionPosition.value }
+  droneStore.objectives.droneDirection = {
+    ...popupDirectionPosition.value
+  }
+  droneStore.updateDroneObjectives()
 }
 
 const updateAltitudeObjective = () => {
-  droneStore.altitudeObjective = localAltitudeObjective.value
+  droneStore.objectives.altitude = localObjectiveAltitude.value
+  droneStore.updateDroneObjectives()
 }
 
-const isAltitudeObjectiveInRange = computed(() => {
+const isObjectAltitudeInRange = computed(() => {
   return (
     MathUtils.clamp(
       altitude.value,
-      droneStore.altitudeObjective - 2,
-      droneStore.altitudeObjective + 2
+      droneStore.objectives.altitude - 2,
+      droneStore.objectives.altitude + 2
     ) === altitude.value
   )
 })
@@ -293,9 +297,9 @@ const isAltitudeObjectiveInRange = computed(() => {
           <Mountain :size="22" class="text-white" />
           <h3
             class="text-xl text-primary font-bold"
-            :class="{ 'text-red-600': !isAltitudeObjectiveInRange }"
+            :class="{ 'text-red-600': !isObjectAltitudeInRange }"
           >
-            {{ altitude }}/{{ droneStore.altitudeObjective }} m
+            {{ altitude }}/{{ droneStore.objectives.altitude }} m
           </h3>
         </div>
         <div class="flex mt-3 gap-2">
@@ -305,7 +309,7 @@ const isAltitudeObjectiveInRange = computed(() => {
             autocomplete="off"
             type="number"
             class="w-full"
-            v-model="localAltitudeObjective"
+            v-model="localObjectiveAltitude"
           />
           <UiButton class="scale-[0.9]" @click="updateAltitudeObjective">
             <SendHorizontal :size="18" />
@@ -380,8 +384,8 @@ const isAltitudeObjectiveInRange = computed(() => {
       <MapboxDefaultMarker
         marker-id="drone-position-objectif"
         :lnglat="[
-          droneStore.droneDirectionPosition.lng,
-          droneStore.droneDirectionPosition.lat
+          droneStore.objectives.droneDirection.lng,
+          droneStore.objectives.droneDirection.lat
         ]"
         :options="{ color: '#22C55E' }"
       />

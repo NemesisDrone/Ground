@@ -1,5 +1,4 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useComponentsStore } from '~/store/components'
 import { Model } from '~/types/droneSettings.types'
 
 interface State {
@@ -9,11 +8,13 @@ interface State {
     name: string
     id: number
   }
-  droneDirectionPosition: {
-    lat: number
-    lng: number
+  objectives: {
+    droneDirection: {
+      lat: number
+      lng: number
+    }
+    altitude: number
   }
-  altitudeObjective: number
 }
 
 export const useDroneSettingsStore = defineStore('droneSettings', {
@@ -24,24 +25,16 @@ export const useDroneSettingsStore = defineStore('droneSettings', {
       name: 'No model selected',
       id: -1
     },
-    droneDirectionPosition: {
-      lat: 0,
-      lng: 0
-    },
-    altitudeObjective: 100
+    objectives: {
+      droneDirection: {
+        lat: 0,
+        lng: 0
+      },
+      altitude: 100
+    }
   }),
 
   actions: {
-    async sendDroneConfig() {
-      const ws = useComponentsStore().communicationWebsocket
-      if (ws) {
-        ws.send({
-          route: 'config',
-          data: {}
-        })
-      }
-    },
-
     async getSettings() {
       const { data } = await useHttp().get<{
         id: number
@@ -70,6 +63,14 @@ export const useDroneSettingsStore = defineStore('droneSettings', {
 
       this.models = data.models
       this.selected_drone_model = data.selected_drone_model
+    },
+
+    async updateDroneObjectives() {
+      await useHttp().post('/api/drone/settings/objectives/', {
+        altitude_objective: this.objectives.altitude,
+        latitude_objective: this.objectives.droneDirection.lat,
+        longitude_objective: this.objectives.droneDirection.lng
+      })
     },
 
     async createDroneModel(model: Model) {

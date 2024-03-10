@@ -44,6 +44,25 @@ def update_selected_drone_settings_model(request: Request):
     return Response(serializer.data)
 
 
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def update_objectives(request: Request):
+    """
+    Update the objectives
+    """
+    drone_settings = DroneSettings.objects.first()
+
+    serializer = DroneSettingsSerializer(
+        drone_settings, data=request.data, partial=True
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    drone_settings.send_objectives_to_drone()
+
+    return Response(serializer.data)
+
+
 class DroneSettingsModelViewSet(viewsets.ModelViewSet):
     """
     This viewset is used to list all the drone settings model, and to create new ones or delete/update them.
