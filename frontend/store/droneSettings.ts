@@ -1,12 +1,17 @@
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useComponentsStore } from '~/store/components'
 import { Model } from '~/types/droneSettings.types'
+
 interface State {
   id: number
   models: Model[]
   selected_drone_model: {
     name: string
     id: number
+  }
+  droneDirectionPosition: {
+    lat: number
+    lng: number
   }
 }
 
@@ -17,6 +22,10 @@ export const useDroneSettingsStore = defineStore('droneSettings', {
     selected_drone_model: {
       name: 'No model selected',
       id: -1
+    },
+    droneDirectionPosition: {
+      lat: 0,
+      lng: 0
     }
   }),
 

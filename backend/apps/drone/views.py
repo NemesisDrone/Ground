@@ -21,6 +21,7 @@ def get_drone_settings(request: Request):
     """
     drone_settings = DroneSettings.objects.first()
     serializer = DroneSettingsSerializer(drone_settings)
+
     return Response(serializer.data)
 
 
