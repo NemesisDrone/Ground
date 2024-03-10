@@ -7,7 +7,9 @@ import {
   ScanSearch,
   Box,
   Layers2,
-  Tags
+  Tags,
+  Goal,
+  PlayCircle
 } from 'lucide-vue-next'
 import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
@@ -22,6 +24,7 @@ import {
 } from '~/helpers/mapBoxLayers'
 import { MathUtils } from 'three'
 import mapboxgl from 'mapbox-gl'
+import { useDroneSettingsStore } from '~/store/droneSettings'
 
 const sensorsStore = useSensorsStore()
 const { gpsPosition } = storeToRefs(sensorsStore)
@@ -29,7 +32,14 @@ const { gpsPosition } = storeToRefs(sensorsStore)
 const uniqueMapId = uuidv4()
 
 const mapRef = useMapboxRef('map-gps-' + uniqueMapId)
+const directionPopupRef = useMapboxPopupRef('direction-popup')
 const route = useRoute()
+
+const popupDirectionPosition = ref({
+  lat: 0,
+  lng: 0
+})
+const showPopupDirection = ref(false)
 
 /**
  * Load the map after 1.5s
@@ -179,6 +189,14 @@ watch(mapRef, () => {
     )
 
     mapRef.value?.addLayer(layerDrone, 'waterway-label')
+
+    mapRef.value?.on('click', (e) => {
+      popupDirectionPosition.value = {
+        lat: e.lngLat.lat,
+        lng: e.lngLat.lng
+      }
+      showPopupDirection.value = true
+    })
   })
 
   mapRef.value?.on('move', () => {
@@ -199,11 +217,24 @@ watch(mapRef, () => {
   })
 })
 
+watch(directionPopupRef, () => {
+  if (!directionPopupRef.value) return
+
+  // @ts-ignore _content
+  directionPopupRef.value._content.querySelector('#btn-position').onclick =
+    updateDirection
+})
 const goToInitialZoom = () => {
   if (!mapRef.value) return
   mapRef.value?.setPitch(45)
   mapRef.value?.setBearing(0)
   mapRef.value?.zoomTo(15.75)
+}
+
+const droneStore = useDroneSettingsStore()
+const updateDirection = () => {
+  showPopupDirection.value = false
+  droneStore.droneDirectionPosition = { ...popupDirectionPosition.value }
 }
 </script>
 <template>
@@ -283,6 +314,27 @@ const goToInitialZoom = () => {
       >
         <Tags :size="24" />
       </button>
+      <MapboxDefaultPopup
+        v-if="showPopupDirection"
+        popup-id="direction-popup"
+        :lnglat="[popupDirectionPosition.lng, popupDirectionPosition.lat]"
+        :options="{ closeOnClick: false }"
+      >
+        <div class="text-black">
+          <UiButton id="btn-position" class="flex items-center gap-2">
+            <Goal :size="24" />
+            <span>Change objectif</span>
+          </UiButton>
+        </div>
+      </MapboxDefaultPopup>
+      <MapboxDefaultMarker
+        marker-id="drone-position-objectif"
+        :lnglat="[
+          droneStore.droneDirectionPosition.lng,
+          droneStore.droneDirectionPosition.lat
+        ]"
+        :options="{ color: '#22C55E' }"
+      />
     </MapboxMap>
   </div>
 </template>
