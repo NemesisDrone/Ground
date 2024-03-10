@@ -13,6 +13,7 @@ interface State {
     lat: number
     lng: number
   }
+  altitudeObjective: number
 }
 
 export const useDroneSettingsStore = defineStore('droneSettings', {
@@ -26,7 +27,8 @@ export const useDroneSettingsStore = defineStore('droneSettings', {
     droneDirectionPosition: {
       lat: 0,
       lng: 0
-    }
+    },
+    altitudeObjective: 100
   }),
 
   actions: {

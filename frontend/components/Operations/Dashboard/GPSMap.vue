@@ -9,7 +9,9 @@ import {
   Layers2,
   Tags,
   Goal,
-  PlayCircle
+  PlayCircle,
+  Mountain,
+  SendHorizontal
 } from 'lucide-vue-next'
 import { useSensorsStore } from '~/store/sensors'
 import { storeToRefs } from 'pinia'
@@ -26,8 +28,14 @@ import { MathUtils } from 'three'
 import mapboxgl from 'mapbox-gl'
 import { useDroneSettingsStore } from '~/store/droneSettings'
 
+const droneStore = useDroneSettingsStore()
+
+const props = defineProps<{
+  enableAltitudeManipulation?: boolean
+}>()
+
 const sensorsStore = useSensorsStore()
-const { gpsPosition } = storeToRefs(sensorsStore)
+const { gpsPosition, altitude } = storeToRefs(sensorsStore)
 
 const uniqueMapId = uuidv4()
 
@@ -40,6 +48,8 @@ const popupDirectionPosition = ref({
   lng: 0
 })
 const showPopupDirection = ref(false)
+
+const localAltitudeObjective = ref(droneStore.altitudeObjective)
 
 /**
  * Load the map after 1.5s
@@ -231,11 +241,24 @@ const goToInitialZoom = () => {
   mapRef.value?.zoomTo(15.75)
 }
 
-const droneStore = useDroneSettingsStore()
 const updateDirection = () => {
   showPopupDirection.value = false
   droneStore.droneDirectionPosition = { ...popupDirectionPosition.value }
 }
+
+const updateAltitudeObjective = () => {
+  droneStore.altitudeObjective = localAltitudeObjective.value
+}
+
+const isAltitudeObjectiveInRange = computed(() => {
+  return (
+    MathUtils.clamp(
+      altitude.value,
+      droneStore.altitudeObjective - 2,
+      droneStore.altitudeObjective + 2
+    ) === altitude.value
+  )
+})
 </script>
 <template>
   <div class="relative h-full m-0 p-0 overflow-hidden">
@@ -262,6 +285,33 @@ const updateDirection = () => {
         attributionControl: false
       }"
     >
+      <div
+        v-if="props.enableAltitudeManipulation"
+        class="absolute top-0 left-0 z-50 bg-neutral-900 rounded p-4 mt-2.5 ml-2.5 text-primary w-[250px]"
+      >
+        <div class="flex justify-between items-center">
+          <Mountain :size="22" class="text-white" />
+          <h3
+            class="text-xl text-primary font-bold"
+            :class="{ 'text-red-600': !isAltitudeObjectiveInRange }"
+          >
+            {{ altitude }}/{{ droneStore.altitudeObjective }} m
+          </h3>
+        </div>
+        <div class="flex mt-3 gap-2">
+          <UiInput
+            id="altitude-objectif"
+            placeholder="Altitude objective"
+            autocomplete="off"
+            type="number"
+            class="w-full"
+            v-model="localAltitudeObjective"
+          />
+          <UiButton class="scale-[0.9]" @click="updateAltitudeObjective">
+            <SendHorizontal :size="18" />
+          </UiButton>
+        </div>
+      </div>
       <button
         class="absolute top-0 right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
         v-if="route.path !== '/fullscreen/gps'"
