@@ -2,7 +2,6 @@ import {WebSocketWrapper} from '~/helpers/webSocketWrapper'
 import {useComponentsStore} from '~/store/components'
 import {useSensorsStore} from '~/store/sensors'
 import {useLogsStore} from '~/store/logs'
-import {useReplayStore} from '~/store/replayStore'
 
 /**
  * Create a new WebSocketWrapper instance
@@ -13,7 +12,6 @@ export const useCommunicationWebsocket = () => {
   const droneStore = useComponentsStore()
   const sensorsStore = useSensorsStore()
   const logsStore = useLogsStore()
-  const replayStore = useReplayStore()
   const ws = new WebSocketWrapper(
     useRuntimeConfig().public.WEB_SOCKET_COMMUNICATION_URL as string
   )

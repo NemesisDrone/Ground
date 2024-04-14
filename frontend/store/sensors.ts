@@ -1,5 +1,4 @@
-import { defineStore, acceptHMRUpdate } from 'pinia'
-import { MathUtils } from 'three'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 
 export const useSensorsStore = defineStore('sensors', {
   state: () => ({
@@ -14,7 +13,8 @@ export const useSensorsStore = defineStore('sensors', {
       timestamp: 0,
       roll: 0,
       pitch: 0,
-      yaw: 90
+      yaw: 90,
+      quat: [0, 0, 0, 1]
     }
   })
 })

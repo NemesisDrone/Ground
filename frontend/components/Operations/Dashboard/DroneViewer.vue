@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { OrbitControls, GLTFModel, Sky } from '@tresjs/cientos'
-import { Euler, Matrix4, Vector3, MathUtils } from 'three'
+import { Euler, Matrix4, Vector3, MathUtils, Quaternion } from 'three'
 import { ShallowRef } from 'vue'
 import { useComponentsStore } from '~/store/components'
 import { useSensorsStore } from '~/store/sensors'
@@ -17,12 +17,14 @@ const defaultCameraLookAt = new Vector3(0, 0, 0)
 
 const droneModelAnimation = () => {
   if (droneRef.value && droneRef.value.value) {
-    droneRef.value.value.rotation.x = MathUtils.degToRad(
-      sensorStore.full.roll
+    const targetQuaternion = new Quaternion(
+      sensorStore.full.quat[2],
+      sensorStore.full.quat[1],
+      sensorStore.full.quat[3],
+      sensorStore.full.quat[0]
     )
-    droneRef.value.value.rotation.z = MathUtils.degToRad(
-      sensorStore.full.pitch
-    )
+
+    droneRef.value.value.quaternion.slerp(targetQuaternion, 1)
   }
   requestAnimationFrame(droneModelAnimation)
 }
