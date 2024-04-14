@@ -33,7 +33,7 @@ export const useCommunicationWebsocket = () => {
     sensorsStore.gpsPosition = event.data
   })
 
-  ws.onMessage('sensors:sense_hat:data', (event) => {
+  ws.onMessage('sensors:imu:data', (event) => {
     sensorsStore.full = event.data
   })
 
