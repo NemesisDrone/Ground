@@ -89,37 +89,39 @@ const demoDisarm = () => {
           <div class="flex flex-col gap-4">
             <SessionRecorderManager />
           </div>
-          <UiButton class="mt-7" @click="demoSpeed(0)">0</UiButton>
-          <UiButton class="mt-7 ml-2" @click="demoSpeed(800)"
-            >800</UiButton
-          >
-          <UiButton class="mt-7 ml-2" @click="demoSpeed(1100)"
-            >1100</UiButton
-          >
-          <UiButton class="mt-7 ml-2" @click="demoSpeed(1500)"
-            >1500</UiButton
-          >
-          <UiButton class="mt-7 ml-2" @click="demoSpeed(1800)"
-            >1800</UiButton
-          >
-          <UiButton class="mt-7 ml-2" @click="demoSpeed(2100)"
-            >2100</UiButton
-          >
-          <UiButton class="ml-2 mt-2" @click="demoSpeed(2500)">
-            2500
-          </UiButton>
-          <UiButton class="ml-2 mt-2" @click="demoCalibrate">
-            Calibrate
-          </UiButton>
-          <UiButton class="ml-2 mt-2" @click="demoArm"> Arm </UiButton>
-          <UiButton class="ml-2 mt-2" @click="demoDisarm">
-            Disarm
-          </UiButton>
-          <br />
-          {{ componentsStore.connectionStatus }}
-          <br />
-          {{ componentsStore.controller.axes }}
-          {{ sensorsStore.full }}
+          <div class="opacity-20">
+            <UiButton class="mt-7" @click="demoSpeed(0)">0</UiButton>
+            <UiButton class="mt-7 ml-2" @click="demoSpeed(800)"
+              >800</UiButton
+            >
+            <UiButton class="mt-7 ml-2" @click="demoSpeed(1100)"
+              >1100</UiButton
+            >
+            <UiButton class="mt-7 ml-2" @click="demoSpeed(1500)"
+              >1500</UiButton
+            >
+            <UiButton class="mt-7 ml-2" @click="demoSpeed(1800)"
+              >1800</UiButton
+            >
+            <UiButton class="mt-7 ml-2" @click="demoSpeed(2100)"
+              >2100</UiButton
+            >
+            <UiButton class="ml-2 mt-2" @click="demoSpeed(2500)">
+              2500
+            </UiButton>
+            <UiButton class="ml-2 mt-2" @click="demoCalibrate">
+              Calibrate
+            </UiButton>
+            <UiButton class="ml-2 mt-2" @click="demoArm"> Arm </UiButton>
+            <UiButton class="ml-2 mt-2" @click="demoDisarm">
+              Disarm
+            </UiButton>
+            <br />
+            {{ componentsStore.connectionStatus }}
+            <br />
+            {{ componentsStore.controller.axes }}
+            {{ sensorsStore.full }}
+          </div>
         </div>
       </div>
 

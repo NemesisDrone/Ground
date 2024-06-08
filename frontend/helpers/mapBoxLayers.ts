@@ -1,10 +1,10 @@
 import mapboxgl from 'mapbox-gl'
-import {useSensorsStore} from '~/store/sensors'
+import { useSensorsStore } from '~/store/sensors'
 import * as THREE from 'three'
-import {MathUtils} from 'three'
+import { MathUtils } from 'three'
 // @ts-ignore
-import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js'
-import {useReplayStore} from '~/store/replayStore'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { useReplayStore } from '~/store/replayStore'
 
 /*
 Get the mapbox layer for the drone model.
@@ -38,9 +38,9 @@ export const getMapBox3DDroneModelLayer = (
       lat: sensorStore.gpsPosition.lat,
       lng: sensorStore.gpsPosition.lng,
       altitude: sensorStore.altitude,
-      roll: sensorStore.full.roll,
-      pitch: sensorStore.full.pitch,
-      yaw: sensorStore.full.yaw
+      roll: sensorStore.imu.roll,
+      pitch: sensorStore.imu.pitch,
+      yaw: sensorStore.imu.yaw
     }
   }
 
@@ -85,8 +85,8 @@ export const getMapBox3DDroneModelLayer = (
       const modelAltitude = droneData.altitude
       const modelRotate = [
         MathUtils.degToRad(droneData.roll) + Math.PI / 2,
-        -(MathUtils.degToRad(droneData.yaw) - Math.PI / 2),
-        MathUtils.degToRad(droneData.pitch)
+        MathUtils.degToRad(droneData.yaw) + Math.PI / 2,
+        -MathUtils.degToRad(droneData.pitch)
       ]
 
       const modelAsMercatorCoordinate =

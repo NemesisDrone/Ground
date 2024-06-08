@@ -1,8 +1,8 @@
-import {WebSocketWrapper} from '~/helpers/webSocketWrapper'
-import {useComponentsStore} from '~/store/components'
-import {useSensorsStore} from '~/store/sensors'
-import {useLogsStore} from '~/store/logs'
-import {useReplayStore} from '~/store/replayStore'
+import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
+import { useComponentsStore } from '~/store/components'
+import { useSensorsStore } from '~/store/sensors'
+import { useLogsStore } from '~/store/logs'
+import { useReplayStore } from '~/store/replayStore'
 
 /**
  * Create a new WebSocketWrapper instance
@@ -33,8 +33,8 @@ export const useCommunicationWebsocket = () => {
     sensorsStore.gpsPosition = event.data
   })
 
-  ws.onMessage('sensors:sense_hat:data', (event) => {
-    sensorsStore.full = event.data
+  ws.onMessage('sensors:imu:data', (event) => {
+    sensorsStore.imu = event.data
   })
 
   ws.onMessage('log', (event) => {

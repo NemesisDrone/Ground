@@ -120,7 +120,7 @@ watch(gpsPosition, () => {
           mapRef.value,
           gpsPosition.value.lat,
           gpsPosition.value.lng,
-          sensorsStore.full.yaw
+          sensorsStore.imu.yaw
         )
       )
   }
@@ -189,7 +189,7 @@ watch(mapRef, () => {
         mapRef.value,
         gpsPosition.value.lat,
         gpsPosition.value.lng,
-        sensorsStore.full.yaw
+        sensorsStore.imu.yaw
       ) as any
     })
 
@@ -220,7 +220,7 @@ watch(mapRef, () => {
             mapRef.value,
             gpsPosition.value.lat,
             gpsPosition.value.lng,
-            sensorsStore.full.yaw
+            sensorsStore.imu.yaw
           )
         )
     } catch {}

@@ -10,11 +10,11 @@ export const useSensorsStore = defineStore('sensors', {
     },
     battery: 0,
     speed: 0,
-    full: {
-      timestamp: 0,
+    imu: {
       roll: 0,
       pitch: 0,
-      yaw: 90
+      yaw: 90,
+      quat: [] as number[]
     }
   })
 })
