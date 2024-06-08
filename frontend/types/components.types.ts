@@ -1,7 +1,7 @@
 export enum ComponentsState {
-  RUNNING = 'RUNNING',
+  STARTED = 'STARTED',
   STOPPED = 'STOPPED',
-  ERROR = 'ERROR'
+  NOT_EXPECTED = 'NOT_EXPECTED'
 }
 
 export interface DroneComponent {

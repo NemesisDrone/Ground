@@ -3,6 +3,7 @@ import { useComponentsStore } from '~/store/components'
 import { useSensorsStore } from '~/store/sensors'
 import { useLogsStore } from '~/store/logs'
 import { useReplayStore } from '~/store/replayStore'
+import { ComponentsState, DroneComponent } from '~/types/components.types'
 
 /**
  * Create a new WebSocketWrapper instance
@@ -46,6 +47,20 @@ export const useCommunicationWebsocket = () => {
     droneStore.connectionStatus = event.data
   })
   droneStore.communicationWebsocket = ws
+
+  ws.onMessage('drone:status', (event) => {
+    // Not nice, but i don't have time to refactor this
+    for (const key in event.data) {
+      // @ts-ignore
+      if (event.data[key] == 'started') {
+        // @ts-ignore
+        droneStore[key].status = ComponentsState.STARTED
+      } else {
+        // @ts-ignore
+        droneStore[key].status = ComponentsState.STOPPED
+      }
+    }
+  })
 
   const close = () => {
     ws.close()

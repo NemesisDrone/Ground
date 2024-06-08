@@ -134,7 +134,7 @@ const demoDisarm = () => {
             :component="componentsStore.gps"
             :icon="Locate"
           />
-          <ComponentStatus :component="componentsStore.servoController" />
+          <ComponentStatus :component="componentsStore.imu" />
           <ComponentStatus
             :component="componentsStore.barometer"
             :icon="Mountain"
