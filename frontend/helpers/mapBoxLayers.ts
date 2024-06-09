@@ -175,8 +175,8 @@ export const getMapBoxDroneDirectionSourceData = (
 ) => {
   const distance = 0.00015 * (Math.pow(2, 22 - (map.getZoom() || 0)) / 8)
   yaw = MathUtils.degToRad(yaw)
-  const newLng = lng + distance * Math.cos(yaw)
-  const newLat = lat + distance * Math.sin(yaw)
+  const newLng = lng - distance * Math.cos(yaw)
+  const newLat = lat - distance * Math.sin(yaw)
 
   return {
     type: 'Feature',
