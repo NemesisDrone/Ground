@@ -35,7 +35,7 @@ export const useComponentsStore = defineStore('components', {
   state: (): State => ({
     communicationWebsocket: null,
     gps: {
-      status: ComponentsState.NOT_EXPECTED,
+      status: ComponentsState.STOPPED,
       name: 'GPS',
       description: 'GPS',
       routeSlug: 'gps'
@@ -46,9 +46,10 @@ export const useComponentsStore = defineStore('components', {
       description: 'Barometer'
     },
     batteryReader: {
-      status: ComponentsState.NOT_EXPECTED,
+      status: ComponentsState.STOPPED,
       name: 'Battery',
-      description: 'Battery reader'
+      description: 'Battery reader',
+      routeSlug: 'battery'
     },
     propulsionController: {
       status: ComponentsState.NOT_EXPECTED,

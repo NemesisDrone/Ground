@@ -49,7 +49,13 @@ const popupDirectionPosition = ref({
 })
 const showPopupDirection = ref(false)
 
+const showAltitudeManipulationPopup = ref(props.enableAltitudeManipulation)
 const localObjectiveAltitude = ref(droneStore.objectives.altitude)
+
+const toggleObjectiveManipulation = () => {
+  showAltitudeManipulationPopup.value =
+    !showAltitudeManipulationPopup.value
+}
 
 /**
  * Load the map after 1.5s
@@ -290,7 +296,7 @@ const isObjectAltitudeInRange = computed(() => {
       }"
     >
       <div
-        v-if="props.enableAltitudeManipulation"
+        v-show="showAltitudeManipulationPopup"
         class="absolute top-0 left-0 z-50 bg-neutral-900 rounded p-4 mt-2.5 ml-2.5 text-primary w-[250px]"
       >
         <div class="flex justify-between items-center">
@@ -367,6 +373,13 @@ const isObjectAltitudeInRange = computed(() => {
         title="Toggle labels"
       >
         <Tags :size="24" />
+      </button>
+      <button
+        class="absolute top-[15rem] right-0 z-50 bg-neutral-900 rounded p-1.5 mt-2.5 mr-2.5 text-primary"
+        @click="toggleObjectiveManipulation"
+        title="Toggle altitude objective"
+      >
+        <Mountain :size="24" />
       </button>
       <MapboxDefaultPopup
         v-if="showPopupDirection"
