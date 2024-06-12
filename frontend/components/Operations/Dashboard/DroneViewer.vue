@@ -17,19 +17,14 @@ const defaultCameraLookAt = new Vector3(0, 0, 0)
 
 const droneModelAnimation = () => {
   if (droneRef.value && droneRef.value.value) {
-    // droneRef.value.value.rotation.x = MathUtils.degToRad(
-    //   sensorStore.imu.roll
-    // )
-    // droneRef.value.value.rotation.z = MathUtils.degToRad(
-    //   sensorStore.imu.pitch
-    // )
-    const imuQuaternion = new Quaternion(
-      sensorStore.imu.quat[2],
-      sensorStore.imu.quat[1],
-      sensorStore.imu.quat[3],
-      sensorStore.imu.quat[0]
+    const targetQuaternion = new Quaternion(
+      sensorStore.full.quat[2],
+      sensorStore.full.quat[1],
+      sensorStore.full.quat[3],
+      sensorStore.full.quat[0]
     )
-    droneRef.value.value.quaternion.copy(imuQuaternion)
+
+    droneRef.value.value.quaternion.slerp(targetQuaternion, 1)
   }
   requestAnimationFrame(droneModelAnimation)
 }
