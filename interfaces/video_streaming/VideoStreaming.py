@@ -6,8 +6,6 @@ import gi
 gi.require_version("Gst", "1.0")
 from gi.repository import GObject, Gst
 
-import redis
-
 import threading
 import asyncio as aio
 from websockets import exceptions as wssexcept
@@ -43,25 +41,9 @@ class NVSServer:
 
         self.nvs_state: int = NVSState.Unknown
         self.lastSender: wssp = None
-        self.pipeline = None
 
         self.thread: threading.Thread = None
         self.loop: aio.AbstractEventLoop = None
-
-        self.lat: float = 0.0
-        self.lon: float = 0.0
-        self.alt: float = 0.0
-
-        self.redis = redis.Redis(
-            host=os.environ.get("REDIS_HOST"),
-            port=os.environ.get("REDIS_PORT"),
-            db=0,
-            decode_responses=True,
-        )
-
-        # Messages from the drone
-        self.ps_drone = self.redis.pubsub(ignore_subscribe_messages=True)
-        self.ps_drone.subscribe(**{"sensors:sim7600:gnss": self._on_gnss_update})
 
         if not Gst.init_check(None):  # init gstreamer
             self.print("GST init failed!")
@@ -72,15 +54,12 @@ class NVSServer:
         # see https://gstreamer.freedesktop.org/documentation/tutorials/basic/debugging-tools.html
         # Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
 
-        gst_pipeline_str = f"udpsrc port={os.environ.get('NVS_UDP_PORT')} caps="
+        gst_pipeline_str = "udpsrc port=7001 caps="
         gst_pipeline_str += '"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96"'
-        gst_pipeline_str += " ! rtph264depay ! h264parse ! avdec_h264 lowres=2 ! queue leaky=2 max-size-buffers=2"
-        gst_pipeline_str += f" ! videoconvert n-threads={os.environ.get('NVS_UDP_PORT')} ! jpegenc quality={os.environ.get('NVS_JPEG_QUAL')} idct-method={os.environ.get('NVS_JPEG_IDCT')} ! appsink name=sink"
+        gst_pipeline_str += " ! rtph264depay ! h264parse ! avdec_h264 ! queue "
+        gst_pipeline_str += " ! videoconvert ! jpegenc ! appsink name=sink"
 
-        try:
-            self.pipeline = Gst.parse_launch(gst_pipeline_str)
-        except Exception as e:
-            print(f"Error during pipeline creation: {e}")
+        self.pipeline = Gst.parse_launch(gst_pipeline_str)
 
         if not self.pipeline:
             print("Could not create pipeline.")
@@ -118,16 +97,12 @@ class NVSServer:
         Stops the running loops & connections.
         This will stop the possibility to try to connect to the address too.
         """
-        prev_state = self.nvs_state
         self.set_nvs_state(NVSState.PendingStop)
         for sock in self.clients:
             sock.close()
 
-        if self.pipeline:
-            self.pipeline.set_state(Gst.State.NULL)
-            self.set_nvs_state(NVSState.Initialized)
-        else:
-            self.set_nvs_state(prev_state)
+        self.pipeline.set_state(Gst.State.NULL)
+        self.set_nvs_state(NVSState.Initialized)
 
     async def run(self) -> None:
         """
@@ -142,8 +117,7 @@ class NVSServer:
         """
         Function generating a loop, waiting for new clients to connect and handles it.
         """
-        if self.pipeline:
-            self.pipeline.set_state(Gst.State.PLAYING)
+        self.pipeline.set_state(Gst.State.PLAYING)
         print("NVS Server up and running.")
 
         while self.nvs_state != NVSState.PendingStop:
@@ -160,13 +134,11 @@ class NVSServer:
 
         try:
             while True:
-                if len(self.clients[sock]) > 0 and self.clients[sock]:
+                if len(self.clients[sock]) > 0:
                     buff = self.clients[sock].pop(0)
                     await sock.send(buff)
         except wssexcept.ConnectionClosed:
             del self.clients[sock]
-
-        print("Client disconnected")
 
     def _on_data_available(self, appsink):
         """
@@ -180,15 +152,12 @@ class NVSServer:
             try:
                 (ret, buffer_map) = gst_buffer.map(Gst.MapFlags.READ)
                 if ret:
-                    # Add EXIF data to the image.
-                    image: bio = exif.with_gps_location(bytes(buffer_map.data), self.lat, self.lon, self.alt)
-                    # Just release this frame.
-                    gst_buffer.unmap(buffer_map)
-
                     # Pending for all clients.
                     for cli in self.clients.items():
                         if True:  # Frame not scheduled as there's no more space.
-                            cli[1].append(image)
+                            cli[1].append(bytes(buffer_map.data))
+                    # Just release this frame.
+                    gst_buffer.unmap(buffer_map)
                 else:
                     self.set_nvs_state(NVSState.GstBufferFail)
 
@@ -197,21 +166,6 @@ class NVSServer:
 
         return Gst.FlowReturn.OK
 
-    def _on_gnss_update(self, message) -> None:
-        if message is None:
-            return
 
-        try:
-            lat = message["lat"].decode()
-            lon = message["lon"].decode()
-            # self.alt = message["alt"].decode() # Currently not really retrieved.
-
-            self.lat = lat[0] + lat[1]/60
-            self.lon = lon[0] + lon[1]/60
-
-        finally:
-            pass
-
-
-if __name__ == '__main__':
-    aio.run(NVSServer().run())
+nvss = NVSServer()
+aio.run(nvss.run())

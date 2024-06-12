@@ -1,4 +1,4 @@
 PyGObject
 websockets
 piexif
-redis
+Pillow

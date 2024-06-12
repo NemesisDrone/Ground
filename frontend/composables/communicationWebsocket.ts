@@ -1,7 +1,9 @@
-import {WebSocketWrapper} from '~/helpers/webSocketWrapper'
-import {useComponentsStore} from '~/store/components'
-import {useSensorsStore} from '~/store/sensors'
-import {useLogsStore} from '~/store/logs'
+import { WebSocketWrapper } from '~/helpers/webSocketWrapper'
+import { useComponentsStore } from '~/store/components'
+import { useSensorsStore } from '~/store/sensors'
+import { useLogsStore } from '~/store/logs'
+import { useReplayStore } from '~/store/replayStore'
+import { ComponentsState, DroneComponent } from '~/types/components.types'
 
 /**
  * Create a new WebSocketWrapper instance
@@ -12,6 +14,7 @@ export const useCommunicationWebsocket = () => {
   const droneStore = useComponentsStore()
   const sensorsStore = useSensorsStore()
   const logsStore = useLogsStore()
+  const replayStore = useReplayStore()
   const ws = new WebSocketWrapper(
     useRuntimeConfig().public.WEB_SOCKET_COMMUNICATION_URL as string
   )
@@ -32,7 +35,7 @@ export const useCommunicationWebsocket = () => {
   })
 
   ws.onMessage('sensors:imu:data', (event) => {
-    sensorsStore.full = event.data
+    sensorsStore.imu = event.data
   })
 
   ws.onMessage('log', (event) => {
@@ -44,6 +47,20 @@ export const useCommunicationWebsocket = () => {
     droneStore.connectionStatus = event.data
   })
   droneStore.communicationWebsocket = ws
+
+  ws.onMessage('drone:status', (event) => {
+    // Not nice, but i don't have time to refactor this
+    for (const key in event.data) {
+      // @ts-ignore
+      if (event.data[key] == 'started') {
+        // @ts-ignore
+        droneStore[key].status = ComponentsState.STARTED
+      } else {
+        // @ts-ignore
+        droneStore[key].status = ComponentsState.STOPPED
+      }
+    }
+  })
 
   const close = () => {
     ws.close()

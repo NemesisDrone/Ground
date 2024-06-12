@@ -39,7 +39,7 @@ def change_to_rational(number) -> tuple:
     return (f.numerator, f.denominator)
 
 
-def with_gps_location(data: bytes, lat: float, lng: float, alt: float) -> bio:
+def set_gps_location(data: bytes, lat: float, lng: float, alt: float, output: bio):
     """
     Adds GPS degrees position as EXIF metadata.
 
@@ -67,8 +67,4 @@ def with_gps_location(data: bytes, lat: float, lng: float, alt: float) -> bio:
 
     exif_dict = {"GPS": gps_ifd}
     exif_bytes = piexif.dump(exif_dict)
-
-    output: bio = bio()
     piexif.insert(exif_bytes, data, output)
-
-    return output

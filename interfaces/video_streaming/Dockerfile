@@ -1,11 +1,10 @@
-FROM python:3.12.4-slim-bookworm
+FROM python:3.11.6-slim-bookworm
 ENV PYTHONUNBUFFERED 1
 
 RUN useradd -m nemesis_nvs
 
 # Install required stuff.
 RUN apt update
-RUN apt upgrade -y
 RUN apt install libgstreamer1.0-0 libgirepository-1.0-1 libgirepository1.0-dev gstreamer1.0-plugins-base gobject-introspection python3-gst-1.0 python3-gi cmake libcairo2-dev python3-cairo python3-gi-cairo gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav -y
 
 # Setup paths
