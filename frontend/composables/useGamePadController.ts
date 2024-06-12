@@ -23,7 +23,7 @@ export const useGamepadController = () => {
         e.gamepad.axes.length
       )
       componentsStore.controller.controllerId = e.gamepad.index
-      componentsStore.controller.status = ComponentsState.RUNNING
+      componentsStore.controller.status = ComponentsState.STARTED
     },
     false
   )

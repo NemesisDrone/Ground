@@ -12,6 +12,7 @@ interface State {
     speed: number
   }
   servoController: DroneComponent
+  imu: DroneComponent
   communicationWebsocket: WebSocketWrapper | null
   connectionStatus: {
     connected: boolean
@@ -40,28 +41,35 @@ export const useComponentsStore = defineStore('components', {
       routeSlug: 'gps'
     },
     barometer: {
-      status: ComponentsState.STOPPED,
+      status: ComponentsState.NOT_EXPECTED,
       name: 'Barometer',
       description: 'Barometer'
     },
     batteryReader: {
       status: ComponentsState.STOPPED,
       name: 'Battery',
-      description: 'Battery reader'
+      description: 'Battery reader',
+      routeSlug: 'battery'
     },
     propulsionController: {
-      status: ComponentsState.STOPPED,
+      status: ComponentsState.NOT_EXPECTED,
       name: 'Propulsion',
       description: 'Propulsion controller',
       speed: 0
     },
     servoController: {
-      status: ComponentsState.STOPPED,
+      status: ComponentsState.NOT_EXPECTED,
       name: 'Servo',
       description: 'Servo controller'
     },
-    laserDistanceSensor: {
+    imu: {
       status: ComponentsState.STOPPED,
+      name: 'IMU',
+      description: 'Inertial measurement unit',
+      routeSlug: 'imu'
+    },
+    laserDistanceSensor: {
+      status: ComponentsState.NOT_EXPECTED,
       name: 'Laser',
       description: 'Laser distance sensor',
       routeSlug: 'laser-distance'
@@ -70,7 +78,7 @@ export const useComponentsStore = defineStore('components', {
       connected: false
     },
     controller: {
-      status: ComponentsState.STOPPED,
+      status: ComponentsState.NOT_EXPECTED,
       name: 'Controller',
       description: 'Gamepad controller',
       disableActions: true,

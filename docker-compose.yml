@@ -81,6 +81,8 @@ services:
       context: ./interfaces/video_streaming
     depends_on:
       - redis
+    env_file:
+      - backend/.env
     ports:
       - "7000:7000"
       - "7001:7001/udp"

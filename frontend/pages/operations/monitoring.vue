@@ -78,7 +78,7 @@ const downloadImage = async (image: DroneImage) => {
       </div>
     </div>
     <div class="h-1/2 w-full flex gap-4 pt-4">
-      <UiScrollArea class="w-2/3 h-full" :scroll-to-bottom="false">
+      <UiScrollArea class="w-5/6 h-full" :scroll-to-bottom="false">
         <UiOverlay :show="isImagesLoading">
           <div
             class="h-full grid grid-cols-4 gap-2 rounded-md bg-neutral-900 p-2"
@@ -99,7 +99,7 @@ const downloadImage = async (image: DroneImage) => {
                     <img
                       :src="img.url"
                       alt=""
-                      class="h-full w-full rounded-[0.12rem]"
+                      class="h-full w-full rounded-[0.12rem] object-cover"
                     />
                   </UiContextMenuTrigger>
                   <UiContextMenuContent>
@@ -155,7 +155,12 @@ const downloadImage = async (image: DroneImage) => {
           </div>
         </UiOverlay>
       </UiScrollArea>
-      <div class="w-1/3 h-full"></div>
+      <div class="w-1/6 h-full">
+        <UiButton class="w-full" @click="monitoringStore.takePicture()">
+          <CameraOff :size="24" color="#27272A" class="mr-2" />
+          Take Picture
+        </UiButton>
+      </div>
     </div>
   </div>
 </template>

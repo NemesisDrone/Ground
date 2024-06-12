@@ -41,10 +41,10 @@ const colorFromStatus = computed(() => {
     case ComponentsState.STOPPED:
       borderClass = 'border-red-600 hover:border-red-900'
       break
-    case ComponentsState.ERROR:
-      borderClass = 'border-orange-600 hover:border-orange-900'
+    case ComponentsState.NOT_EXPECTED:
+      borderClass = 'border-gray-600 '
       break
-    case ComponentsState.RUNNING:
+    case ComponentsState.STARTED:
       borderClass = 'border-green-600 hover:border-green-900'
       break
   }
@@ -59,9 +59,9 @@ const TextColorFromStatus = computed(() => {
   switch (props.component.status) {
     case ComponentsState.STOPPED:
       return 'text-red-600'
-    case ComponentsState.ERROR:
-      return 'text-orange-600'
-    case ComponentsState.RUNNING:
+    case ComponentsState.NOT_EXPECTED:
+      return 'text-gray-600'
+    case ComponentsState.STARTED:
       return 'text-green-600'
   }
 })
@@ -70,37 +70,38 @@ const IconFromStatus = computed(() => {
   switch (props.component.status) {
     case ComponentsState.STOPPED:
       return MonitorX
-    case ComponentsState.ERROR:
+    case ComponentsState.NOT_EXPECTED:
       return AlertTriangle
-    case ComponentsState.RUNNING:
+    case ComponentsState.STARTED:
       return MonitorCheck
   }
 })
 
-// watch for changes in websocket
-watch(
-  () => componentsStore.communicationWebsocket,
-  () => {
-    if (props.component.routeSlug) {
-      componentsStore.communicationWebsocket?.onMessage(
-        [
-          `state:${props.component.routeSlug}:started`,
-          `state:${props.component.routeSlug}:running`
-        ],
-        (event: any) => {
-          props.component.status = ComponentsState.RUNNING
-        }
-      )
+const isWebsocketListenerMounted = ref(false)
+const websocketListener = () => {
+  if (props.component.routeSlug && !isWebsocketListenerMounted.value) {
+    isWebsocketListenerMounted.value = true
+    componentsStore.communicationWebsocket?.onMessage(
+      [`state:${props.component.routeSlug}:started`],
+      (event: any) => {
+        props.component.status = ComponentsState.STARTED
+        console.log(event)
+      }
+    )
 
-      componentsStore.communicationWebsocket?.onMessage(
-        [`state:${props.component.routeSlug}:stopped`],
-        (event: any) => {
-          props.component.status = ComponentsState.STOPPED
-        }
-      )
-    }
+    componentsStore.communicationWebsocket?.onMessage(
+      [`state:${props.component.routeSlug}:stopped`],
+      (event: any) => {
+        props.component.status = ComponentsState.STOPPED
+        console.log(event)
+      }
+    )
   }
-)
+}
+
+// watch for changes in websocket
+watch(() => componentsStore.communicationWebsocket, websocketListener)
+onMounted(websocketListener)
 
 const startComponent = () => {
   componentsStore.communicationWebsocket?.send({
@@ -176,8 +177,8 @@ const restartComponent = () => {
             {{
               props.component.status === ComponentsState.STOPPED
                 ? 'Stopped'
-                : props.component.status === ComponentsState.ERROR
-                ? 'Error'
+                : props.component.status === ComponentsState.NOT_EXPECTED
+                ? 'Not expected'
                 : 'Running'
             }}
           </div>
@@ -193,10 +194,10 @@ const restartComponent = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger as-child>
-                <Power
+                <RotateCcw
                   :size="32"
                   class="text-primary cursor-pointer"
-                  @click="startComponent"
+                  @click="restartComponent"
                 />
               </TooltipTrigger>
               <TooltipContent>
@@ -206,10 +207,7 @@ const restartComponent = () => {
           </TooltipProvider>
         </template>
         <template
-          v-else-if="
-            props.component.status === ComponentsState.RUNNING ||
-            props.component.status === ComponentsState.ERROR
-          "
+          v-else-if="props.component.status === ComponentsState.STARTED"
         >
           <TooltipProvider>
             <Tooltip>
