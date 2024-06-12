@@ -2,9 +2,12 @@
 import { ScreenShare, XCircle } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { useSensorsStore } from '~/store/sensors'
+import { useNvsStore } from '~/store/nvs'
 
 const route = useRoute()
 const sensorsStore = useSensorsStore()
+const nvsStore = useNvsStore()
+
 
 const openInNewTab = () => {
   window.open('/fullscreen/video', '_blank')
@@ -249,31 +252,14 @@ onMounted(() => {
   let pitch = 0.0
   let roll = 0.0
 
-  let ws = new WebSocket(
-    useRuntimeConfig().public.NVS_WEB_SOCKET_URL as string
-  )
-
-  function ws_connect() {
-    ws.addEventListener("error", event => {
-      console.error("WS ERROR: ", event.message)
-      ws.close()
-      ws = null
+  useNvsWebsocket()
+  nvsStore.streamWebsocket.addEventListener('message', event => {
+    event.data.arrayBuffer().then(res => {
+      document.querySelector("#imager").src = (window.URL || window.webkitURL).createObjectURL(new Blob([new Uint8Array(res)], { type: 'image/jpeg' }))
     });
-
-    ws.addEventListener("close", event => {
-      ws.close()
-      ws = null
-    });
-
-    ws.addEventListener('message', event => {
-      event.data.arrayBuffer().then(res => {
-        document.querySelector("#imager").src = (window.URL || window.webkitURL).createObjectURL(new Blob([new Uint8Array(res)], { type: 'image/jpeg' }))
-      });
-    });
-  };
-
-  ws_connect()
+  });
 })
+
 </script>
 
 <template>
